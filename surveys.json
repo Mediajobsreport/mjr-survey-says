@@ -1,0 +1,97 @@
+{
+  "updated_at": "2026-09-08T20:00:00Z",
+  "count": 7,
+  "items": [
+    {
+      "id": "ipsos-human-food-20260828",
+      "topic": "Food & Dining",
+      "question": "What percentage of Americans say they prefer a human rather than automation to prepare their food at a restaurant?",
+      "answer": "87%",
+      "stat": "87%",
+      "context": "Ipsos found the preference for human-prepared restaurant food has grown since 2023.",
+      "talk": "Would you care if a robot prepared your meal as long as it tasted good?",
+      "source": "Ipsos Consumer Tracker",
+      "source_url": "https://www.ipsos.com/en-us/news-polls/consumer-behavior-time-covid-19",
+      "source_date": "2026-08-28",
+      "published_at": "2026-08-28"
+    },
+    {
+      "id": "pew-ai-search-20260617",
+      "topic": "Technology",
+      "question": "What percentage of U.S. adults say they use AI chatbots to search for information?",
+      "answer": "42%",
+      "stat": "42%",
+      "context": "Searching for information was the most commonly reported chatbot use in Pew's 2026 survey.",
+      "talk": "What have you stopped Googling because you now ask AI instead?",
+      "source": "Pew Research Center",
+      "source_url": "https://www.pewresearch.org/internet/2026/06/17/americans-and-ai-2026-chatbots-smart-devices-and-views-on-impact/",
+      "source_date": "2026-06-17",
+      "published_at": "2026-06-17"
+    },
+    {
+      "id": "ipsos-streaming-cancel-20260424",
+      "topic": "Entertainment",
+      "question": "What percentage of Americans said they had canceled a streaming subscription during the previous six months?",
+      "answer": "39%",
+      "stat": "39%",
+      "context": "Ipsos reported the share had risen by 10 percentage points from the prior month.",
+      "talk": "If you could keep only one streaming service, which one survives?",
+      "source": "Ipsos Consumer Tracker",
+      "source_url": "https://www.ipsos.com/en-us/latest-us-opinion-polls",
+      "source_date": "2026-04-24",
+      "published_at": "2026-04-24"
+    },
+    {
+      "id": "pew-ai-work-20260617",
+      "topic": "Work",
+      "question": "Among employed U.S. adults, what percentage say they use AI chatbots for tasks at work?",
+      "answer": "38%",
+      "stat": "38%",
+      "context": "Pew found more than a third of employed adults report using chatbots for work tasks.",
+      "talk": "What work task would you happily hand to AI forever?",
+      "source": "Pew Research Center",
+      "source_url": "https://www.pewresearch.org/internet/2026/06/17/americans-and-ai-2026-chatbots-smart-devices-and-views-on-impact/",
+      "source_date": "2026-06-17",
+      "published_at": "2026-06-17"
+    },
+    {
+      "id": "ipsos-online-discounts-20260410",
+      "topic": "Shopping",
+      "question": "What percentage of Americans agree they can get better discounts online than in stores?",
+      "answer": "71%",
+      "stat": "71%",
+      "context": "Ipsos found a strong majority believes online shopping offers better discounts.",
+      "talk": "What do you still refuse to buy online?",
+      "source": "Ipsos Consumer Tracker",
+      "source_url": "https://www.ipsos.com/en-us/latest-us-opinion-polls",
+      "source_date": "2026-04-10",
+      "published_at": "2026-04-10"
+    },
+    {
+      "id": "ipsos-fastfood-human-20260828",
+      "topic": "Food & Dining",
+      "question": "When ordering fast food, what percentage of Americans say they would rather interact with a person than an automated system?",
+      "answer": "75%",
+      "stat": "75%",
+      "context": "Three in four Americans told Ipsos they prefer human interaction when ordering fast food.",
+      "talk": "Do kiosks make ordering faster, or do they turn customers into unpaid cashiers?",
+      "source": "Ipsos Consumer Tracker",
+      "source_url": "https://www.ipsos.com/en-us/news-polls/consumer-behavior-time-covid-19",
+      "source_date": "2026-08-28",
+      "published_at": "2026-08-28"
+    },
+    {
+      "id": "ipsos-extreme-weather-finance-20260828",
+      "topic": "Money",
+      "question": "Nearly four in ten Americans say what issue is already affecting their personal finances?",
+      "answer": "Extreme weather",
+      "stat": "39%",
+      "context": "Thirty-nine percent said extreme weather is affecting their finances a great deal or a fair amount.",
+      "talk": "What weather-related expense has surprised you the most?",
+      "source": "Ipsos Consumer Tracker",
+      "source_url": "https://www.ipsos.com/en-us/news-polls/consumer-behavior-time-covid-19",
+      "source_date": "2026-08-28",
+      "published_at": "2026-08-28"
+    }
+  ]
+}
