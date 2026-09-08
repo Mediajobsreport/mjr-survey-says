@@ -4,6 +4,9 @@ const crypto = require("crypto");
 
 const OUT_JSON = path.join(process.cwd(), "docs", "surveys.json");
 const OUT_HTML = path.join(process.cwd(), "docs", "survey-says.html");
+const OUT_HTML_3 = path.join(process.cwd(), "docs", "survey-says-3.html");
+const OUT_HTML_5 = path.join(process.cwd(), "docs", "survey-says-5.html");
+const OUT_HTML_7 = path.join(process.cwd(), "docs", "survey-says-7.html");
 const SEED = path.join(process.cwd(), "data-seed.json");
 
 const SOURCES = [
@@ -177,13 +180,11 @@ function pickWidgetItems(items) {
   }
   return picked;
 }
-function buildWidgetHtml(items) {
-  const picked = pickWidgetItems(items);
+function buildWidgetHtml(items, limit = 3) {
+  const picked = pickWidgetItems(items).slice(0, limit);
   const topics = [...new Set(picked.map(x => x.topic))].sort();
   const options = topics.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("\n");
-  const cards = picked.map((item, i) => {
-    const extraClass = i >= 3 ? " mjrss-extra" : "";
-    return `<article class="mjrss-card${extraClass}" data-topic="${escapeHtml(item.topic)}">
+  const cards = picked.map((item) => `<article class="mjrss-card" data-topic="${escapeHtml(item.topic)}">
       <div class="mjrss-main">
         <div class="mjrss-meta"><span class="mjrss-topic">${escapeHtml(item.topic)}</span><span class="mjrss-date">${escapeHtml(displayDate(item.source_date || item.published_at))}</span></div>
         <p class="mjrss-question">${escapeHtml(item.question)}</p>
@@ -192,8 +193,7 @@ function buildWidgetHtml(items) {
         <div class="mjrss-source"><strong>Source:</strong> <a href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.source)}</a></div>
       </div>
       <div class="mjrss-statbox"><span class="mjrss-stat">${escapeHtml(item.stat)}</span><span class="mjrss-answerlabel">Answer</span></div>
-    </article>`;
-  }).join("\n");
+    </article>`).join("\n");
 
   return `<!doctype html>
 <html lang="en">
@@ -202,7 +202,7 @@ function buildWidgetHtml(items) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MJR Survey Says</title>
 <style>
-html,body{margin:0;padding:0;background:transparent;font-family:Roboto,Arial,sans-serif}#mjrSurveySays{--mjrss-blue:#192A56;--mjrss-ink:#172033;--mjrss-muted:#687386;--mjrss-line:#dfe5ee;--mjrss-soft:#f5f7fb;width:100%;margin:0;background:#fff;border:1px solid var(--mjrss-line);border-radius:0 0 10px 10px;overflow:hidden;color:var(--mjrss-ink);box-sizing:border-box}#mjrSurveySays,#mjrSurveySays *{box-sizing:border-box}#mjrSurveySays .mjrss-head{background:var(--mjrss-blue);color:#fff;text-align:center;padding:11px 14px 10px}#mjrSurveySays .mjrss-head h2{margin:0;color:#fff;font-size:21px;line-height:1.1;font-weight:800}#mjrSurveySays .mjrss-head p{margin:4px 0 0;color:#fff;font-size:12px;line-height:1.3;opacity:.9}#mjrSurveySays .mjrss-toolbar{padding:7px 10px;border-bottom:1px solid var(--mjrss-line);background:#fff;display:flex;justify-content:flex-start}#mjrSurveySays .mjrss-toolbar label{display:flex;gap:6px;align-items:center;font-size:11px;font-weight:700;color:var(--mjrss-blue)}#mjrSurveySays .mjrss-topicfilter{border:1px solid #cfd7e5;border-radius:6px;background:#fff;color:var(--mjrss-blue);padding:5px 8px;font:700 11px/1 Roboto,Arial,sans-serif}#mjrSurveySays .mjrss-card{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:12px;padding:10px 14px;border-bottom:1px solid var(--mjrss-line);background:#fff}#mjrSurveySays .mjrss-card:nth-child(even){background:#fafbfe}#mjrSurveySays .mjrss-extra{display:none}#mjrSurveySays .mjrss-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:4px}#mjrSurveySays .mjrss-topic{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--mjrss-blue)}#mjrSurveySays .mjrss-date{font-size:10px;color:var(--mjrss-muted)}#mjrSurveySays .mjrss-question{margin:0 0 4px;color:var(--mjrss-ink);font-size:15px;line-height:1.3;font-weight:800}#mjrSurveySays .mjrss-context,#mjrSurveySays .mjrss-talk{margin:0 0 5px;color:var(--mjrss-ink);font-size:12px;line-height:1.35}#mjrSurveySays .mjrss-source{color:var(--mjrss-muted);font-size:10.5px;line-height:1.3}#mjrSurveySays .mjrss-source a{color:var(--mjrss-blue);text-decoration:underline}#mjrSurveySays .mjrss-statbox{align-self:center;justify-self:stretch;background:var(--mjrss-soft);border:1px solid var(--mjrss-line);border-radius:8px;padding:9px 8px;text-align:center}#mjrSurveySays .mjrss-stat{display:block;color:var(--mjrss-blue);font-size:24px;line-height:1;font-weight:900}#mjrSurveySays .mjrss-answerlabel{display:block;margin-top:4px;color:var(--mjrss-muted);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}#mjrSurveySays .mjrss-controls{display:flex;justify-content:center;gap:6px;padding:8px 10px;background:#fff}#mjrSurveySays .mjrss-control{border:1px solid #cfd7e5;border-radius:6px;background:#fff;color:var(--mjrss-blue);padding:6px 10px;font:700 11px/1 Roboto,Arial,sans-serif;cursor:pointer}#mjrSurveySays .mjrss-control.active{background:var(--mjrss-blue);border-color:var(--mjrss-blue);color:#fff}@media(max-width:680px){#mjrSurveySays .mjrss-card{grid-template-columns:minmax(0,1fr) 84px;gap:8px;padding:9px 10px}#mjrSurveySays .mjrss-question{font-size:14px}#mjrSurveySays .mjrss-context,#mjrSurveySays .mjrss-talk{font-size:11.5px}#mjrSurveySays .mjrss-stat{font-size:20px}}@media(max-width:480px){#mjrSurveySays .mjrss-card{grid-template-columns:1fr}#mjrSurveySays .mjrss-statbox{justify-self:start;min-width:84px}}
+html,body{margin:0;padding:0;background:transparent;font-family:Roboto,Arial,sans-serif}#mjrSurveySays{--mjrss-blue:#192A56;--mjrss-ink:#172033;--mjrss-muted:#687386;--mjrss-line:#dfe5ee;--mjrss-soft:#f5f7fb;width:100%;margin:0;background:#fff;border:1px solid var(--mjrss-line);border-radius:0 0 10px 10px;overflow:hidden;color:var(--mjrss-ink);box-sizing:border-box}#mjrSurveySays,#mjrSurveySays *{box-sizing:border-box}#mjrSurveySays .mjrss-head{background:var(--mjrss-blue);color:#fff;text-align:center;padding:11px 14px 10px}#mjrSurveySays .mjrss-head h2{margin:0;color:#fff;font-size:21px;line-height:1.1;font-weight:800}#mjrSurveySays .mjrss-head p{margin:4px 0 0;color:#fff;font-size:12px;line-height:1.3;opacity:.9}#mjrSurveySays .mjrss-toolbar{padding:7px 10px;border-bottom:1px solid var(--mjrss-line);background:#fff;display:flex;justify-content:flex-start}#mjrSurveySays .mjrss-toolbar label{display:flex;gap:6px;align-items:center;font-size:11px;font-weight:700;color:var(--mjrss-blue)}#mjrSurveySays .mjrss-topicfilter{border:1px solid #cfd7e5;border-radius:6px;background:#fff;color:var(--mjrss-blue);padding:5px 8px;font:700 11px/1 Roboto,Arial,sans-serif}#mjrSurveySays .mjrss-card{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:12px;padding:10px 14px;border-bottom:1px solid var(--mjrss-line);background:#fff}#mjrSurveySays .mjrss-card:nth-child(even){background:#fafbfe}#mjrSurveySays .mjrss-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:4px}#mjrSurveySays .mjrss-topic{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--mjrss-blue)}#mjrSurveySays .mjrss-date{font-size:10px;color:var(--mjrss-muted)}#mjrSurveySays .mjrss-question{margin:0 0 4px;color:var(--mjrss-ink);font-size:15px;line-height:1.3;font-weight:800}#mjrSurveySays .mjrss-context,#mjrSurveySays .mjrss-talk{margin:0 0 5px;color:var(--mjrss-ink);font-size:12px;line-height:1.35}#mjrSurveySays .mjrss-source{color:var(--mjrss-muted);font-size:10.5px;line-height:1.3}#mjrSurveySays .mjrss-source a{color:var(--mjrss-blue);text-decoration:underline}#mjrSurveySays .mjrss-statbox{align-self:center;justify-self:stretch;background:var(--mjrss-soft);border:1px solid var(--mjrss-line);border-radius:8px;padding:9px 8px;text-align:center}#mjrSurveySays .mjrss-stat{display:block;color:var(--mjrss-blue);font-size:24px;line-height:1;font-weight:900}#mjrSurveySays .mjrss-answerlabel{display:block;margin-top:4px;color:var(--mjrss-muted);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}@media(max-width:680px){#mjrSurveySays .mjrss-card{grid-template-columns:minmax(0,1fr) 84px;gap:8px;padding:9px 10px}#mjrSurveySays .mjrss-question{font-size:14px}#mjrSurveySays .mjrss-context,#mjrSurveySays .mjrss-talk{font-size:11.5px}#mjrSurveySays .mjrss-stat{font-size:20px}}@media(max-width:480px){#mjrSurveySays .mjrss-card{grid-template-columns:1fr}#mjrSurveySays .mjrss-statbox{justify-self:start;min-width:84px}}
 </style>
 </head>
 <body>
@@ -210,14 +210,14 @@ html,body{margin:0;padding:0;background:transparent;font-family:Roboto,Arial,san
   <div class="mjrss-head"><h2>📊 MJR SURVEY SAYS</h2><p>Fresh, source-backed surveys and stats for on-air conversation.</p></div>
   <div class="mjrss-toolbar"><label><span>Topic</span><select class="mjrss-topicfilter" aria-label="Filter Survey Says by topic"><option value="all">All Topics</option>${options}</select></label></div>
   <div class="mjrss-cards">${cards}</div>
-  <div class="mjrss-controls"><button type="button" data-count="3" class="mjrss-control active">Show Less</button><button type="button" data-count="5" class="mjrss-control">Show 5</button><button type="button" data-count="7" class="mjrss-control">Show 7</button></div>
 </div>
 <script>
-(function(){var root=document.getElementById("mjrSurveySays");if(!root)return;var controls=root.querySelectorAll(".mjrss-control");var filter=root.querySelector(".mjrss-topicfilter");var cards=root.querySelectorAll(".mjrss-card");var count=3;function update(){var topic=filter.value;var shown=0;cards.forEach(function(card){var match=(topic==="all"||card.getAttribute("data-topic")===topic);var visible=match&&shown<count;card.style.display=visible?"grid":"none";if(visible)shown++;});controls.forEach(function(btn){btn.classList.toggle("active",Number(btn.getAttribute("data-count"))===count);});}controls.forEach(function(btn){btn.addEventListener("click",function(){count=Number(btn.getAttribute("data-count"));update();});});filter.addEventListener("change",update);update();})();
+(function(){var root=document.getElementById("mjrSurveySays");if(!root)return;var filter=root.querySelector(".mjrss-topicfilter");var cards=root.querySelectorAll(".mjrss-card");function update(){var topic=filter.value;cards.forEach(function(card){card.style.display=(topic==="all"||card.getAttribute("data-topic")===topic)?"grid":"none";});}filter.addEventListener("change",update);update();})();
 </script>
 </body>
 </html>`;
 }
+
 async function fetchText(url) {
   const r = await fetch(url, {headers: {"user-agent":"MediaJobsReport-SurveySays/1.1 (+https://www.mediajobsreport.com/)"}, redirect:"follow"});
   if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
@@ -259,7 +259,10 @@ async function fetchText(url) {
   const payload = {updated_at: new Date().toISOString(), count: items.length, items};
   fs.mkdirSync(path.dirname(OUT_JSON), {recursive:true});
   fs.writeFileSync(OUT_JSON, JSON.stringify(payload, null, 2) + "\n");
-  fs.writeFileSync(OUT_HTML, buildWidgetHtml(items));
+  fs.writeFileSync(OUT_HTML_3, buildWidgetHtml(items, 3));
+  fs.writeFileSync(OUT_HTML_5, buildWidgetHtml(items, 5));
+  fs.writeFileSync(OUT_HTML_7, buildWidgetHtml(items, 7));
+  fs.writeFileSync(OUT_HTML, buildWidgetHtml(items, 3));
   console.log(`Published ${items.length} Survey Says items (${discovered.length} discovered this run).`);
-  console.log(`Static widget: ${OUT_HTML}`);
+  console.log(`Static widgets: 3 / 5 / 7 generated in docs/`);
 })().catch(err => { console.error(err); process.exit(1); });
