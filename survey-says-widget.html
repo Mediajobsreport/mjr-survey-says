@@ -1,0 +1,378 @@
+<!-- MJR SURVEY SAYS - PREP FULL-WIDTH COMPACT -->
+<div id="mjrSurveySays">
+  <div class="mjrss-head">
+    <h2>MJR SURVEY SAYS</h2>
+    <p>Fresh, source-backed surveys and stats for on-air conversation.</p>
+  </div>
+
+  <div class="mjrss-cards"></div>
+
+  <div class="mjrss-controls">
+    <select class="mjrss-topicfilter" aria-label="Filter Survey Says by topic">
+      <option value="all">All Topics</option>
+    </select>
+    <button type="button" data-count="3" class="mjrss-control active">Show Less</button>
+    <button type="button" data-count="5" class="mjrss-control">Show 5</button>
+    <button type="button" data-count="7" class="mjrss-control">Show 7</button>
+  </div>
+</div>
+
+<style>
+#mjrSurveySays{
+  --mjrss-blue:#192A56;
+  --mjrss-ink:#172033;
+  --mjrss-muted:#687386;
+  --mjrss-line:#dfe5ee;
+  --mjrss-soft:#f5f7fb;
+  width:100%;
+  max-width:none;
+  margin:0;
+  background:#fff;
+  border:1px solid var(--mjrss-line);
+  border-radius:0 0 10px 10px;
+  overflow:hidden;
+  color:var(--mjrss-ink);
+  font-family:Roboto,Arial,sans-serif;
+  box-sizing:border-box;
+}
+#mjrSurveySays,
+#mjrSurveySays *{
+  box-sizing:border-box;
+}
+#mjrSurveySays .mjrss-head{
+  background:var(--mjrss-blue);
+  color:#fff;
+  text-align:center;
+  padding:11px 14px 10px;
+}
+#mjrSurveySays .mjrss-head h2{
+  margin:0;
+  color:#fff;
+  font-size:21px;
+  line-height:1.1;
+  font-weight:800;
+}
+#mjrSurveySays .mjrss-head p{
+  margin:4px 0 0;
+  color:#fff;
+  font-size:12px;
+  line-height:1.3;
+  opacity:.9;
+}
+#mjrSurveySays .mjrss-cards{
+  display:block;
+  width:100%;
+  background:#fff;
+}
+#mjrSurveySays .mjrss-card{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 110px;
+  gap:12px;
+  padding:10px 14px;
+  border-bottom:1px solid var(--mjrss-line);
+  background:#fff;
+}
+#mjrSurveySays .mjrss-card:nth-child(even){
+  background:#fafbfe;
+}
+#mjrSurveySays .mjrss-main{
+  min-width:0;
+}
+#mjrSurveySays .mjrss-meta{
+  display:flex;
+  gap:7px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-bottom:4px;
+}
+#mjrSurveySays .mjrss-topic{
+  display:inline-block;
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--mjrss-blue);
+}
+#mjrSurveySays .mjrss-date{
+  font-size:10px;
+  color:var(--mjrss-muted);
+}
+#mjrSurveySays .mjrss-question{
+  margin:0 0 4px;
+  color:var(--mjrss-ink);
+  font-size:15px;
+  line-height:1.3;
+  font-weight:800;
+}
+#mjrSurveySays .mjrss-context{
+  margin:0 0 5px;
+  color:var(--mjrss-ink);
+  font-size:12px;
+  line-height:1.35;
+}
+#mjrSurveySays .mjrss-talk{
+  margin:0 0 4px;
+  color:var(--mjrss-ink);
+  font-size:12px;
+  line-height:1.35;
+}
+#mjrSurveySays .mjrss-source{
+  color:var(--mjrss-muted);
+  font-size:10.5px;
+  line-height:1.3;
+}
+#mjrSurveySays .mjrss-source a{
+  color:var(--mjrss-blue);
+  text-decoration:underline;
+}
+#mjrSurveySays .mjrss-statbox{
+  align-self:center;
+  justify-self:stretch;
+  background:var(--mjrss-soft);
+  border:1px solid var(--mjrss-line);
+  border-radius:8px;
+  padding:9px 8px;
+  text-align:center;
+}
+#mjrSurveySays .mjrss-stat{
+  display:block;
+  color:var(--mjrss-blue);
+  font-size:24px;
+  line-height:1;
+  font-weight:900;
+}
+#mjrSurveySays .mjrss-answerlabel{
+  display:block;
+  margin-top:4px;
+  color:var(--mjrss-muted);
+  font-size:9px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+#mjrSurveySays .mjrss-controls{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  padding:8px 10px;
+  background:#fff;
+}
+#mjrSurveySays .mjrss-topicfilter{
+  border:1px solid #cfd7e5;
+  border-radius:6px;
+  background:#fff;
+  color:var(--mjrss-blue);
+  padding:6px 9px;
+  font:700 11px/1 Roboto,Arial,sans-serif;
+  min-height:29px;
+}
+#mjrSurveySays .mjrss-control{
+  border:1px solid #cfd7e5;
+  border-radius:6px;
+  background:#fff;
+  color:var(--mjrss-blue);
+  padding:6px 10px;
+  font:700 11px/1 Roboto,Arial,sans-serif;
+  cursor:pointer;
+}
+#mjrSurveySays .mjrss-control.active{
+  background:var(--mjrss-blue);
+  border-color:var(--mjrss-blue);
+  color:#fff;
+}
+@media(max-width:680px){
+  #mjrSurveySays .mjrss-card{
+    grid-template-columns:minmax(0,1fr) 84px;
+    gap:8px;
+    padding:9px 10px;
+  }
+  #mjrSurveySays .mjrss-question{font-size:14px}
+  #mjrSurveySays .mjrss-context,
+  #mjrSurveySays .mjrss-talk{font-size:11.5px}
+  #mjrSurveySays .mjrss-stat{font-size:20px}
+}
+@media(max-width:480px){
+  #mjrSurveySays .mjrss-card{
+    grid-template-columns:1fr;
+  }
+  #mjrSurveySays .mjrss-statbox{
+    justify-self:start;
+    min-width:84px;
+  }
+}
+</style>
+
+<script>
+(function(){
+  const root = document.getElementById("mjrSurveySays");
+  if (!root) return;
+
+  const DATA_URL = "https://mediajobsreport.github.io/mjr-survey-says/surveys.json";
+
+  const fallbackItems = [
+    {
+      topic:"Food & Dining",
+      question:"What percentage of Americans say they prefer a human — rather than automation — to prepare their food at a restaurant?",
+      answer:"87%",
+      stat:"87%",
+      context:"Ipsos found the preference for human-prepared restaurant food has grown since 2023.",
+      talk:"Would you care if a robot prepared your meal as long as it tasted good?",
+      source:"Ipsos Consumer Tracker",
+      source_url:"https://www.ipsos.com/en-us/news-polls/consumer-behavior-time-covid-19",
+      source_date:"Aug. 28, 2026"
+    },
+    {
+      topic:"Technology",
+      question:"What percentage of U.S. adults say they use AI chatbots to search for information?",
+      answer:"42%",
+      stat:"42%",
+      context:"Searching for information was the most commonly reported chatbot use in Pew's 2026 survey.",
+      talk:"What have you stopped Googling because you now ask AI instead?",
+      source:"Pew Research Center",
+      source_url:"https://www.pewresearch.org/internet/2026/06/17/americans-and-ai-2026-chatbots-smart-devices-and-views-on-impact/",
+      source_date:"June 17, 2026"
+    },
+    {
+      topic:"Entertainment",
+      question:"What percentage of Americans said they had canceled a streaming subscription during the previous six months?",
+      answer:"39%",
+      stat:"39%",
+      context:"Ipsos reported the share had risen by 10 percentage points from the prior month.",
+      talk:"If you could keep only one streaming service, which one survives?",
+      source:"Ipsos Consumer Tracker",
+      source_url:"https://www.ipsos.com/en-us/latest-us-opinion-polls",
+      source_date:"Apr. 24, 2026"
+    },
+    {
+      topic:"Work",
+      question:"Among employed U.S. adults, what percentage say they use AI chatbots for tasks at work?",
+      answer:"38%",
+      stat:"38%",
+      context:"Pew found more than a third of employed adults report using chatbots for work tasks.",
+      talk:"What work task would you happily hand to AI forever?",
+      source:"Pew Research Center",
+      source_url:"https://www.pewresearch.org/internet/2026/06/17/americans-and-ai-2026-chatbots-smart-devices-and-views-on-impact/",
+      source_date:"June 17, 2026"
+    },
+    {
+      topic:"Shopping",
+      question:"What percentage of Americans agree they can get better discounts online than in stores?",
+      answer:"71%",
+      stat:"71%",
+      context:"Ipsos found a strong majority believes online shopping offers better discounts.",
+      talk:"What do you still refuse to buy online?",
+      source:"Ipsos Consumer Tracker",
+      source_url:"https://www.ipsos.com/en-us/latest-us-opinion-polls",
+      source_date:"Apr. 10, 2026"
+    },
+    {
+      topic:"Food & Dining",
+      question:"When ordering fast food, what percentage of Americans say they would rather interact with a person than an automated system?",
+      answer:"75%",
+      stat:"75%",
+      context:"Three in four Americans told Ipsos they prefer human interaction when ordering fast food.",
+      talk:"Do kiosks make ordering faster, or do they turn customers into unpaid cashiers?",
+      source:"Ipsos Consumer Tracker",
+      source_url:"https://www.ipsos.com/en-us/news-polls/consumer-behavior-time-covid-19",
+      source_date:"Aug. 28, 2026"
+    },
+    {
+      topic:"Money",
+      question:"Nearly four in ten Americans say what issue is already affecting their personal finances?",
+      answer:"Extreme weather",
+      stat:"39%",
+      context:"Thirty-nine percent said extreme weather is affecting their finances a great deal or a fair amount.",
+      talk:"What weather-related expense has surprised you the most?",
+      source:"Ipsos Consumer Tracker",
+      source_url:"https://www.ipsos.com/en-us/news-polls/consumer-behavior-time-covid-19",
+      source_date:"Aug. 28, 2026"
+    }
+  ];
+
+  let items = fallbackItems.slice();
+
+  let visibleCount = 3;
+  const cards = root.querySelector(".mjrss-cards");
+  const controls = root.querySelectorAll(".mjrss-control");
+  const topicFilter = root.querySelector(".mjrss-topicfilter");
+
+  function esc(value){
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function(ch){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch];
+    });
+  }
+
+  function render(){
+    const topic = topicFilter.value;
+    const filtered = topic === "all" ? items : items.filter(function(item){
+      return item.topic === topic;
+    });
+
+    cards.innerHTML = filtered.slice(0, visibleCount).map(function(item){
+      return `
+        <article class="mjrss-card">
+          <div class="mjrss-main">
+            <div class="mjrss-meta">
+              <span class="mjrss-topic">${esc(item.topic)}</span>
+              <span class="mjrss-date">${esc(item.source_date)}</span>
+            </div>
+            <p class="mjrss-question">${esc(item.question)}</p>
+            <p class="mjrss-context"><strong>Answer:</strong> ${esc(item.answer)} — ${esc(item.context)}</p>
+            <p class="mjrss-talk"><strong>Talk About It:</strong> ${esc(item.talk)}</p>
+            <div class="mjrss-source"><strong>Source:</strong> <a href="${esc(item.source_url)}" target="_blank" rel="noopener noreferrer">${esc(item.source)}</a></div>
+          </div>
+          <div class="mjrss-statbox">
+            <span class="mjrss-stat">${esc(item.stat)}</span>
+            <span class="mjrss-answerlabel">Answer</span>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    controls.forEach(function(btn){
+      btn.classList.toggle("active", Number(btn.dataset.count) === visibleCount);
+    });
+  }
+
+  function buildTopics(){
+    const topics = [];
+    items.forEach(function(item){
+      if (item.topic && topics.indexOf(item.topic) === -1) topics.push(item.topic);
+    });
+    topics.sort().forEach(function(topic){
+      const option = document.createElement("option");
+      option.value = topic;
+      option.textContent = topic;
+      topicFilter.appendChild(option);
+    });
+  }
+
+  controls.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      visibleCount = Number(btn.dataset.count);
+      render();
+    });
+  });
+
+  topicFilter.addEventListener("change", render);
+
+  async function loadFeed(){
+    try{
+      const r = await fetch(DATA_URL + "?v=" + Date.now(), {cache:"no-store"});
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const payload = await r.json();
+      const loaded = Array.isArray(payload) ? payload : payload.items;
+      if (Array.isArray(loaded) && loaded.length) items = loaded;
+    }catch(err){
+      console.warn("MJR Survey Says feed unavailable; using built-in fallback.", err);
+    }
+
+    // Rebuild topic choices after remote data arrives.
+    while (topicFilter.options.length > 1) topicFilter.remove(1);
+    buildTopics();
+    render();
+  }
+
+  loadFeed();
+})();
+</script>
