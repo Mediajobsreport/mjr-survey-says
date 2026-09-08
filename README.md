@@ -1,52 +1,41 @@
 # MJR Survey Says
 
-Automatic source-backed survey/stat feed for the MJR Radio Prep page.
+Automated source-backed survey/statistics feed for **📊 MJR SURVEY SAYS** in MJR Radio Prep.
 
 ## What it does
 
-- Runs every day with GitHub Actions.
 - Reads the official Pew Research Center publications RSS feed.
-- Looks for usable percentage-based findings in RSS excerpts.
-- Converts qualifying findings into concise "guess the number" questions.
-- Keeps a rolling pool and deduplicates old items.
-- Publishes `docs/surveys.json`.
-- The Prep widget loads the JSON automatically, shows 3 items by default, and can expand to 5 or 7.
-- If the feed is temporarily unavailable, the widget uses its built-in fallback items.
+- Rejects obvious political material for the Prep widget.
+- Extracts percentage-based survey findings.
+- Keeps a rolling, de-duplicated pool in `docs/surveys.json`.
+- Generates a complete static widget page at `docs/survey-says.html`.
+- Shows 3 items by default with 5/7 expansion and topic filtering.
+- Runs automatically each day through GitHub Actions.
 
-## GitHub setup
+## GitHub Pages
 
-1. Create a public GitHub repository named `mjr-survey-says`.
-2. Upload the contents of this folder to the repository root.
-3. In GitHub: **Settings → Pages**.
-4. Set **Deploy from a branch**.
-5. Branch: `main`; Folder: `/docs`.
-6. Save.
-7. Open **Actions → Build MJR Survey Says → Run workflow** once.
+Pages should publish from the `main` branch `/docs` folder.
 
-Expected feed URL:
+Expected URLs:
 
-`https://mediajobsreport.github.io/mjr-survey-says/surveys.json`
+- JSON: `https://mediajobsreport.github.io/mjr-survey-says/surveys.json`
+- Static widget: `https://mediajobsreport.github.io/mjr-survey-says/survey-says.html`
 
-The included widget already points to that URL.
+## Recommended Prep embed
 
-## Daily schedule
+Because the Prep editor did not reliably run remote-data JavaScript, use the generated static widget as an iframe:
 
-The workflow is scheduled for 08:15 UTC daily, before the normal MJR Prep production window.
+```html
+<iframe
+  src="https://mediajobsreport.github.io/mjr-survey-says/survey-says.html"
+  title="MJR Survey Says"
+  loading="lazy"
+  style="width:100%;height:720px;border:0;display:block;"
+></iframe>
+```
+
+The iframe loads a fully rendered HTML document; it does not require the Prep page itself to fetch JSON.
 
 ## Source policy
 
-The first automatic adapter uses Pew Research Center's official RSS feed. It does not spider or scrape Pew article pages. Each displayed item links to the original source.
-
-The project is intentionally adapter-based so other survey publishers can be added later when we identify an appropriate RSS/API/licensed source.
-
-## Important editorial note
-
-The automated generator is deliberately conservative. It only creates items when an RSS excerpt contains a clear numeric percentage. This avoids inventing survey results. Keep the source link visible in the widget.
-
-## Files
-
-- `.github/workflows/build-surveys.yml` — daily automation
-- `scripts/build-surveys.js` — feed builder
-- `data-seed.json` — fallback/seed items
-- `docs/surveys.json` — published feed
-- `survey-says-widget.html` — Prep embed
+Initial automation uses only Pew Research Center's official RSS feed. It does not scrape Pew article pages. Additional sources should be added only when their API/RSS/licensing permits automated use.
