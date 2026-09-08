@@ -3,7 +3,7 @@ name: Build MJR Survey Says
 on:
   workflow_dispatch:
   schedule:
-    # Runs before the MJR Prep production window every day.
+    # 08:15 UTC daily. During EDT this is 4:15 a.m. ET.
     - cron: "15 8 * * *"
 
 permissions:
@@ -21,17 +21,17 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build Survey Says feed
+      - name: Build Survey Says feed and widget
         run: npm run build
 
-      - name: Commit updated feed
+      - name: Commit updated Survey Says files
         run: |
           git config user.name "mjr-survey-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/surveys.json
+          git add docs/surveys.json docs/survey-says.html
           if git diff --cached --quiet; then
             echo "No changes."
           else
-            git commit -m "Update Survey Says feed"
+            git commit -m "Update Survey Says"
             git push
           fi
