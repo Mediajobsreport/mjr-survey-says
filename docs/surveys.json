@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-09-09T16:13:43.970Z",
-  "count": 46,
+  "updated_at": "2026-09-09T16:21:54.192Z",
+  "count": 42,
   "items": [
     {
       "id": "a5a0027251a14974",
@@ -113,20 +113,6 @@
       "published_at": "2026-08-28"
     },
     {
-      "id": "59bcf23211924f31",
-      "topic": "Life & Culture",
-      "question": "what percentage are already use donor-advised funds?",
-      "answer": "42%",
-      "stat": "42%",
-      "context": "Finding: 42% are already using donor-advised funds.",
-      "talk": "Does this number surprise you, or does it sound about right?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/america-this-week-august-20-2026/",
-      "source_date": "2026-08-21",
-      "published_at": "2026-08-21",
-      "auto_generated": true
-    },
-    {
       "id": "b2b732a0a79d2860",
       "topic": "Money",
       "question": "What percentage of Gen Z adults skip weekend plans to save money?",
@@ -183,48 +169,6 @@
       "auto_generated": true
     },
     {
-      "id": "759d17bf122e7f04",
-      "topic": "Technology",
-      "question": "what percentage say they’d grow skeptical if an AI tool mostly pushed premium or expensive products?",
-      "answer": "74%",
-      "stat": "74%",
-      "context": "Finding: 74% say they’d grow skeptical if an AI tool mostly pushed premium or expensive products.",
-      "talk": "What everyday task are you most willing to hand over to AI?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/what-do-shoppers-really-want-from-ai/",
-      "source_date": "2026-07-31",
-      "published_at": "2026-07-31",
-      "auto_generated": true
-    },
-    {
-      "id": "3ab629d937ef7dbd",
-      "topic": "Technology",
-      "question": "what percentage say AI recommendations would feel more trustworthy if they showed both pros and cons?",
-      "answer": "31%",
-      "stat": "31%",
-      "context": "Finding: 31% say AI recommendations would feel more trustworthy if they showed both pros and cons.",
-      "talk": "What everyday task are you most willing to hand over to AI?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/what-do-shoppers-really-want-from-ai/",
-      "source_date": "2026-07-31",
-      "published_at": "2026-07-31",
-      "auto_generated": true
-    },
-    {
-      "id": "b3b92bbdcac8f4d7",
-      "topic": "Technology",
-      "question": "what percentage want a clear explanation of why a product was recommended?",
-      "answer": "29%",
-      "stat": "29%",
-      "context": "Finding: 29% want a clear explanation of why a product was recommended.",
-      "talk": "Would this number be higher or lower among your friends and coworkers?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/what-do-shoppers-really-want-from-ai/",
-      "source_date": "2026-07-31",
-      "published_at": "2026-07-31",
-      "auto_generated": true
-    },
-    {
       "id": "ff34d028371a7562",
       "topic": "Technology",
       "question": "What percentage of global consumers say AI platforms should be required to disclose whether a recommendation was paid for or sponsored?",
@@ -246,6 +190,20 @@
       "stat": "72%",
       "context": "Finding: 72% of consumers are comfortable with AI-assisted shopping, provided they retain the final decision.",
       "talk": "What everyday task are you most willing to hand over to AI?",
+      "source": "The Harris Poll",
+      "source_url": "https://theharrispoll.com/articles/what-do-shoppers-really-want-from-ai/",
+      "source_date": "2026-07-31",
+      "published_at": "2026-07-31",
+      "auto_generated": true
+    },
+    {
+      "id": "b3b92bbdcac8f4d7",
+      "topic": "Technology",
+      "question": "what percentage want a clear explanation of why a product was recommended?",
+      "answer": "29%",
+      "stat": "29%",
+      "context": "Finding: 29% want a clear explanation of why a product was recommended.",
+      "talk": "Would this number be higher or lower among your friends and coworkers?",
       "source": "The Harris Poll",
       "source_url": "https://theharrispoll.com/articles/what-do-shoppers-really-want-from-ai/",
       "source_date": "2026-07-31",
@@ -288,20 +246,6 @@
       "stat": "71%",
       "context": "Finding: 71% of consumers say physical experiences deepen their connection to a brand .",
       "talk": "What purchase or shopping habit have you changed the most lately?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/what-we-learned-at-cannes-lions-2026/",
-      "source_date": "2026-07-13",
-      "published_at": "2026-07-13",
-      "auto_generated": true
-    },
-    {
-      "id": "0a767bcab112af4c",
-      "topic": "Life & Culture",
-      "question": "what percentage say it makes ads feel less authentic?",
-      "answer": "78%",
-      "stat": "78%",
-      "context": "Finding: 78% say it makes ads feel less authentic.",
-      "talk": "Does this number surprise you, or does it sound about right?",
       "source": "The Harris Poll",
       "source_url": "https://theharrispoll.com/articles/what-we-learned-at-cannes-lions-2026/",
       "source_date": "2026-07-13",
