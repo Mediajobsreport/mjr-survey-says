@@ -59,3 +59,11 @@ The builder keeps up to 90 usable survey items for up to 180 days, while the pub
 
 ### Talker ratio support (v1.2)
 The Talker adapter now recognizes both percentage findings and common survey ratios such as `2 in 3`, `4 in 5`, `one in three`, and `four in five`. It also checks the RSS headline because Talker frequently places the strongest finding there.
+
+
+## Daily rotation (v1.3)
+The builder now keeps `mjr-survey-rotation.json` with the IDs shown during recent runs. Each daily build prefers findings that have not appeared during the previous 7 days, then fills remaining slots from the rolling pool. It also favors topic variety before repeating a topic. The 3- and 5-item widgets are always subsets of the same 7-item daily selection.
+
+
+## Source visibility and Talker priority (v1.4)
+The build log now reports how many usable findings were discovered from each source. If the rolling pool contains a usable Talker Research item, the daily selector places one Talker item in the default 3-item view before filling the remaining slots by freshness and topic variety. The log also reports the source mix for the default 3 and full 7 selections.
