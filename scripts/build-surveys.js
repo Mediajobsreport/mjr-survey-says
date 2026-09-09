@@ -60,14 +60,21 @@ const SOURCES = [
 
 const MAX_POOL = 140;
 const MAX_AGE_DAYS = 180;
+const AP_NORC_MAX_AGE_DAYS = 365;
 
-function maxAgeDaysForSource(source) {
-  return source === "AP-NORC Center" ? 365 : MAX_AGE_DAYS;
-}
+const ROTATION_STATE = path.join(
+  process.cwd(),
+  "mjr-survey-rotation.json"
+);
 
-const ROTATION_STATE = path.join(process.cwd(), "mjr-survey-rotation.json");
 const RECENT_SHOWN_DAYS = 7;
 const MAX_WIDGET_ITEMS = 7;
+
+function maxAgeDaysForSource(source) {
+  return source === "AP-NORC Center"
+    ? AP_NORC_MAX_AGE_DAYS
+    : MAX_AGE_DAYS;
+}
 
 function decodeXml(s = "") {
   return s
@@ -104,6 +111,7 @@ function tag(block, name) {
       "i"
     )
   );
+
   return m ? stripHtml(m[1]) : "";
 }
 
@@ -119,7 +127,8 @@ function tags(block, name) {
 }
 
 function parseRss(xml) {
-  const blocks = xml.match(/<item\b[\s\S]*?<\/item>/gi) || [];
+  const blocks =
+    xml.match(/<item\b[\s\S]*?<\/item>/gi) || [];
 
   return blocks.map(b => ({
     title: tag(b, "title"),
@@ -127,7 +136,9 @@ function parseRss(xml) {
     date: tag(b, "pubDate"),
     description: tag(b, "description"),
     content: tag(b, "content:encoded"),
-    creator: tag(b, "dc:creator") || tag(b, "author"),
+    creator:
+      tag(b, "dc:creator") ||
+      tag(b, "author"),
     categories: tags(b, "category")
   }));
 }
@@ -149,7 +160,11 @@ function sentences(text = "") {
     .replace(/\s+/g, " ")
     .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
     .map(s => s.trim())
-    .filter(s => s.length >= 35 && s.length <= 330);
+    .filter(
+      s =>
+        s.length >= 35 &&
+        s.length <= 330
+    );
 }
 
 function inferTopic(text = "") {
@@ -191,7 +206,9 @@ function inferTopic(text = "") {
   ];
 
   for (const [name, re] of rules) {
-    if (re.test(t)) return name;
+    if (re.test(t)) {
+      return name;
+    }
   }
 
   return "Life & Culture";
@@ -207,70 +224,161 @@ function talkFor(topic) {
   const prompts = {
     Technology:
       "Would this number be higher or lower among your friends and coworkers?",
+
     Entertainment:
       "Does this match your own viewing, listening or entertainment habits?",
+
     Money:
       "Where do you see this showing up most in your own budget?",
+
     Work:
       "Does this sound like your workplace, or is your experience completely different?",
+
     Shopping:
       "What purchase or shopping habit have you changed the most lately?",
+
     "Food & Dining":
       "Does this match the way you eat, order or dine out?",
+
     "Family & Life":
       "Would your family or friends agree with this finding?",
+
     Health:
       "Has this changed the way you think about your own health choices?",
+
     "Life & Culture":
       "Does this number surprise you, or does it sound about right?"
   };
 
-  return prompts[topic] || prompts["Life & Culture"];
+  return (
+    prompts[topic] ||
+    prompts["Life & Culture"]
+  );
 }
 
 function makeQuestion(sentence, stat) {
-  let s = sentence.replace(/\s+/g, " ").trim();
+  let s = sentence
+    .replace(/\s+/g, " ")
+    .trim();
 
-  if (/\bin\b/i.test(stat) && !stat.includes("%")) {
+  /*
+   * RATIO QUESTIONS
+   *
+   * Examples:
+   * "3 in 10 donated between $51 and $100."
+   * "Another 3 in 10 donated between $51 and $100."
+   * "Nearly 2 in 3 Americans use..."
+   *
+   * We want:
+   * "How many donated between $51 and $100?"
+   */
+
+  if (
+    /\bin\b/i.test(stat) &&
+    !stat.includes("%")
+  ) {
     const escaped = stat.replace(
       /[.*+?^${}()|[\]\\]/g,
       "\\$&"
     );
 
+    /*
+     * Remove transition/qualifier words before
+     * the ratio so they don't become part of
+     * the generated question.
+     */
     let cleaned = s.replace(
-      /^(only|nearly|about|roughly|almost)\s+/i,
+      /^(another|about|around|roughly|nearly|almost|approximately|only|just|more than|less than)\s+/i,
       ""
     );
 
-    if (new RegExp(`^${escaped}\\s+`, "i").test(cleaned)) {
+    /*
+     * Ratio begins the sentence.
+     *
+     * "3 in 10 donated between $51 and $100."
+     *
+     * becomes:
+     *
+     * "How many donated between $51 and $100?"
+     */
+    if (
+      new RegExp(
+        `^${escaped}\\s+`,
+        "i"
+      ).test(cleaned)
+    ) {
       let tail = cleaned
-        .replace(new RegExp(`^${escaped}\\s+`, "i"), "")
-        .replace(/[.!]+$/, "");
+        .replace(
+          new RegExp(
+            `^${escaped}\\s+`,
+            "i"
+          ),
+          ""
+        )
+        .replace(/[.!]+$/, "")
+        .trim();
 
-      tail = tail.replace(/^of\s+/i, "");
+      tail = tail.replace(
+        /^of\s+/i,
+        ""
+      );
 
-      return `How many ${tail}?`;
+      if (tail) {
+        return `How many ${tail}?`;
+      }
     }
 
-    const replaced = cleaned.replace(
-      new RegExp(escaped, "i"),
-      "how many"
+    /*
+     * Ratio occurs later in the sentence.
+     * Favor the wording after the ratio instead
+     * of inserting "how many" awkwardly.
+     */
+    const ratioMatch = cleaned.match(
+      new RegExp(
+        `${escaped}\\s+(.+?)[.!]?$`,
+        "i"
+      )
     );
 
-    if (/^how many\b/i.test(replaced)) {
-      return replaced.replace(/[.!]+$/, "") + "?";
+    if (
+      ratioMatch &&
+      ratioMatch[1]
+    ) {
+      let tail = ratioMatch[1]
+        .replace(/[.!?]+$/, "")
+        .trim();
+
+      tail = tail.replace(
+        /^of\s+/i,
+        ""
+      );
+
+      if (tail) {
+        return `How many ${tail}?`;
+      }
     }
 
-    return `According to the survey, ${replaced.replace(
-      /[.!]+$/,
-      ""
-    )}?`;
+    /*
+     * Safe fallback for unusual ratio sentences.
+     */
+    return "How many people matched this survey finding?";
   }
 
-  const escaped = stat.replace("%", "\\%");
+  /*
+   * PERCENTAGE QUESTIONS
+   */
 
+  const escaped =
+    stat.replace("%", "\\%");
+
+  /*
+   * "42% of Americans..."
+   */
   let m = s.match(
-    new RegExp(`^${escaped}\\s+of\\s+(.+?)[.!]?$`, "i")
+    new RegExp(
+      `^${escaped}\\s+of\\s+(.+?)[.!]?$`,
+      "i"
+    )
   );
 
   if (m) {
@@ -280,6 +388,9 @@ function makeQuestion(sentence, stat) {
     )}?`;
   }
 
+  /*
+   * "Among adults, 42%..."
+   */
   m = s.match(
     new RegExp(
       `^(Among\\s+[^,]+,\\s*)${escaped}\\s+(.+?)[.!]?$`,
@@ -294,6 +405,9 @@ function makeQuestion(sentence, stat) {
     )}?`;
   }
 
+  /*
+   * Percent shown in parentheses.
+   */
   m = s.match(
     new RegExp(
       `^(.+?)\\s+\\(${escaped}\\)(.+?)[.!]?$`,
@@ -303,18 +417,37 @@ function makeQuestion(sentence, stat) {
 
   if (m) {
     return `What percentage ${m[2]
-      .replace(/^[,;:\s-]+/, "")
-      .replace(/[.!?]+$/, "")}?`;
+      .replace(
+        /^[,;:\s-]+/,
+        ""
+      )
+      .replace(
+        /[.!?]+$/,
+        ""
+      )}?`;
   }
 
+  /*
+   * General percentage fallback.
+   */
   const replaced = s.replace(
-    new RegExp(escaped, "i"),
+    new RegExp(
+      escaped,
+      "i"
+    ),
     "what percentage"
   );
 
   return (
-    replaced.replace(/[.!]+$/, "") +
-    (replaced.endsWith("?") ? "" : "?")
+    replaced.replace(
+      /[.!]+$/,
+      ""
+    ) +
+    (
+      replaced.endsWith("?")
+        ? ""
+        : "?"
+    )
   );
 }
 
@@ -337,6 +470,9 @@ function normalizeRatio(raw) {
 function findStats(sentence) {
   const found = [];
 
+  /*
+   * Percentages
+   */
   for (
     const m of sentence.matchAll(
       /\b(?!1000)(\d{1,2}|100)%\b/g
@@ -344,7 +480,10 @@ function findStats(sentence) {
   ) {
     const n = Number(m[1]);
 
-    if (n >= 5 && n <= 95) {
+    if (
+      n >= 5 &&
+      n <= 95
+    ) {
       found.push({
         stat: m[0],
         index: m.index,
@@ -353,6 +492,11 @@ function findStats(sentence) {
     }
   }
 
+  /*
+   * Numeric ratios:
+   * 2 in 3
+   * 4 in 5
+   */
   for (
     const m of sentence.matchAll(
       /\b([1-9]|10)\s+in\s+([2-9]|10)\b/gi
@@ -370,6 +514,11 @@ function findStats(sentence) {
     }
   }
 
+  /*
+   * Word ratios:
+   * two in three
+   * four in five
+   */
   const words =
     "(?:one|two|three|four|five|six|seven|eight|nine|ten)";
 
@@ -391,9 +540,16 @@ function findStats(sentence) {
     ten: 10
   };
 
-  for (const m of sentence.matchAll(wordRe)) {
-    const a = nums[m[1].toLowerCase()];
-    const b = nums[m[2].toLowerCase()];
+  for (
+    const m of sentence.matchAll(
+      wordRe
+    )
+  ) {
+    const a =
+      nums[m[1].toLowerCase()];
+
+    const b =
+      nums[m[2].toLowerCase()];
 
     if (a < b) {
       found.push({
@@ -407,13 +563,20 @@ function findStats(sentence) {
   const seen = new Set();
 
   return found
-    .sort((a, b) => a.index - b.index)
+    .sort(
+      (a, b) =>
+        a.index - b.index
+    )
     .filter(x => {
-      const k = `${x.stat}|${x.index}`;
+      const k =
+        `${x.stat}|${x.index}`;
 
-      if (seen.has(k)) return false;
+      if (seen.has(k)) {
+        return false;
+      }
 
       seen.add(k);
+
       return true;
     });
 }
@@ -421,7 +584,9 @@ function findStats(sentence) {
 function hashId(parts) {
   return crypto
     .createHash("sha1")
-    .update(parts.join("|"))
+    .update(
+      parts.join("|")
+    )
     .digest("hex")
     .slice(0, 16);
 }
@@ -429,32 +594,54 @@ function hashId(parts) {
 function isoDate(raw) {
   const d = new Date(raw);
 
-  return Number.isNaN(d.getTime())
-    ? new Date().toISOString().slice(0, 10)
-    : d.toISOString().slice(0, 10);
+  return Number.isNaN(
+    d.getTime()
+  )
+    ? new Date()
+        .toISOString()
+        .slice(0, 10)
+    : d
+        .toISOString()
+        .slice(0, 10);
 }
 
 function displayDate(raw) {
-  const d = new Date(raw + "T12:00:00Z");
+  const d = new Date(
+    raw + "T12:00:00Z"
+  );
 
-  if (Number.isNaN(d.getTime())) return raw || "";
+  if (
+    Number.isNaN(
+      d.getTime()
+    )
+  ) {
+    return raw || "";
+  }
 
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC"
-  });
+  return d.toLocaleDateString(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "UTC"
+    }
+  );
 }
 
 function ageDays(date) {
   return (
     Date.now() -
-    new Date(date + "T00:00:00Z").getTime()
+    new Date(
+      date + "T00:00:00Z"
+    ).getTime()
   ) / 86400000;
 }
 
-function extractCandidates(article, sourceName) {
+function extractCandidates(
+  article,
+  sourceName
+) {
   if (
     isPolitical(
       `${article.title} ${article.description} ${article.content}`
@@ -471,26 +658,50 @@ function extractCandidates(article, sourceName) {
 
   const candidateSentences = [];
 
-  for (const chunk of chunks) {
-    const clean = stripHtml(chunk)
-      .replace(/\s+/g, " ")
-      .trim();
+  for (
+    const chunk of chunks
+  ) {
+    const clean =
+      stripHtml(chunk)
+        .replace(/\s+/g, " ")
+        .trim();
 
-    if (!clean) continue;
-
-    if (chunk === article.title || clean.length < 35) {
-      candidateSentences.push(clean);
+    if (!clean) {
+      continue;
     }
 
-    candidateSentences.push(...sentences(clean));
+    if (
+      chunk === article.title ||
+      clean.length < 35
+    ) {
+      candidateSentences.push(
+        clean
+      );
+    }
+
+    candidateSentences.push(
+      ...sentences(clean)
+    );
   }
 
   const seen = new Set();
   const out = [];
 
-  for (const sentence of candidateSentences) {
-    if (!sentence || isPolitical(sentence)) continue;
+  for (
+    const sentence of
+    candidateSentences
+  ) {
+    if (
+      !sentence ||
+      isPolitical(sentence)
+    ) {
+      continue;
+    }
 
+    /*
+     * Remove common false-positive
+     * percentage contexts.
+     */
     if (
       /\b(discount|off sale|battery|humidity|chance of rain)\b/i.test(
         sentence
@@ -499,24 +710,43 @@ function extractCandidates(article, sourceName) {
       continue;
     }
 
-    const stats = findStats(sentence);
+    const stats =
+      findStats(sentence);
 
-    if (!stats.length) continue;
+    if (!stats.length) {
+      continue;
+    }
 
-    for (const found of stats.slice(0, 2)) {
-      const stat = found.stat;
+    /*
+     * Limit each sentence to two
+     * findings so one paragraph
+     * doesn't overwhelm the pool.
+     */
+    for (
+      const found of
+      stats.slice(0, 2)
+    ) {
+      const stat =
+        found.stat;
+
       const key =
         `${article.link}|${sentence}|${stat}`;
 
-      if (seen.has(key)) continue;
+      if (
+        seen.has(key)
+      ) {
+        continue;
+      }
 
       seen.add(key);
 
-      const topic = inferTopic(
-        `${article.title} ${sentence}`
-      );
+      const topic =
+        inferTopic(
+          `${article.title} ${sentence}`
+        );
 
-      const published = isoDate(article.date);
+      const published =
+        isoDate(article.date);
 
       out.push({
         id: hashId([
@@ -525,19 +755,41 @@ function extractCandidates(article, sourceName) {
           sentence,
           stat
         ]),
+
         topic,
-        question: makeQuestion(sentence, stat),
+
+        question:
+          makeQuestion(
+            sentence,
+            stat
+          ),
+
         answer: stat,
+
         stat,
-        context: article.title
-          ? `From “${article.title}.”`
-          : "From a recent survey finding.",
-        talk: talkFor(topic),
-        source: sourceName,
-        source_url: article.link,
-        source_date: published,
-        published_at: published,
-        auto_generated: true
+
+        context:
+          article.title
+            ? `From “${article.title}.”`
+            : "From a recent survey finding.",
+
+        talk:
+          talkFor(topic),
+
+        source:
+          sourceName,
+
+        source_url:
+          article.link,
+
+        source_date:
+          published,
+
+        published_at:
+          published,
+
+        auto_generated:
+          true
       });
     }
   }
@@ -573,8 +825,12 @@ function isUsable(item) {
   if (
     item.auto_generated &&
     ageDays(
-      item.published_at || item.source_date
-    ) > maxAgeDaysForSource(item.source)
+      item.published_at ||
+      item.source_date
+    ) >
+    maxAgeDaysForSource(
+      item.source
+    )
   ) {
     return false;
   }
@@ -582,109 +838,188 @@ function isUsable(item) {
   return true;
 }
 
-function pickWidgetItems(items) {
+function pickWidgetItems(
+  items
+) {
   const picked = [];
-  const topicCount = new Map();
+  const topicCount =
+    new Map();
 
-  for (const item of items) {
-    const n = topicCount.get(item.topic) || 0;
+  for (
+    const item of items
+  ) {
+    const n =
+      topicCount.get(
+        item.topic
+      ) || 0;
 
-    if (n >= 2) continue;
+    if (n >= 2) {
+      continue;
+    }
 
     picked.push(item);
-    topicCount.set(item.topic, n + 1);
 
-    if (picked.length >= MAX_WIDGET_ITEMS) break;
+    topicCount.set(
+      item.topic,
+      n + 1
+    );
+
+    if (
+      picked.length >=
+      MAX_WIDGET_ITEMS
+    ) {
+      break;
+    }
   }
 
-  if (picked.length < MAX_WIDGET_ITEMS) {
-    for (const item of items) {
-      if (!picked.some(x => x.id === item.id)) {
+  if (
+    picked.length <
+    MAX_WIDGET_ITEMS
+  ) {
+    for (
+      const item of items
+    ) {
+      if (
+        !picked.some(
+          x =>
+            x.id === item.id
+        )
+      ) {
         picked.push(item);
       }
 
-      if (picked.length >= MAX_WIDGET_ITEMS) break;
+      if (
+        picked.length >=
+        MAX_WIDGET_ITEMS
+      ) {
+        break;
+      }
     }
   }
 
   return picked;
 }
 
-function buildWidgetHtml(items, limit = 3) {
-  const picked = pickWidgetItems(items).slice(0, limit);
+function buildWidgetHtml(
+  items,
+  limit = 3
+) {
+  const picked =
+    pickWidgetItems(items)
+      .slice(0, limit);
 
   const topics = [
-    ...new Set(picked.map(x => x.topic))
+    ...new Set(
+      picked.map(
+        x => x.topic
+      )
+    )
   ].sort();
 
-  const options = topics
-    .map(
-      t =>
-        `<option value="${escapeHtml(t)}">${escapeHtml(
-          t
-        )}</option>`
-    )
-    .join("\n");
+  const options =
+    topics
+      .map(
+        t =>
+          `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`
+      )
+      .join("\n");
 
-  const cards = picked
-    .map(
-      item => `<article class="mjrss-card" data-topic="${escapeHtml(
-        item.topic
-      )}">
-      <div class="mjrss-main">
-        <div class="mjrss-meta"><span class="mjrss-topic">${escapeHtml(
-          item.topic
-        )}</span><span class="mjrss-date">${escapeHtml(
-          displayDate(
-            item.source_date || item.published_at
-          )
-        )}</span></div>
-        <p class="mjrss-question">${escapeHtml(
-          item.question
-        )}</p>
-        <p class="mjrss-context"><strong>Answer:</strong> ${escapeHtml(
-          item.answer || item.stat
-        )}${
-          item.context
-            ? ` — ${escapeHtml(item.context)}`
-            : ""
-        }</p>
-        <p class="mjrss-talk"><strong>Talk About It:</strong> ${escapeHtml(
-          item.talk || talkFor(item.topic)
-        )}</p>
-        <div class="mjrss-source"><strong>Source:</strong> <a href="${escapeHtml(
-          item.source_url
-        )}" target="_blank" rel="noopener noreferrer">${escapeHtml(
-          item.source
-        )}</a></div>
-      </div>
-      <div class="mjrss-statbox"><span class="mjrss-stat">${escapeHtml(
+  const cards =
+    picked
+      .map(
+        item =>
+          `<article class="mjrss-card" data-topic="${escapeHtml(item.topic)}">
+  <div class="mjrss-main">
+
+    <div class="mjrss-meta">
+      <span class="mjrss-topic">${escapeHtml(item.topic)}</span>
+      <span class="mjrss-date">${escapeHtml(
+        displayDate(
+          item.source_date ||
+          item.published_at
+        )
+      )}</span>
+    </div>
+
+    <p class="mjrss-question">${escapeHtml(
+      item.question
+    )}</p>
+
+    <p class="mjrss-context">
+      <strong>Answer:</strong>
+      ${escapeHtml(
+        item.answer ||
         item.stat
-      )}</span><span class="mjrss-answerlabel">Answer</span></div>
-    </article>`
-    )
-    .join("\n");
+      )}
+      ${
+        item.context
+          ? ` — ${escapeHtml(item.context)}`
+          : ""
+      }
+    </p>
+
+    <p class="mjrss-talk">
+      <strong>Talk About It:</strong>
+      ${escapeHtml(
+        item.talk ||
+        talkFor(item.topic)
+      )}
+    </p>
+
+    <div class="mjrss-source">
+      <strong>Source:</strong>
+      <a href="${escapeHtml(
+        item.source_url
+      )}"
+      target="_blank"
+      rel="noopener noreferrer">${escapeHtml(
+        item.source
+      )}</a>
+    </div>
+
+  </div>
+
+  <div class="mjrss-statbox">
+    <span class="mjrss-stat">${escapeHtml(
+      item.stat
+    )}</span>
+    <span class="mjrss-answerlabel">Answer</span>
+  </div>
+</article>`
+      )
+      .join("\n");
 
   return `<!doctype html>
 <html lang="en">
+
 <head>
+
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
 <title>MJR Survey Says</title>
+
 <style>
-html,body{
+
+html,
+body {
   margin:0;
   padding:0;
   background:transparent;
-  font-family:Roboto,Arial,sans-serif
+  font-family:Roboto,Arial,sans-serif;
 }
 
-#mjrSurveySays{
+#mjrSurveySays {
   --mjrss-blue:#192A56;
   --mjrss-ink:#172033;
   --mjrss-muted:#687386;
   --mjrss-line:#dfe5ee;
   --mjrss-soft:#f5f7fb;
+
   width:100%;
   margin:0;
   background:#fff;
@@ -692,202 +1027,225 @@ html,body{
   border-radius:0 0 10px 10px;
   overflow:hidden;
   color:var(--mjrss-ink);
-  box-sizing:border-box
+  box-sizing:border-box;
 }
 
 #mjrSurveySays,
-#mjrSurveySays *{
-  box-sizing:border-box
+#mjrSurveySays * {
+  box-sizing:border-box;
 }
 
-#mjrSurveySays .mjrss-head{
+#mjrSurveySays .mjrss-head {
   background:var(--mjrss-blue);
   color:#fff;
   text-align:center;
-  padding:11px 14px 10px
+  padding:11px 14px 10px;
 }
 
-#mjrSurveySays .mjrss-head h2{
+#mjrSurveySays .mjrss-head h2 {
   margin:0;
   color:#fff;
   font-size:21px;
   line-height:1.1;
-  font-weight:800
+  font-weight:800;
 }
 
-#mjrSurveySays .mjrss-head p{
+#mjrSurveySays .mjrss-head p {
   margin:4px 0 0;
   color:#fff;
   font-size:12px;
   line-height:1.3;
-  opacity:.9
+  opacity:.9;
 }
 
-#mjrSurveySays .mjrss-toolbar{
+#mjrSurveySays .mjrss-toolbar {
   padding:7px 10px;
   border-bottom:1px solid var(--mjrss-line);
   background:#fff;
   display:flex;
-  justify-content:flex-start
+  justify-content:flex-start;
 }
 
-#mjrSurveySays .mjrss-toolbar label{
+#mjrSurveySays .mjrss-toolbar label {
   display:flex;
   gap:6px;
   align-items:center;
   font-size:11px;
   font-weight:700;
-  color:var(--mjrss-blue)
+  color:var(--mjrss-blue);
 }
 
-#mjrSurveySays .mjrss-topicfilter{
+#mjrSurveySays .mjrss-topicfilter {
   border:1px solid #cfd7e5;
   border-radius:6px;
   background:#fff;
   color:var(--mjrss-blue);
   padding:5px 8px;
-  font:700 11px/1 Roboto,Arial,sans-serif
+  font:700 11px/1 Roboto,Arial,sans-serif;
 }
 
-#mjrSurveySays .mjrss-card{
+#mjrSurveySays .mjrss-card {
   display:grid;
   grid-template-columns:minmax(0,1fr) 110px;
   gap:12px;
   padding:10px 14px;
   border-bottom:1px solid var(--mjrss-line);
-  background:#fff
+  background:#fff;
 }
 
-#mjrSurveySays .mjrss-card:nth-child(even){
-  background:#fafbfe
+#mjrSurveySays .mjrss-card:nth-child(even) {
+  background:#fafbfe;
 }
 
-#mjrSurveySays .mjrss-meta{
+#mjrSurveySays .mjrss-meta {
   display:flex;
   gap:7px;
   align-items:center;
   flex-wrap:wrap;
-  margin-bottom:4px
+  margin-bottom:4px;
 }
 
-#mjrSurveySays .mjrss-topic{
+#mjrSurveySays .mjrss-topic {
   font-size:10px;
   font-weight:800;
   text-transform:uppercase;
   letter-spacing:.04em;
-  color:var(--mjrss-blue)
+  color:var(--mjrss-blue);
 }
 
-#mjrSurveySays .mjrss-date{
+#mjrSurveySays .mjrss-date {
   font-size:10px;
-  color:var(--mjrss-muted)
+  color:var(--mjrss-muted);
 }
 
-#mjrSurveySays .mjrss-question{
+#mjrSurveySays .mjrss-question {
   margin:0 0 4px;
   color:var(--mjrss-ink);
   font-size:15px;
   line-height:1.3;
-  font-weight:800
+  font-weight:800;
 }
 
 #mjrSurveySays .mjrss-context,
-#mjrSurveySays .mjrss-talk{
+#mjrSurveySays .mjrss-talk {
   margin:0 0 5px;
   color:var(--mjrss-ink);
   font-size:12px;
-  line-height:1.35
+  line-height:1.35;
 }
 
-#mjrSurveySays .mjrss-source{
+#mjrSurveySays .mjrss-source {
   color:var(--mjrss-muted);
   font-size:10.5px;
-  line-height:1.3
+  line-height:1.3;
 }
 
-#mjrSurveySays .mjrss-source a{
+#mjrSurveySays .mjrss-source a {
   color:var(--mjrss-blue);
-  text-decoration:underline
+  text-decoration:underline;
 }
 
-#mjrSurveySays .mjrss-statbox{
+#mjrSurveySays .mjrss-statbox {
   align-self:center;
   justify-self:stretch;
   background:var(--mjrss-soft);
   border:1px solid var(--mjrss-line);
   border-radius:8px;
   padding:9px 8px;
-  text-align:center
+  text-align:center;
 }
 
-#mjrSurveySays .mjrss-stat{
+#mjrSurveySays .mjrss-stat {
   display:block;
   color:var(--mjrss-blue);
   font-size:24px;
   line-height:1;
-  font-weight:900
+  font-weight:900;
 }
 
-#mjrSurveySays .mjrss-answerlabel{
+#mjrSurveySays .mjrss-answerlabel {
   display:block;
   margin-top:4px;
   color:var(--mjrss-muted);
   font-size:9px;
   font-weight:700;
   text-transform:uppercase;
-  letter-spacing:.05em
+  letter-spacing:.05em;
 }
 
-@media(max-width:680px){
-  #mjrSurveySays .mjrss-card{
+@media(max-width:680px) {
+
+  #mjrSurveySays .mjrss-card {
     grid-template-columns:minmax(0,1fr) 84px;
     gap:8px;
-    padding:9px 10px
+    padding:9px 10px;
   }
 
-  #mjrSurveySays .mjrss-question{
-    font-size:14px
+  #mjrSurveySays .mjrss-question {
+    font-size:14px;
   }
 
   #mjrSurveySays .mjrss-context,
-  #mjrSurveySays .mjrss-talk{
-    font-size:11.5px
+  #mjrSurveySays .mjrss-talk {
+    font-size:11.5px;
   }
 
-  #mjrSurveySays .mjrss-stat{
-    font-size:20px
+  #mjrSurveySays .mjrss-stat {
+    font-size:20px;
   }
 }
 
-@media(max-width:480px){
-  #mjrSurveySays .mjrss-card{
-    grid-template-columns:1fr
+@media(max-width:480px) {
+
+  #mjrSurveySays .mjrss-card {
+    grid-template-columns:1fr;
   }
 
-  #mjrSurveySays .mjrss-statbox{
+  #mjrSurveySays .mjrss-statbox {
     justify-self:start;
-    min-width:84px
+    min-width:84px;
   }
 }
+
 </style>
+
 </head>
+
 <body>
 
 <div id="mjrSurveySays">
 
   <div class="mjrss-head">
+
     <h2>📊 MJR SURVEY SAYS</h2>
-    <p>Fresh, source-backed surveys and stats for on-air conversation.</p>
+
+    <p>
+      Fresh, source-backed surveys and stats for on-air conversation.
+    </p>
+
   </div>
 
   <div class="mjrss-toolbar">
+
     <label>
+
       <span>Topic</span>
-      <select class="mjrss-topicfilter" aria-label="Filter Survey Says by topic">
-        <option value="all">All Topics</option>
+
+      <select
+        class="mjrss-topicfilter"
+        aria-label="Filter Survey Says by topic"
+      >
+
+        <option value="all">
+          All Topics
+        </option>
+
         ${options}
+
       </select>
+
     </label>
+
   </div>
 
   <div class="mjrss-cards">
@@ -897,60 +1255,110 @@ html,body{
 </div>
 
 <script>
+
 (function(){
-  var root=document.getElementById("mjrSurveySays");
 
-  if(!root)return;
+  var root =
+    document.getElementById(
+      "mjrSurveySays"
+    );
 
-  var filter=root.querySelector(".mjrss-topicfilter");
-  var cards=root.querySelectorAll(".mjrss-card");
-
-  function update(){
-    var topic=filter.value;
-
-    cards.forEach(function(card){
-      card.style.display=
-        (
-          topic==="all" ||
-          card.getAttribute("data-topic")===topic
-        )
-        ? "grid"
-        : "none";
-    });
+  if (!root) {
+    return;
   }
 
-  filter.addEventListener("change",update);
+  var filter =
+    root.querySelector(
+      ".mjrss-topicfilter"
+    );
+
+  var cards =
+    root.querySelectorAll(
+      ".mjrss-card"
+    );
+
+  function update() {
+
+    var topic =
+      filter.value;
+
+    cards.forEach(
+      function(card) {
+
+        card.style.display =
+          (
+            topic === "all" ||
+            card.getAttribute(
+              "data-topic"
+            ) === topic
+          )
+            ? "grid"
+            : "none";
+
+      }
+    );
+  }
+
+  filter.addEventListener(
+    "change",
+    update
+  );
+
   update();
+
 })();
+
 </script>
 
 </body>
+
 </html>`;
 }
 
 function readRotationState() {
   try {
-    const parsed = JSON.parse(
-      fs.readFileSync(ROTATION_STATE, "utf8")
-    );
+    const parsed =
+      JSON.parse(
+        fs.readFileSync(
+          ROTATION_STATE,
+          "utf8"
+        )
+      );
 
-    return Array.isArray(parsed.history)
+    return Array.isArray(
+      parsed.history
+    )
       ? parsed
       : { history: [] };
+
   } catch {
-    return { history: [] };
+
+    return {
+      history: []
+    };
+
   }
 }
 
-function writeRotationState(state) {
+function writeRotationState(
+  state
+) {
   fs.writeFileSync(
     ROTATION_STATE,
-    JSON.stringify(state, null, 2) + "\n"
+    JSON.stringify(
+      state,
+      null,
+      2
+    ) + "\n"
   );
 }
 
-function dateKey(d = new Date()) {
-  return d.toISOString().slice(0, 10);
+function dateKey(
+  d = new Date()
+) {
+  return d
+    .toISOString()
+    .slice(0, 10);
 }
 
 function recentShownIds(
@@ -958,18 +1366,32 @@ function recentShownIds(
   days = RECENT_SHOWN_DAYS
 ) {
   const cutoff =
-    Date.now() - days * 86400000;
+    Date.now() -
+    days * 86400000;
 
-  const ids = new Set();
+  const ids =
+    new Set();
 
-  for (const row of state.history || []) {
-    const t = Date.parse(row.date || "");
+  for (
+    const row of
+    state.history || []
+  ) {
+    const t =
+      Date.parse(
+        row.date || ""
+      );
 
-    if (!Number.isFinite(t) || t < cutoff) {
+    if (
+      !Number.isFinite(t) ||
+      t < cutoff
+    ) {
       continue;
     }
 
-    for (const id of row.ids || []) {
+    for (
+      const id of
+      row.ids || []
+    ) {
       ids.add(id);
     }
   }
@@ -977,30 +1399,48 @@ function recentShownIds(
   return ids;
 }
 
-function pickDailyRotation(pool, count, state) {
-  const recent = recentShownIds(state);
+function pickDailyRotation(
+  pool,
+  count,
+  state
+) {
+  const recent =
+    recentShownIds(state);
 
-  const fresh = pool.filter(
-    x => !recent.has(x.id)
-  );
-
-  const fallback = pool.filter(
-    x => recent.has(x.id)
-  );
-
-  const newestFirst = arr =>
-    [...arr].sort((a, b) =>
-      String(
-        b.published_at || b.source_date || ""
-      ).localeCompare(
-        String(
-          a.published_at || a.source_date || ""
-        )
-      )
+  const fresh =
+    pool.filter(
+      x =>
+        !recent.has(x.id)
     );
 
-  const orderedFresh = newestFirst(fresh);
-  const orderedFallback = newestFirst(fallback);
+  const fallback =
+    pool.filter(
+      x =>
+        recent.has(x.id)
+    );
+
+  const newestFirst =
+    arr =>
+      [...arr].sort(
+        (a, b) =>
+          String(
+            b.published_at ||
+            b.source_date ||
+            ""
+          ).localeCompare(
+            String(
+              a.published_at ||
+              a.source_date ||
+              ""
+            )
+          )
+      );
+
+  const orderedFresh =
+    newestFirst(fresh);
+
+  const orderedFallback =
+    newestFirst(fallback);
 
   const ordered = [
     ...orderedFresh,
@@ -1009,54 +1449,114 @@ function pickDailyRotation(pool, count, state) {
 
   const chosen = [];
 
-  const talker = ordered.find(
-    x => x.source === "Talker Research"
-  );
+  /*
+   * Keep Talker in the default group
+   * whenever a usable Talker item exists.
+   */
+  const talker =
+    ordered.find(
+      x =>
+        x.source ===
+        "Talker Research"
+    );
 
-  if (talker && count > 0) {
-    chosen.push(talker);
+  if (
+    talker &&
+    count > 0
+  ) {
+    chosen.push(
+      talker
+    );
   }
 
-  const usedTopics = new Set(
-    chosen.map(x => x.topic)
-  );
+  const usedTopics =
+    new Set(
+      chosen.map(
+        x => x.topic
+      )
+    );
 
-  for (const item of ordered) {
-    if (chosen.length >= count) break;
+  /*
+   * Prefer topic variety.
+   */
+  for (
+    const item of ordered
+  ) {
+    if (
+      chosen.length >= count
+    ) {
+      break;
+    }
 
     if (
-      chosen.some(x => x.id === item.id)
+      chosen.some(
+        x =>
+          x.id === item.id
+      )
     ) {
       continue;
     }
 
-    if (!usedTopics.has(item.topic)) {
-      chosen.push(item);
-      usedTopics.add(item.topic);
+    if (
+      !usedTopics.has(
+        item.topic
+      )
+    ) {
+      chosen.push(
+        item
+      );
+
+      usedTopics.add(
+        item.topic
+      );
     }
   }
 
-  for (const item of ordered) {
-    if (chosen.length >= count) break;
+  /*
+   * Fill remaining positions
+   * by freshness.
+   */
+  for (
+    const item of ordered
+  ) {
+    if (
+      chosen.length >= count
+    ) {
+      break;
+    }
 
     if (
-      !chosen.some(x => x.id === item.id)
+      !chosen.some(
+        x =>
+          x.id === item.id
+      )
     ) {
-      chosen.push(item);
+      chosen.push(
+        item
+      );
     }
   }
 
-  return chosen.slice(0, count);
+  return chosen.slice(
+    0,
+    count
+  );
 }
 
-async function fetchText(url) {
-  const r = await fetch(url, {
-    headers: {
-      "user-agent":
-        "MediaJobsReport-SurveySays/1.1 (+https://www.mediajobsreport.com/)"
-    },
-    redirect: "follow"
-  });
+async function fetchText(
+  url
+) {
+  const r =
+    await fetch(
+      url,
+      {
+        headers: {
+          "user-agent":
+            "MediaJobsReport-SurveySays/1.1 (+https://www.mediajobsreport.com/)"
+        },
+        redirect: "follow"
+      }
+    );
 
   if (!r.ok) {
     throw new Error(
@@ -1073,112 +1573,156 @@ async function fetchText(url) {
     "Building MJR Survey Says feed + static widget..."
   );
 
+  /*
+   * DIAGNOSTICS
+   */
+
   const diag = {};
 
-  const ensureDiag = source => {
-    if (!diag[source]) {
-      diag[source] = {
-        discovered: 0,
-        rejectedMissing: 0,
-        rejectedQuestionLength: 0,
-        rejectedPolitical: 0,
-        rejectedAge: 0,
-        rejectedDuplicate: 0,
-        accepted: 0
-      };
-    }
+  const ensureDiag =
+    source => {
 
-    return diag[source];
-  };
+      if (!diag[source]) {
+        diag[source] = {
+          discovered: 0,
+          rejectedMissing: 0,
+          rejectedQuestionLength: 0,
+          rejectedPolitical: 0,
+          rejectedAge: 0,
+          rejectedDuplicate: 0,
+          accepted: 0
+        };
+      }
 
-  const explainUsability = item => {
+      return diag[source];
+    };
 
-    if (
-      !item ||
-      !item.question ||
-      !item.source_url ||
-      !item.stat
-    ) {
-      return "missing";
-    }
+  const explainUsability =
+    item => {
 
-    if (
-      item.question.length < 25 ||
-      item.question.length > 280
-    ) {
-      return "question_length";
-    }
+      if (
+        !item ||
+        !item.question ||
+        !item.source_url ||
+        !item.stat
+      ) {
+        return "missing";
+      }
 
-    if (
-      isPolitical(
-        `${item.question} ${item.context || ""}`
+      if (
+        item.question.length < 25 ||
+        item.question.length > 280
+      ) {
+        return "question_length";
+      }
+
+      if (
+        isPolitical(
+          `${item.question} ${item.context || ""}`
+        )
+      ) {
+        return "political";
+      }
+
+      if (
+        item.auto_generated &&
+        ageDays(
+          item.published_at ||
+          item.source_date
+        ) >
+        maxAgeDaysForSource(
+          item.source
+        )
+      ) {
+        return "age";
+      }
+
+      return "ok";
+    };
+
+  /*
+   * LOAD SEED DATA
+   */
+
+  const seed =
+    JSON.parse(
+      fs.readFileSync(
+        SEED,
+        "utf8"
       )
-    ) {
-      return "political";
-    }
+    );
 
-    if (
-      item.auto_generated &&
-      ageDays(
-        item.published_at ||
-        item.source_date
-      ) >
-      maxAgeDaysForSource(item.source)
-    ) {
-      return "age";
-    }
-
-    return "ok";
-  };
-
-  const seed = JSON.parse(
-    fs.readFileSync(SEED, "utf8")
-  );
+  /*
+   * LOAD PREVIOUS POOL
+   */
 
   let previous = [];
 
-  if (fs.existsSync(OUT_JSON)) {
+  if (
+    fs.existsSync(
+      OUT_JSON
+    )
+  ) {
     try {
-      const old = JSON.parse(
-        fs.readFileSync(
-          OUT_JSON,
-          "utf8"
-        )
-      );
 
-      previous = Array.isArray(old.items)
-        ? old.items
-        : [];
+      const old =
+        JSON.parse(
+          fs.readFileSync(
+            OUT_JSON,
+            "utf8"
+          )
+        );
+
+      previous =
+        Array.isArray(
+          old.items
+        )
+          ? old.items
+          : [];
+
     } catch {}
   }
 
+  /*
+   * FETCH SOURCES
+   */
+
   let discovered = [];
 
-  for (const source of SOURCES) {
-
+  for (
+    const source of SOURCES
+  ) {
     try {
 
       console.log(
         `Fetching ${source.name}: ${source.url}`
       );
 
-      const xml = await fetchText(
-        source.url
-      );
+      const xml =
+        await fetchText(
+          source.url
+        );
 
-      let articles = parseRss(xml);
+      let articles =
+        parseRss(xml);
 
       console.log(
         `  RSS items: ${articles.length}`
       );
 
+      /*
+       * Talker publishes several kinds
+       * of stories. Only use material
+       * identified as Talker Research.
+       */
       if (
         source.filter ===
         "talker-research"
       ) {
-        articles = articles.filter(
-          isTalkerResearchArticle
-        );
+        articles =
+          articles.filter(
+            isTalkerResearchArticle
+          );
 
         console.log(
           `  Talker Research items: ${articles.length}`
@@ -1188,7 +1732,9 @@ async function fetchText(url) {
       const beforeSource =
         discovered.length;
 
-      for (const article of articles) {
+      for (
+        const article of articles
+      ) {
         discovered.push(
           ...extractCandidates(
             article,
@@ -1203,7 +1749,8 @@ async function fetchText(url) {
 
       ensureDiag(
         source.name
-      ).discovered += addedBySource;
+      ).discovered +=
+        addedBySource;
 
       console.log(
         `  Usable findings discovered from ${source.name}: ${addedBySource}`
@@ -1218,6 +1765,10 @@ async function fetchText(url) {
     }
   }
 
+  /*
+   * MERGE NEW + PREVIOUS + SEED
+   */
+
   const merged = [
     ...discovered,
     ...previous,
@@ -1227,10 +1778,12 @@ async function fetchText(url) {
   const discoveredObjects =
     new Set(discovered);
 
-  const dedup = new Map();
+  const dedup =
+    new Map();
 
-  for (const item of merged) {
-
+  for (
+    const item of merged
+  ) {
     const key =
       item.id ||
       hashId([
@@ -1240,44 +1793,64 @@ async function fetchText(url) {
       ]);
 
     const reason =
-      explainUsability(item);
-
-    if (
-      discoveredObjects.has(item)
-    ) {
-
-      const d = ensureDiag(
-        item.source || "Unknown"
+      explainUsability(
+        item
       );
 
-      if (reason === "missing") {
+    if (
+      discoveredObjects.has(
+        item
+      )
+    ) {
+      const d =
+        ensureDiag(
+          item.source ||
+          "Unknown"
+        );
+
+      if (
+        reason ===
+        "missing"
+      ) {
         d.rejectedMissing++;
+
       } else if (
-        reason === "question_length"
+        reason ===
+        "question_length"
       ) {
         d.rejectedQuestionLength++;
+
       } else if (
-        reason === "political"
+        reason ===
+        "political"
       ) {
         d.rejectedPolitical++;
+
       } else if (
-        reason === "age"
+        reason ===
+        "age"
       ) {
         d.rejectedAge++;
       }
     }
 
-    if (reason !== "ok") {
+    if (
+      reason !== "ok"
+    ) {
       continue;
     }
 
-    if (dedup.has(key)) {
-
+    if (
+      dedup.has(key)
+    ) {
       if (
-        discoveredObjects.has(item)
+        discoveredObjects.has(
+          item
+        )
       ) {
         ensureDiag(
-          item.source || "Unknown"
+          item.source ||
+          "Unknown"
         ).rejectedDuplicate++;
       }
 
@@ -1293,18 +1866,25 @@ async function fetchText(url) {
     );
   }
 
+  /*
+   * SORT AND LIMIT ROLLING POOL
+   */
+
   const allUsable = [
     ...dedup.values()
-  ].sort((a, b) =>
-    String(
-      b.published_at ||
-      b.source_date
-    ).localeCompare(
+  ].sort(
+    (a, b) =>
       String(
-        a.published_at ||
-        a.source_date
+        b.published_at ||
+        b.source_date ||
+        ""
+      ).localeCompare(
+        String(
+          a.published_at ||
+          a.source_date ||
+          ""
+        )
       )
-    )
   );
 
   const items =
@@ -1315,13 +1895,22 @@ async function fetchText(url) {
 
   const finalIds =
     new Set(
-      items.map(x => x.id)
+      items.map(
+        x => x.id
+      )
     );
 
-  for (const item of discovered) {
+  /*
+   * COUNT ACCEPTED NEW FINDINGS
+   */
 
+  for (
+    const item of discovered
+  ) {
     const reason =
-      explainUsability(item);
+      explainUsability(
+        item
+      );
 
     const key =
       item.id ||
@@ -1336,18 +1925,23 @@ async function fetchText(url) {
       finalIds.has(key)
     ) {
       ensureDiag(
-        item.source || "Unknown"
+        item.source ||
+        "Unknown"
       ).accepted++;
     }
   }
+
+  /*
+   * PRINT DIAGNOSTICS
+   */
 
   for (
     const [source, d]
     of Object.entries(diag)
   ) {
-
     console.log(
-      `Diagnostics ${source}: discovered=${d.discovered}, ` +
+      `Diagnostics ${source}: ` +
+      `discovered=${d.discovered}, ` +
       `missing=${d.rejectedMissing}, ` +
       `question_length=${d.rejectedQuestionLength}, ` +
       `political=${d.rejectedPolitical}, ` +
@@ -1357,16 +1951,28 @@ async function fetchText(url) {
     );
   }
 
+  /*
+   * WRITE JSON POOL
+   */
+
   const payload = {
     updated_at:
-      new Date().toISOString(),
-    count: items.length,
+      new Date()
+        .toISOString(),
+
+    count:
+      items.length,
+
     items
   };
 
   fs.mkdirSync(
-    path.dirname(OUT_JSON),
-    { recursive: true }
+    path.dirname(
+      OUT_JSON
+    ),
+    {
+      recursive: true
+    }
   );
 
   fs.writeFileSync(
@@ -1377,6 +1983,10 @@ async function fetchText(url) {
       2
     ) + "\n"
   );
+
+  /*
+   * DAILY ROTATION
+   */
 
   const rotationState =
     readRotationState();
@@ -1389,10 +1999,20 @@ async function fetchText(url) {
     );
 
   const daily5 =
-    daily7.slice(0, 5);
+    daily7.slice(
+      0,
+      5
+    );
 
   const daily3 =
-    daily7.slice(0, 3);
+    daily7.slice(
+      0,
+      3
+    );
+
+  /*
+   * GENERATE STATIC PAGES
+   */
 
   fs.writeFileSync(
     OUT_HTML_3,
@@ -1418,6 +2038,10 @@ async function fetchText(url) {
     )
   );
 
+  /*
+   * Default alias = 3 items
+   */
+
   fs.writeFileSync(
     OUT_HTML,
     buildWidgetHtml(
@@ -1426,23 +2050,40 @@ async function fetchText(url) {
     )
   );
 
+  /*
+   * SAVE ROTATION HISTORY
+   */
+
   rotationState.history = [
     {
-      date: dateKey(),
-      ids: daily7.map(
-        x => x.id
-      )
+      date:
+        dateKey(),
+
+      ids:
+        daily7.map(
+          x => x.id
+        )
     },
+
     ...(rotationState.history || [])
       .filter(
         x =>
-          x.date !== dateKey()
+          x.date !==
+          dateKey()
       )
-  ].slice(0, 30);
+
+  ].slice(
+    0,
+    30
+  );
 
   writeRotationState(
     rotationState
   );
+
+  /*
+   * FINAL BUILD REPORT
+   */
 
   console.log(
     `Published ${items.length} Survey Says items (${discovered.length} discovered this run).`
@@ -1450,21 +2091,29 @@ async function fetchText(url) {
 
   const mix3 =
     daily3.reduce(
-      (m, x) => (
+      (m, x) => {
         m[x.source] =
-          (m[x.source] || 0) + 1,
-        m
-      ),
+          (
+            m[x.source] ||
+            0
+          ) + 1;
+
+        return m;
+      },
       {}
     );
 
   const mix7 =
     daily7.reduce(
-      (m, x) => (
+      (m, x) => {
         m[x.source] =
-          (m[x.source] || 0) + 1,
-        m
-      ),
+          (
+            m[x.source] ||
+            0
+          ) + 1;
+
+        return m;
+      },
       {}
     );
 
@@ -1484,10 +2133,12 @@ async function fetchText(url) {
     "Static widgets: 3 / 5 / 7 generated in docs/"
   );
 
-})().catch(err => {
+})().catch(
+  err => {
 
-  console.error(err);
+    console.error(err);
 
-  process.exit(1);
+    process.exit(1);
 
-});
+  }
+);
