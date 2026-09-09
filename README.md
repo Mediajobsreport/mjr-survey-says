@@ -39,3 +39,19 @@ The iframe loads a fully rendered HTML document; it does not require the Prep pa
 ## Source policy
 
 Initial automation uses only Pew Research Center's official RSS feed. It does not scrape Pew article pages. Additional sources should be added only when their API/RSS/licensing permits automated use.
+
+
+## Automated source adapters
+
+### Talker Research
+- Uses Talker's official RSS feed: `https://talker.news/feed/`
+- The builder accepts only feed items explicitly identified as **Talker Research**.
+- It does **not** crawl individual Talker story pages.
+- Talker Research remains fully attributed and every widget item links to the originating Talker page.
+- Talker News stories are excluded from this adapter.
+
+### Pew Research Center
+- Continues using Pew's official publications RSS feed.
+- The rolling pool retains usable findings when a daily feed run has no new percentage-based candidates.
+
+The builder keeps up to 90 usable survey items for up to 180 days, while the public widgets continue to show 3, 5, or 7 items.
