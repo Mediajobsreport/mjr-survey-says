@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-09-09T16:21:54.192Z",
-  "count": 42,
+  "updated_at": "2026-09-09T16:29:11.438Z",
+  "count": 34,
   "items": [
     {
       "id": "a5a0027251a14974",
@@ -73,20 +73,6 @@
       "auto_generated": true
     },
     {
-      "id": "b0f617471bc6fce6",
-      "topic": "Health",
-      "question": "What percentage of U.S. Adults Are ‘Very’ Likely to Switch Health Insurance Soon – Here’s What to Know?",
-      "answer": "16%",
-      "stat": "16%",
-      "context": "Finding: 16% of U.S. Adults Are ‘Very’ Likely to Switch Health Insurance Soon – Here’s What to Know",
-      "talk": "Has this changed the way you think about your own health choices?",
-      "source": "CivicScience",
-      "source_url": "https://civicscience.com/16-of-u-s-adults-are-very-likely-to-switch-health-insurance-soon-heres-what-to-know/",
-      "source_date": "2026-09-01",
-      "published_at": "2026-09-01",
-      "auto_generated": true
-    },
-    {
       "id": "ipsos-human-food-20260828",
       "topic": "Food & Dining",
       "question": "What percentage of Americans say they prefer a human rather than automation to prepare their food at a restaurant?",
@@ -124,34 +110,6 @@
       "source_url": "https://theharrispoll.com/articles/america-this-week-august-6-2026/",
       "source_date": "2026-08-06",
       "published_at": "2026-08-06",
-      "auto_generated": true
-    },
-    {
-      "id": "17fc35081b0fd7b7",
-      "topic": "Money",
-      "question": "What percentage of Gen Z Skip Weekend Plans to Save Money In a new poll we conducted with FORTUNE , Gen Z aren’t making weekend plans anymore when they’re afraid of opening their bank app on Monday?",
-      "answer": "62%",
-      "stat": "62%",
-      "context": "Finding: 62% of Gen Z Skip Weekend Plans to Save Money In a new poll we conducted with FORTUNE , Gen Z aren’t making weekend plans anymore when they’re afraid of opening their bank app on Monday.",
-      "talk": "Does this finding match the way you are spending, saving or giving right now?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/america-this-week-august-6-2026/",
-      "source_date": "2026-08-06",
-      "published_at": "2026-08-06",
-      "auto_generated": true
-    },
-    {
-      "id": "46858526b9dfdcff",
-      "topic": "Technology",
-      "question": "what percentage assume brands will try to pay their way into AI recommendations, and most want that disclosed?",
-      "answer": "78%",
-      "stat": "78%",
-      "context": "Finding: 78% assume brands will try to pay their way into AI recommendations, and most want that disclosed.",
-      "talk": "What everyday task are you most willing to hand over to AI?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/what-do-shoppers-really-want-from-ai/",
-      "source_date": "2026-07-31",
-      "published_at": "2026-07-31",
       "auto_generated": true
     },
     {
@@ -197,20 +155,6 @@
       "auto_generated": true
     },
     {
-      "id": "b3b92bbdcac8f4d7",
-      "topic": "Technology",
-      "question": "what percentage want a clear explanation of why a product was recommended?",
-      "answer": "29%",
-      "stat": "29%",
-      "context": "Finding: 29% want a clear explanation of why a product was recommended.",
-      "talk": "Would this number be higher or lower among your friends and coworkers?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/what-do-shoppers-really-want-from-ai/",
-      "source_date": "2026-07-31",
-      "published_at": "2026-07-31",
-      "auto_generated": true
-    },
-    {
       "id": "2e092e3bbf80dbfa",
       "topic": "Technology",
       "question": "What percentage of Americans see China as more advanced than the U.S. in AI development say U.S. leadership in AI is extremely or very important?",
@@ -246,48 +190,6 @@
       "stat": "71%",
       "context": "Finding: 71% of consumers say physical experiences deepen their connection to a brand .",
       "talk": "What purchase or shopping habit have you changed the most lately?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/what-we-learned-at-cannes-lions-2026/",
-      "source_date": "2026-07-13",
-      "published_at": "2026-07-13",
-      "auto_generated": true
-    },
-    {
-      "id": "fdcf718dec3e1eb3",
-      "topic": "Technology",
-      "question": "what percentage would be less likely to trust an ad they suspected was AI-made?",
-      "answer": "73%",
-      "stat": "73%",
-      "context": "Finding: 73% would be less likely to trust an ad they suspected was AI-made.",
-      "talk": "What everyday task are you most willing to hand over to AI?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/what-we-learned-at-cannes-lions-2026/",
-      "source_date": "2026-07-13",
-      "published_at": "2026-07-13",
-      "auto_generated": true
-    },
-    {
-      "id": "bef96adfacc793ed",
-      "topic": "Family & Life",
-      "question": "What percentage of soccer fans are excited about a World Cup on home soil?",
-      "answer": "70%",
-      "stat": "70%",
-      "context": "Finding: 70% of soccer fans are excited about a World Cup on home soil.",
-      "talk": "Would your family or friends agree with this finding?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/what-we-learned-at-cannes-lions-2026/",
-      "source_date": "2026-07-13",
-      "published_at": "2026-07-13",
-      "auto_generated": true
-    },
-    {
-      "id": "6761b49521f9ce6a",
-      "topic": "Life & Culture",
-      "question": "What percentage of Gen Z wish they could disconnect more easily?",
-      "answer": "81%",
-      "stat": "81%",
-      "context": "Finding: 81% of Gen Z wish they could disconnect more easily.",
-      "talk": "Does this number surprise you, or does it sound about right?",
       "source": "The Harris Poll",
       "source_url": "https://theharrispoll.com/articles/what-we-learned-at-cannes-lions-2026/",
       "source_date": "2026-07-13",
@@ -465,20 +367,6 @@
       "answer": "4 in 10",
       "stat": "4 in 10",
       "context": "Finding: About 4 in 10 gave money to someone they knew personally, donated while checking out at a store, or provided non-financial support to people in their community.",
-      "talk": "What type of cause are you most likely to donate to, and what makes you trust an organization enough to give?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/most-adults-have-donated-to-charities-this-year/?utm_source=rss&utm_medium=rss&utm_campaign=most-adults-have-donated-to-charities-this-year",
-      "source_date": "2025-12-22",
-      "published_at": "2025-12-22",
-      "auto_generated": true
-    },
-    {
-      "id": "28d3b1a1bc041b41",
-      "topic": "Money",
-      "question": "How many volunteered their time to a charitable organization?",
-      "answer": "3 in 10",
-      "stat": "3 in 10",
-      "context": "Finding: Three in 10 volunteered their time to a charitable organization.",
       "talk": "What type of cause are you most likely to donate to, and what makes you trust an organization enough to give?",
       "source": "AP-NORC Center",
       "source_url": "https://apnorc.org/projects/most-adults-have-donated-to-charities-this-year/?utm_source=rss&utm_medium=rss&utm_campaign=most-adults-have-donated-to-charities-this-year",
