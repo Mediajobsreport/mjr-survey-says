@@ -732,6 +732,66 @@ function contextHasMixedMeasurementClauses(context = '') {
   return false;
 }
 
+
+
+// v3.3: rejection-only clause-integrity safeguard.
+// If the target statistic appears after a conjunction/colon/semicolon, the final
+// question may not borrow measured behavior from the earlier clause. Population
+// words alone are allowed; substantive earlier-clause wording is not.
+function questionLeaksPreStatClause(item) {
+  const context = String(item?.context || '').replace(/\s+/g, ' ').trim();
+  const finding = context.replace(/^.*?Finding:\s*/i, '').trim();
+  const q = String(item?.question || '').replace(/\s+/g, ' ').trim();
+  const stat = String(item?.stat || item?.answer || '').replace(/\s+/g, ' ').trim();
+  if (!finding || !q || !stat) return false;
+
+  const statIndex = finding.toLowerCase().indexOf(stat.toLowerCase());
+  if (statIndex < 0) return false;
+
+  const before = finding.slice(0, statIndex);
+  const connectors = [...before.matchAll(/\b(?:and|but|while|though|although|whereas|however)\b|[:;]/gi)];
+  if (!connectors.length) return false;
+
+  const last = connectors[connectors.length - 1];
+  const connectorIndex = last.index ?? -1;
+  if (connectorIndex < 0) return false;
+
+  // Only apply when the connector is reasonably close to the target statistic;
+  // this is the compound-finding pattern we are trying to reject.
+  if (statIndex - (connectorIndex + last[0].length) > 45) return false;
+
+  const priorClause = before.slice(0, connectorIndex).split(/[.!?]/).pop().trim();
+  if (!priorClause) return false;
+
+  // Words that can legitimately be shared without importing the earlier measurement.
+  const stop = new Set([
+    'a','an','the','of','to','in','on','at','for','from','with','by','about','into','over','under',
+    'and','or','but','while','though','although','whereas','however','that','which','who','whom',
+    'what','percentage','how','many','say','says','said','report','reports','reported','feel','feels',
+    'think','thinks','believe','believes','are','is','were','was','be','been','being','have','has','had',
+    'do','does','did','their','they','them','when','than','as','most','some','many','few','still','more',
+    'less','nearly','about','according','new','research','survey','poll','people','person','persons',
+    'american','americans','adult','adults','consumer','consumers','parent','parents','worker','workers',
+    'employee','employees','respondent','respondents','woman','women','man','men','gen','z','millennial',
+    'millennials','household','households','user','users','customer','customers','family','families'
+  ]);
+
+  const tokens = text => String(text)
+    .toLowerCase()
+    .replace(/[’']/g, '')
+    .match(/[a-z][a-z-]{2,}/g) || [];
+
+  const priorWords = [...new Set(tokens(priorClause).filter(w => !stop.has(w)))];
+  if (!priorWords.length) return false;
+
+  const qWords = new Set(tokens(q));
+  const leaked = priorWords.filter(w => qWords.has(w));
+
+  // One distinctive substantive word from the earlier measured clause is enough
+  // to reject because this gate is intentionally conservative.
+  return leaked.length > 0;
+}
+
 function finalBroadcastQualityGate(item) {
   if (!item || !item.question) return false;
   const q = String(item.question).replace(/\s+/g, ' ').trim();
@@ -749,6 +809,7 @@ function finalBroadcastQualityGate(item) {
   if (containsUndefinedReference(q)) return false;
   if (contextHasUndefinedPopulation(item.context || '')) return false;
   if (contextHasMixedMeasurementClauses(item.context || '')) return false;
+  if (questionLeaksPreStatClause(item)) return false;
 
   // Catch copy collisions and headline prose that are technically grammatical but not an on-air question.
   if (/\b(?:In a nationwide poll of|In a survey of|The survey found|The poll found|we conducted with|highlighting the critical role)\b[^?]{90,}/i.test(q)) return false;
@@ -771,6 +832,7 @@ function explainUsability(item) {
   if (hasMalformedPercentagePopulation(item.question)) return 'standalone';
   if (/\bFinding:\s*\d{1,3}%\s+(?:are|is|were|was|have|has|had|say|says|said|use|uses|used|plan|plans|planned|they|their|them)\b/i.test(item.context || '')) return 'standalone';
   if (contextHasMixedMeasurementClauses(item.context || '')) return 'standalone';
+  if (questionLeaksPreStatClause(item)) return 'standalone';
   if (item.auto_generated && ageDays(item.published_at || item.source_date) > maxAgeDaysForSource(item.source)) return 'age';
   return 'ok';
 }
@@ -1000,7 +1062,7 @@ async function fetchHtmlDiscoverySource(source) {
 
 (async () => {
   console.log('Building MJR Survey Says feed + static widget...');
-  console.log('v3.2 final broadcast-quality gate: ON (written fractions count as statistics)');
+  console.log('v3.3 final broadcast-quality gate: ON (rejects pre-stat clause leakage)');
 
   const diag = {};
   const ensureDiag = source => {
