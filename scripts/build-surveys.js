@@ -435,6 +435,29 @@ async function fetchText(url) {
 
 (async () => {
   console.log("Building MJR Survey Says feed + static widget...");
+
+  const diag = {};
+  const ensureDiag = (source) => {
+    if (!diag[source]) diag[source] = {
+      discovered: 0,
+      rejectedMissing: 0,
+      rejectedQuestionLength: 0,
+      rejectedPolitical: 0,
+      rejectedAge: 0,
+      rejectedDuplicate: 0,
+      accepted: 0
+    };
+    return diag[source];
+  };
+
+  const explainUsability = (item) => {
+    if (!item || !item.question || !item.source_url || !item.stat) return "missing";
+    if (item.question.length < 25 || item.question.length > 280) return "question_length";
+    if (isPolitical(`${item.question} ${item.context || ""}`)) return "political";
+    if (item.auto_generated && ageDays(item.published_at || item.source_date) > MAX_AGE_DAYS) return "age";
+    return "ok";
+  };
+
   const seed = JSON.parse(fs.readFileSync(SEED, "utf8"));
   let previous = [];
   if (fs.existsSync(OUT_JSON)) {
@@ -456,6 +479,7 @@ async function fetchText(url) {
       const beforeSource = discovered.length;
       for (const article of articles) discovered.push(...extractCandidates(article, source.name));
       const addedBySource = discovered.length - beforeSource;
+      ensureDiag(source.name).discovered += addedBySource;
       console.log(`  Usable findings discovered from ${source.name}: ${addedBySource}`);
     } catch (err) {
       console.warn(`  Source failed: ${err.message}`);
@@ -463,15 +487,51 @@ async function fetchText(url) {
   }
 
   const merged = [...discovered, ...previous, ...seed];
+  const discoveredObjects = new Set(discovered);
   const dedup = new Map();
+
   for (const item of merged) {
     const key = item.id || hashId([item.source, item.source_url, item.question]);
-    if (!dedup.has(key) && isUsable(item)) dedup.set(key, {...item, id:key});
+    const reason = explainUsability(item);
+
+    if (discoveredObjects.has(item)) {
+      const d = ensureDiag(item.source || "Unknown");
+      if (reason === "missing") d.rejectedMissing++;
+      else if (reason === "question_length") d.rejectedQuestionLength++;
+      else if (reason === "political") d.rejectedPolitical++;
+      else if (reason === "age") d.rejectedAge++;
+    }
+
+    if (reason !== "ok") continue;
+
+    if (dedup.has(key)) {
+      if (discoveredObjects.has(item)) ensureDiag(item.source || "Unknown").rejectedDuplicate++;
+      continue;
+    }
+
+    dedup.set(key, {...item, id:key});
   }
 
-  const items = [...dedup.values()]
-    .sort((a,b) => String(b.published_at || b.source_date).localeCompare(String(a.published_at || a.source_date)))
-    .slice(0, MAX_POOL);
+  const allUsable = [...dedup.values()]
+    .sort((a,b) => String(b.published_at || b.source_date).localeCompare(String(a.published_at || a.source_date)));
+
+  const items = allUsable.slice(0, MAX_POOL);
+  const finalIds = new Set(items.map(x => x.id));
+
+  for (const item of discovered) {
+    const reason = explainUsability(item);
+    const key = item.id || hashId([item.source, item.source_url, item.question]);
+    if (reason === "ok" && finalIds.has(key)) ensureDiag(item.source || "Unknown").accepted++;
+  }
+
+  for (const [source, d] of Object.entries(diag)) {
+    console.log(
+      `Diagnostics ${source}: discovered=${d.discovered}, ` +
+      `missing=${d.rejectedMissing}, question_length=${d.rejectedQuestionLength}, ` +
+      `political=${d.rejectedPolitical}, age=${d.rejectedAge}, ` +
+      `duplicate=${d.rejectedDuplicate}, accepted=${d.accepted}`
+    );
+  }
 
   const payload = {updated_at: new Date().toISOString(), count: items.length, items};
   fs.mkdirSync(path.dirname(OUT_JSON), {recursive:true});
