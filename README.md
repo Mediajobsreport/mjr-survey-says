@@ -80,3 +80,14 @@ This ensures that:
 - `surveys.json`
 
 are all committed after each build, and the daily rotation history persists between GitHub Action runs.
+
+
+## Pipeline diagnostics (v1.7)
+The build now reports, by source, how many newly discovered findings are rejected for:
+- missing required fields
+- question length
+- political-content filtering
+- age
+- duplicate ID
+
+It also reports how many newly discovered findings survive into the published rolling pool.
