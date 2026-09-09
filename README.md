@@ -55,3 +55,7 @@ Initial automation uses only Pew Research Center's official RSS feed. It does no
 - The rolling pool retains usable findings when a daily feed run has no new percentage-based candidates.
 
 The builder keeps up to 90 usable survey items for up to 180 days, while the public widgets continue to show 3, 5, or 7 items.
+
+
+### Talker ratio support (v1.2)
+The Talker adapter now recognizes both percentage findings and common survey ratios such as `2 in 3`, `4 in 5`, `one in three`, and `four in five`. It also checks the RSS headline because Talker frequently places the strongest finding there.
