@@ -3,24 +3,85 @@ const path = require("path");
 const crypto = require("crypto");
 
 const ROOT = process.cwd();
-const OUT_JSON = path.join(ROOT, "docs", "surveys.json");
-const OUT_HTML = path.join(ROOT, "docs", "survey-says.html");
-const OUT_HTML_3 = path.join(ROOT, "docs", "survey-says-3.html");
-const OUT_HTML_5 = path.join(ROOT, "docs", "survey-says-5.html");
-const OUT_HTML_7 = path.join(ROOT, "docs", "survey-says-7.html");
-const SEED = path.join(ROOT, "data-seed.json");
-const ROTATION_STATE = path.join(ROOT, "mjr-survey-rotation.json");
+
+const OUT_JSON = path.join(
+  ROOT,
+  "docs",
+  "surveys.json"
+);
+
+const OUT_HTML = path.join(
+  ROOT,
+  "docs",
+  "survey-says.html"
+);
+
+const OUT_HTML_3 = path.join(
+  ROOT,
+  "docs",
+  "survey-says-3.html"
+);
+
+const OUT_HTML_5 = path.join(
+  ROOT,
+  "docs",
+  "survey-says-5.html"
+);
+
+const OUT_HTML_7 = path.join(
+  ROOT,
+  "docs",
+  "survey-says-7.html"
+);
+
+const SEED = path.join(
+  ROOT,
+  "data-seed.json"
+);
+
+const ROTATION_STATE = path.join(
+  ROOT,
+  "mjr-survey-rotation.json"
+);
 
 const SOURCES = [
-  { name: "Talker Research", url: "https://talker.news/feed/", filter: "talker-research" },
-  { name: "Pew Research Center", url: "https://www.pewresearch.org/publications/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/topics/culture-and-society/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/topics/science-and-technology/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/topics/younger-generations/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/topics/education/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/topics/media-insight-project/feed/" },
-  { name: "Edison Research", url: "https://www.edisonresearch.com/feed/" }
+  {
+    name: "Talker Research",
+    url: "https://talker.news/feed/",
+    filter: "talker-research"
+  },
+  {
+    name: "Pew Research Center",
+    url: "https://www.pewresearch.org/publications/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/culture-and-society/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/science-and-technology/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/younger-generations/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/education/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/media-insight-project/feed/"
+  },
+  {
+    name: "Edison Research",
+    url: "https://www.edisonresearch.com/feed/"
+  }
 ];
 
 const MAX_POOL = 140;
@@ -28,80 +89,186 @@ const MAX_AGE_DAYS = 180;
 const AP_NORC_MAX_AGE_DAYS = 365;
 const RECENT_SHOWN_DAYS = 7;
 const MAX_WIDGET_ITEMS = 7;
+const MAX_PER_SOURCE = 2;
 
 function maxAgeDaysForSource(source) {
-  return source === "AP-NORC Center" ? AP_NORC_MAX_AGE_DAYS : MAX_AGE_DAYS;
+  return source === "AP-NORC Center"
+    ? AP_NORC_MAX_AGE_DAYS
+    : MAX_AGE_DAYS;
 }
 
 function decodeXml(s = "") {
-  return s
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;|&apos;/g, "'")
-    .replace(/&#038;/g, "&");
+  return String(s)
+    .replace(
+      /<!\[CDATA\[([\s\S]*?)\]\]>/g,
+      "$1"
+    )
+    .replace(
+      /&amp;/g,
+      "&"
+    )
+    .replace(
+      /&lt;/g,
+      "<"
+    )
+    .replace(
+      /&gt;/g,
+      ">"
+    )
+    .replace(
+      /&quot;/g,
+      '"'
+    )
+    .replace(
+      /&#039;|&apos;/g,
+      "'"
+    )
+    .replace(
+      /&#038;/g,
+      "&"
+    );
 }
 
 function stripHtml(s = "") {
-  return decodeXml(String(s))
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\s+/g, " ")
+  return decodeXml(s)
+    .replace(
+      /<script[\s\S]*?<\/script>/gi,
+      " "
+    )
+    .replace(
+      /<style[\s\S]*?<\/style>/gi,
+      " "
+    )
+    .replace(
+      /<[^>]+>/g,
+      " "
+    )
+    .replace(
+      /\s+/g,
+      " "
+    )
     .trim();
 }
 
 function escapeHtml(s = "") {
   return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 }
 
 function tag(block, name) {
-  const m = block.match(
-    new RegExp(
-      `<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`,
-      "i"
-    )
-  );
+  const m =
+    block.match(
+      new RegExp(
+        `<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`,
+        "i"
+      )
+    );
 
-  return m ? stripHtml(m[1]) : "";
+  return m
+    ? stripHtml(
+        m[1]
+      )
+    : "";
 }
 
 function tags(block, name) {
-  const re = new RegExp(
-    `<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`,
-    "gi"
-  );
+  const re =
+    new RegExp(
+      `<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`,
+      "gi"
+    );
 
-  return [...block.matchAll(re)]
-    .map(m => stripHtml(m[1]))
+  return [
+    ...block.matchAll(re)
+  ]
+    .map(
+      m =>
+        stripHtml(
+          m[1]
+        )
+    )
     .filter(Boolean);
 }
 
 function parseRss(xml) {
   const blocks =
-    xml.match(/<item\b[\s\S]*?<\/item>/gi) || [];
+    xml.match(
+      /<item\b[\s\S]*?<\/item>/gi
+    ) || [];
 
-  return blocks.map(b => ({
-    title: tag(b, "title"),
-    link: tag(b, "link"),
-    date: tag(b, "pubDate"),
-    description: tag(b, "description"),
-    content: tag(b, "content:encoded"),
-    creator:
-      tag(b, "dc:creator") ||
-      tag(b, "author"),
-    categories: tags(b, "category")
-  }));
+  return blocks.map(
+    b => ({
+      title:
+        tag(
+          b,
+          "title"
+        ),
+
+      link:
+        tag(
+          b,
+          "link"
+        ),
+
+      date:
+        tag(
+          b,
+          "pubDate"
+        ),
+
+      description:
+        tag(
+          b,
+          "description"
+        ),
+
+      content:
+        tag(
+          b,
+          "content:encoded"
+        ),
+
+      creator:
+        tag(
+          b,
+          "dc:creator"
+        ) ||
+        tag(
+          b,
+          "author"
+        ),
+
+      categories:
+        tags(
+          b,
+          "category"
+        )
+    })
+  );
 }
 
-function isTalkerResearchArticle(article) {
+function isTalkerResearchArticle(
+  article
+) {
   const haystack = [
     article.creator || "",
     ...(article.categories || []),
@@ -110,14 +277,24 @@ function isTalkerResearchArticle(article) {
     article.content || ""
   ].join(" ");
 
-  return /\bTalker Research\b/i.test(haystack);
+  return /\bTalker Research\b/i.test(
+    haystack
+  );
 }
 
 function sentences(text = "") {
-  return text
-    .replace(/\s+/g, " ")
-    .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
-    .map(s => s.trim())
+  return String(text)
+    .replace(
+      /\s+/g,
+      " "
+    )
+    .split(
+      /(?<=[.!?])\s+(?=[A-Z0-9])/
+    )
+    .map(
+      s =>
+        s.trim()
+    )
     .filter(
       s =>
         s.length >= 35 &&
@@ -126,50 +303,84 @@ function sentences(text = "") {
 }
 
 function inferTopic(text = "") {
-  const t = text.toLowerCase();
+  const t =
+    text.toLowerCase();
 
   const rules = [
     [
       "Technology",
-      /\b(ai|artificial intelligence|chatbot|smartphone|internet|online|social media|technology|digital)\b/
+      /\b(ai|artificial intelligence|chatbot|smartphone|internet|online|social media|technology|digital|crypto|cryptocurrency)\b/
     ],
+
     [
       "Entertainment",
-      /\b(streaming|television|tv|movie|music|podcast|radio|entertainment)\b/
+      /\b(streaming|streamed radio|radio|television|tv|movie|music|podcast|entertainment|audio)\b/
     ],
+
     [
       "Money",
-      /\b(money|cost|price|inflation|financial|economy|spending|income|cash|debt|donation|donate|crowdfunding)\b/
+      /\b(money|cost|price|inflation|financial|finance|economy|spending|income|cash|debt|donation|donate|crowdfunding|expense)\b/
     ],
+
     [
       "Work",
-      /\b(work|job|employee|employer|workplace|career|office)\b/
+      /\b(work|job|employee|employer|workplace|career|office|worker)\b/
     ],
+
     [
       "Shopping",
-      /\b(shop|shopping|retail|store|purchase|consumer|buy)\b/
+      /\b(shop|shopping|retail|store|purchase|consumer|buy|bought)\b/
     ],
+
     [
       "Food & Dining",
-      /\b(food|restaurant|meal|fast food|grocery|dining)\b/
+      /\b(food|restaurant|meal|fast food|grocery|dining|eat|eating)\b/
     ],
+
     [
       "Family & Life",
-      /\b(parent|child|family|relationship|dating|marriage|home|caregiver|childcare|daycare)\b/
+      /\b(parent|child|children|family|relationship|dating|marriage|home|caregiver|childcare|daycare)\b/
     ],
+
     [
       "Health",
-      /\b(health|doctor|medical|hospital|fitness|sleep)\b/
+      /\b(health|wellness|doctor|medical|hospital|fitness|sleep|medicine)\b/
     ]
   ];
 
-  for (const [name, re] of rules) {
-    if (re.test(t)) {
+  for (
+    const [name, re]
+    of rules
+  ) {
+    if (
+      re.test(t)
+    ) {
       return name;
     }
   }
 
   return "Life & Culture";
+}
+
+function inferTopicFromFinding(
+  sentence = "",
+  title = ""
+) {
+  const fromSentence =
+    inferTopic(
+      sentence
+    );
+
+  if (
+    fromSentence !==
+    "Life & Culture"
+  ) {
+    return fromSentence;
+  }
+
+  return inferTopic(
+    title
+  );
 }
 
 function isPolitical(text = "") {
@@ -178,129 +389,91 @@ function isPolitical(text = "") {
   );
 }
 
-function surveySubjectFromTitle(title = "") {
-  const t = stripHtml(title)
-    .replace(/\s+/g, " ")
-    .trim();
-
-  const lower = t.toLowerCase();
-
-  const rules = [
-    [
-      /\bcrowdfund(?:ing|ed)?\b/,
-      "crowdfunding donations"
-    ],
-    [
-      /\b(parent|parents|kid|kids|child|children)\b[\s\S]{0,80}\b(care|childcare|daycare)\b|\b(care|childcare|daycare)\b[\s\S]{0,80}\b(parent|parents|kid|kids|child|children)\b/,
-      "how parents find care for their children"
-    ],
-    [
-      /\bpodcast\b/,
-      "podcast listening"
-    ],
-    [
-      /\bradio\b/,
-      "radio listening"
-    ],
-    [
-      /\bstreaming\b/,
-      "streaming habits"
-    ],
-    [
-      /\bsocial media\b/,
-      "social media use"
-    ],
-    [
-      /\b(ai|artificial intelligence|chatbot)\b/,
-      "artificial intelligence"
-    ],
-    [
-      /\bworkplace|employee|employees|worker|workers|job|jobs\b/,
-      "work and the workplace"
-    ],
-    [
-      /\bshopping|shopper|shoppers|consumer|consumers|retail\b/,
-      "consumer and shopping habits"
-    ],
-    [
-      /\bhealth|medical|doctor|hospital|fitness|sleep\b/,
-      "health"
-    ],
-    [
-      /\bparent|parents|family|families|child|children|kid|kids\b/,
-      "family life"
-    ]
-  ];
-
-  for (const [re, subject] of rules) {
-    if (re.test(lower)) {
-      return subject;
-    }
-  }
-
-  if (!t) {
-    return "";
-  }
-
-  const short =
-    t.length > 90
-      ? `${t.slice(0, 87).trim()}...`
-      : t;
-
-  return `the research topic “${short}”`;
-}
-
-function talkFor(
+function talkForFinding(
   topic,
-  articleTitle = "",
-  sentence = ""
+  sentence = "",
+  title = ""
 ) {
   const h =
-    `${articleTitle} ${sentence}`
+    `${sentence} ${title}`
       .toLowerCase();
 
   if (
-    /\bcrowdfund(?:ing|ed)?\b/.test(h)
+    /\bcrowdfund(?:ing|ed)?\b/.test(
+      h
+    )
   ) {
     return "Have you ever donated to a crowdfunding campaign? What made you decide to give?";
   }
 
   if (
-    /\b(parent|parents|kid|kids|child|children)\b[\s\S]{0,100}\b(care|childcare|daycare)\b|\b(care|childcare|daycare)\b[\s\S]{0,100}\b(parent|parents|kid|kids|child|children)\b/.test(
+    /\bstreamed radio|streaming radio|radio stream\b/.test(
       h
     )
   ) {
-    return "When choosing care for a child, what matters most: cost, location, trust or flexibility?";
+    return "How often do you listen to a radio station through an app or stream instead of a regular radio?";
   }
 
   if (
-    /\bpodcast\b/.test(h)
-  ) {
-    return "How do your own podcast habits compare with this finding?";
-  }
-
-  if (
-    /\bradio\b/.test(h)
+    /\bradio\b/.test(
+      sentence.toLowerCase()
+    )
   ) {
     return "Does this match the way you or the people around you use radio?";
   }
 
   if (
-    /\bstreaming|television|tv|movie\b/.test(h)
+    /\bpodcast\b/.test(
+      sentence.toLowerCase()
+    )
   ) {
-    return "Does this match your own viewing or streaming habits?";
+    return "How do your own podcast habits compare with this finding?";
   }
 
   if (
-    /\bsocial media\b/.test(h)
+    /\bhealth|wellness\b/.test(
+      sentence.toLowerCase()
+    ) &&
+    /\binfluencer/.test(
+      sentence.toLowerCase()
+    )
+  ) {
+    return "Would you trust health advice from an influencer, or do you want it from a medical professional?";
+  }
+
+  if (
+    /\bcrypto|cryptocurrency\b/.test(
+      sentence.toLowerCase()
+    )
+  ) {
+    return "Have you ever owned or used cryptocurrency, or have you stayed away from it completely?";
+  }
+
+  if (
+    /\bsocial media\b/.test(
+      sentence.toLowerCase()
+    )
   ) {
     return "Does this match the way you and your friends actually use social media?";
   }
 
   if (
-    /\b(ai|artificial intelligence|chatbot)\b/.test(h)
+    /\b(ai|artificial intelligence|chatbot)\b/.test(
+      sentence.toLowerCase()
+    )
   ) {
-    return "Where are you most comfortable — or least comfortable — using AI in everyday life?";
+    return "What everyday task are you most willing to hand over to AI?";
+  }
+
+  if (
+    /\b(parent|parents|child|children|kid|kids)\b/.test(
+      sentence.toLowerCase()
+    ) &&
+    /\b(care|childcare|daycare)\b/.test(
+      sentence.toLowerCase()
+    )
+  ) {
+    return "When choosing care for a child, what matters most: cost, location, trust or flexibility?";
   }
 
   const prompts = {
@@ -338,16 +511,85 @@ function talkFor(
   );
 }
 
-function startsWithVerbPhrase(text = "") {
-  return /^(donated|donate|gave|give|spent|spend|said|say|use|used|uses|watch|watched|watches|listen|listened|listens|buy|bought|buys|shop|shopped|shops|prefer|preferred|prefers|agree|agreed|agrees|believe|believed|believes|think|thought|thinks|reported|report|reports|have|had|has|are|were|is|want|wanted|wants|plan|planned|plans|expect|expected|expects|feel|felt|feels|chose|choose|chooses|selected|select|selects|experienced|experience|experiences|received|receive|receives|paid|pay|pays|borrowed|borrow|borrows|saved|save|saves)\b/i.test(
+function startsWithVerbPhrase(
+  text = ""
+) {
+  return /^(donated|donate|gave|give|spent|spend|said|say|use|used|uses|watch|watched|watches|listen|listened|listens|listening|buy|bought|buys|shop|shopped|shops|prefer|preferred|prefers|agree|agreed|agrees|believe|believed|believes|think|thought|thinks|reported|report|reports|have|had|has|are|were|is|want|wanted|wants|plan|planned|plans|expect|expected|expects|feel|felt|feels|chose|choose|chooses|selected|select|selects|experienced|experience|experiences|received|receive|receives|paid|pay|pays|borrowed|borrow|borrows|saved|save|saves|get|gets|got)\b/i.test(
     text.trim()
   );
 }
 
-function hasBadQuestionLanguage(question = "") {
+function fixBroadcastGrammar(
+  text = ""
+) {
+  let t =
+    text
+      .replace(
+        /\s+/g,
+        " "
+      )
+      .trim();
+
+  t =
+    t.replace(
+      /\bAustralians\s+(\d{1,2})-(\d{1,2})\b/gi,
+      "Australians ages $1–$2"
+    );
+
+  t =
+    t.replace(
+      /\bAmericans\s+(\d{1,2})-(\d{1,2})\b/gi,
+      "Americans ages $1–$2"
+    );
+
+  t =
+    t.replace(
+      /\badults\s+(\d{1,2})-(\d{1,2})\b/gi,
+      "adults ages $1–$2"
+    );
+
+  t =
+    t.replace(
+      /\bpeople\s+(\d{1,2})-(\d{1,2})\b/gi,
+      "people ages $1–$2"
+    );
+
+  t =
+    t.replace(
+      /\b(listening)\s+to\b/gi,
+      "listen to"
+    );
+
+  t =
+    t.replace(
+      /\b(using)\s+/gi,
+      "use "
+    );
+
+  t =
+    t.replace(
+      /\b(watching)\s+/gi,
+      "watch "
+    );
+
+  t =
+    t.replace(
+      /\b(getting)\s+/gi,
+      "get "
+    );
+
+  return t;
+}
+
+function hasBadQuestionLanguage(
+  question = ""
+) {
   const q =
     question
-      .replace(/\s+/g, " ")
+      .replace(
+        /\s+/g,
+        " "
+      )
       .trim();
 
   if (!q) {
@@ -355,22 +597,24 @@ function hasBadQuestionLanguage(question = "") {
   }
 
   if (
-    /\b(matched this survey finding|matched the survey finding|this survey finding|this finding|the finding above|the survey finding above)\b/i.test(
+    /\b(matched this survey finding|matched the survey finding|this survey finding|this finding|the finding above|the survey finding above|the research topic)\b/i.test(
       q
     )
   ) {
     return true;
   }
 
-  const m =
-    q.match(
-      /^(?:In a survey about .+?,\s*)?How many\s+(.+?)\?/i
-    );
+  if (
+    /\bhow many\s+(donated|said|used|use|listening|watching|getting|prefer|agreed|believe|think)\b/i.test(
+      q
+    )
+  ) {
+    return true;
+  }
 
   if (
-    m &&
-    startsWithVerbPhrase(
-      m[1]
+    /\bhow many\s+[^?]{0,70}\b(listening|using|watching|getting)\b/i.test(
+      q
     )
   ) {
     return true;
@@ -379,14 +623,21 @@ function hasBadQuestionLanguage(question = "") {
   return false;
 }
 
-function questionHasStandaloneContext(question = "") {
+function questionHasStandaloneContext(
+  question = ""
+) {
   const q =
     question
-      .replace(/\s+/g, " ")
+      .replace(
+        /\s+/g,
+        " "
+      )
       .trim();
 
   if (
-    hasBadQuestionLanguage(q)
+    hasBadQuestionLanguage(
+      q
+    )
   ) {
     return false;
   }
@@ -402,196 +653,210 @@ function questionHasStandaloneContext(question = "") {
   return true;
 }
 
-function makeQuestion(
+function stripRatioLead(
   sentence,
-  stat,
-  articleTitle = ""
+  stat
+) {
+  const escaped =
+    stat.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&"
+    );
+
+  return sentence
+    .replace(
+      new RegExp(
+        `^(about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\\s*${escaped}\\s+`,
+        "i"
+      ),
+      ""
+    )
+    .replace(
+      /[.!?]+$/,
+      ""
+    )
+    .trim();
+}
+
+function makeRatioQuestion(
+  sentence,
+  stat
 ) {
   const s =
     sentence
-      .replace(/\s+/g, " ")
+      .replace(
+        /\s+/g,
+        " "
+      )
       .trim();
 
-  const subject =
-    surveySubjectFromTitle(
-      articleTitle
+  const escaped =
+    stat.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&"
     );
 
-  const prefix =
-    subject
-      ? `In a survey about ${subject}, `
-      : "";
-
-  /*
-   * RATIO QUESTIONS
-   *
-   * If a ratio cannot be turned into
-   * a clear standalone question,
-   * return an empty string so it
-   * gets rejected.
-   */
+  const beginsWithRatio =
+    new RegExp(
+      `^(about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\\s*${escaped}\\s+`,
+      "i"
+    ).test(
+      s
+    );
 
   if (
-    /\bin\b/i.test(stat) &&
-    !stat.includes("%")
+    beginsWithRatio
   ) {
-    const escaped =
-      stat.replace(
-        /[.*+?^${}()|[\]\\]/g,
-        "\\$&"
+    let tail =
+      stripRatioLead(
+        s,
+        stat
       );
 
-    let cleaned =
-      s.replace(
-        /^(another|about|around|roughly|nearly|almost|approximately|only|just|more than|less than)\s+/i,
+    tail =
+      tail.replace(
+        /^of\s+/i,
         ""
       );
 
-    if (
-      new RegExp(
-        `^${escaped}\\s+`,
-        "i"
-      ).test(cleaned)
-    ) {
-      let tail =
-        cleaned
-          .replace(
-            new RegExp(
-              `^${escaped}\\s+`,
-              "i"
-            ),
-            ""
-          )
-          .replace(
-            /[.!]+$/,
-            ""
-          )
-          .trim()
-          .replace(
-            /^of\s+/i,
-            ""
-          );
+    tail =
+      fixBroadcastGrammar(
+        tail
+      );
 
-      if (!tail) {
-        return "";
-      }
-
-      const nounTail =
-        startsWithVerbPhrase(tail)
-          ? `people ${tail}`
-          : tail;
-
-      return `${prefix}how many ${nounTail}?`
-        .replace(
-          /^In a survey about ([^,]+), how/i,
-          "In a survey about $1, how"
-        )
-        .replace(
-          /^how/,
-          "How"
-        );
+    if (!tail) {
+      return "";
     }
 
-    const idx =
-      cleaned
-        .toLowerCase()
-        .indexOf(
-          stat.toLowerCase()
-        );
-
     if (
-      idx >= 0
+      startsWithVerbPhrase(
+        tail
+      )
     ) {
-      const before =
-        cleaned
-          .slice(
-            0,
-            idx
-          )
-          .replace(
-            /[,;:\s-]+$/,
-            ""
-          )
-          .trim();
-
-      let after =
-        cleaned
-          .slice(
-            idx + stat.length
-          )
-          .replace(
-            /^[,;:\s-]+/,
-            ""
-          )
-          .replace(
-            /[.!?]+$/,
-            ""
-          )
-          .trim()
-          .replace(
-            /^of\s+/i,
-            ""
-          );
-
-      if (!after) {
-        return "";
-      }
-
-      if (
-        /^among\b/i.test(before)
-      ) {
-        return `${before}, how many ${
-          startsWithVerbPhrase(after)
-            ? `people ${after}`
-            : after
-        }?`
-          .replace(
-            /^among/i,
-            "Among"
-          );
-      }
-
-      const population =
-        before.match(
-          /\b(Americans|adults|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|voters|teens|teenagers|children|students|people)\b[^,;:]*/i
-        );
-
-      if (population) {
-        const pop =
-          population[0]
-            .replace(
-              /^(about|around|roughly|nearly|almost|approximately|only|just|more than|less than)\s+/i,
-              ""
-            )
-            .trim();
-
-        return `How many ${pop} ${after}?`
-          .replace(
-            /\s+/g,
-            " "
-          );
-      }
-
-      if (prefix) {
-        const nounTail =
-          startsWithVerbPhrase(after)
-            ? `people ${after}`
-            : after;
-
-        return `${prefix}how many ${nounTail}?`
-          .replace(
-            /^In a survey about ([^,]+), how/i,
-            "In a survey about $1, how"
-          );
-      }
+      return `How many people ${tail}?`;
     }
 
+    return `How many ${tail}?`;
+  }
+
+  const idx =
+    s
+      .toLowerCase()
+      .indexOf(
+        stat.toLowerCase()
+      );
+
+  if (
+    idx < 0
+  ) {
     return "";
   }
 
-  /*
-   * PERCENTAGE QUESTIONS
-   */
+  let before =
+    s
+      .slice(
+        0,
+        idx
+      )
+      .replace(
+        /[,;:\s-]+$/,
+        ""
+      )
+      .trim();
+
+  let after =
+    s
+      .slice(
+        idx +
+        stat.length
+      )
+      .replace(
+        /^[,;:\s-]+/,
+        ""
+      )
+      .replace(
+        /[.!?]+$/,
+        ""
+      )
+      .trim();
+
+  after =
+    after.replace(
+      /^of\s+/i,
+      ""
+    );
+
+  after =
+    fixBroadcastGrammar(
+      after
+    );
+
+  if (!after) {
+    return "";
+  }
+
+  if (
+    /^among\b/i.test(
+      before
+    )
+  ) {
+    const population =
+      before
+        .replace(
+          /^among\s+/i,
+          ""
+        )
+        .trim();
+
+    if (
+      startsWithVerbPhrase(
+        after
+      )
+    ) {
+      return `Among ${population}, how many people ${after}?`;
+    }
+
+    return `Among ${population}, how many ${after}?`;
+  }
+
+  const populationMatch =
+    before.match(
+      /\b(Americans|Australians|adults|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|teens|teenagers|children|students|people|women|men)\b[^,;:]*/i
+    );
+
+  if (
+    populationMatch
+  ) {
+    let population =
+      fixBroadcastGrammar(
+        populationMatch[0]
+      );
+
+    if (
+      startsWithVerbPhrase(
+        after
+      )
+    ) {
+      return `How many ${population} ${after}?`;
+    }
+
+    return `How many ${population} ${after}?`;
+  }
+
+  return "";
+}
+
+function makePercentageQuestion(
+  sentence,
+  stat
+) {
+  const s =
+    sentence
+      .replace(
+        /\s+/g,
+        " "
+      )
+      .trim();
 
   const escaped =
     stat.replace(
@@ -607,10 +872,15 @@ function makeQuestion(
       )
     );
 
-  if (m) {
-    return `What percentage of ${m[1].replace(
-      /[.!?]+$/,
-      ""
+  if (
+    m
+  ) {
+    return `What percentage of ${fixBroadcastGrammar(
+      m[1]
+        .replace(
+          /[.!?]+$/,
+          ""
+        )
     )}?`;
   }
 
@@ -622,53 +892,35 @@ function makeQuestion(
       )
     );
 
-  if (m) {
-    return `${m[1]}what percentage ${m[2].replace(
-      /[.!?]+$/,
-      ""
-    )}?`;
-  }
-
-  m =
-    s.match(
-      new RegExp(
-        `^(.+?)\\s+\\(${escaped}\\)(.+?)[.!]?$`,
-        "i"
-      )
-    );
-
-  if (m) {
-    const after =
+  if (
+    m
+  ) {
+    return `${m[1]}what percentage ${fixBroadcastGrammar(
       m[2]
-        .replace(
-          /^[,;:\s-]+/,
-          ""
-        )
         .replace(
           /[.!?]+$/,
           ""
         )
-        .trim();
-
-    if (after) {
-      return `What percentage ${after}?`;
-    }
+    )}?`;
   }
 
   const replaced =
-    s.replace(
-      new RegExp(
-        escaped,
-        "i"
-      ),
-      "what percentage"
+    fixBroadcastGrammar(
+      s.replace(
+        new RegExp(
+          escaped,
+          "i"
+        ),
+        "what percentage"
+      )
     );
 
   return (
-    replaced.replace(
-      /[.!]+$/,
-      ""
-    ) +
+    replaced
+      .replace(
+        /[.!]+$/,
+        ""
+      ) +
     (
       replaced.endsWith("?")
         ? ""
@@ -677,45 +929,115 @@ function makeQuestion(
   );
 }
 
-function findStats(sentence) {
+function makeQuestion(
+  sentence,
+  stat
+) {
+  let q = "";
+
+  if (
+    /\bin\b/i.test(
+      stat
+    ) &&
+    !stat.includes(
+      "%"
+    )
+  ) {
+    q =
+      makeRatioQuestion(
+        sentence,
+        stat
+      );
+  } else {
+    q =
+      makePercentageQuestion(
+        sentence,
+        stat
+      );
+  }
+
+  q =
+    fixBroadcastGrammar(
+      q
+    )
+      .replace(
+        /\s+\?/g,
+        "?"
+      )
+      .trim();
+
+  if (
+    !questionHasStandaloneContext(
+      q
+    )
+  ) {
+    return "";
+  }
+
+  return q;
+}
+
+function findStats(
+  sentence
+) {
   const found = [];
 
   for (
-    const m of sentence.matchAll(
+    const m of
+    sentence.matchAll(
       /\b(?!1000)(\d{1,2}|100)%\b/g
     )
   ) {
     const n =
-      Number(m[1]);
+      Number(
+        m[1]
+      );
 
     if (
       n >= 5 &&
       n <= 95
     ) {
       found.push({
-        stat: m[0],
-        index: m.index,
-        type: "percent"
+        stat:
+          m[0],
+
+        index:
+          m.index,
+
+        type:
+          "percent"
       });
     }
   }
 
   for (
-    const m of sentence.matchAll(
+    const m of
+    sentence.matchAll(
       /\b([1-9]|10)\s+in\s+([2-9]|10)\b/gi
     )
   ) {
     const a =
-      Number(m[1]);
+      Number(
+        m[1]
+      );
 
     const b =
-      Number(m[2]);
+      Number(
+        m[2]
+      );
 
-    if (a < b) {
+    if (
+      a < b
+    ) {
       found.push({
-        stat: `${a} in ${b}`,
-        index: m.index,
-        type: "ratio"
+        stat:
+          `${a} in ${b}`,
+
+        index:
+          m.index,
+
+        type:
+          "ratio"
       });
     }
   }
@@ -737,25 +1059,35 @@ function findStats(sentence) {
   };
 
   for (
-    const m of sentence.matchAll(
+    const m of
+    sentence.matchAll(
       wordRe
     )
   ) {
     const a =
       nums[
-        m[1].toLowerCase()
+        m[1]
+          .toLowerCase()
       ];
 
     const b =
       nums[
-        m[2].toLowerCase()
+        m[2]
+          .toLowerCase()
       ];
 
-    if (a < b) {
+    if (
+      a < b
+    ) {
       found.push({
-        stat: `${a} in ${b}`,
-        index: m.index,
-        type: "ratio"
+        stat:
+          `${a} in ${b}`,
+
+        index:
+          m.index,
+
+        type:
+          "ratio"
       });
     }
   }
@@ -766,7 +1098,8 @@ function findStats(sentence) {
   return found
     .sort(
       (a, b) =>
-        a.index - b.index
+        a.index -
+        b.index
     )
     .filter(
       x => {
@@ -774,34 +1107,50 @@ function findStats(sentence) {
           `${x.stat}|${x.index}`;
 
         if (
-          seen.has(k)
+          seen.has(
+            k
+          )
         ) {
           return false;
         }
 
-        seen.add(k);
+        seen.add(
+          k
+        );
 
         return true;
       }
     );
 }
 
-function hashId(parts) {
+function hashId(
+  parts
+) {
   return crypto
-    .createHash("sha1")
-    .update(
-      parts.join("|")
+    .createHash(
+      "sha1"
     )
-    .digest("hex")
+    .update(
+      parts.join(
+        "|"
+      )
+    )
+    .digest(
+      "hex"
+    )
     .slice(
       0,
       16
     );
 }
 
-function isoDate(raw) {
+function isoDate(
+  raw
+) {
   const d =
-    new Date(raw);
+    new Date(
+      raw
+    );
 
   return Number.isNaN(
     d.getTime()
@@ -820,7 +1169,9 @@ function isoDate(raw) {
         );
 }
 
-function displayDate(raw) {
+function displayDate(
+  raw
+) {
   const d =
     new Date(
       `${raw}T12:00:00Z`
@@ -837,15 +1188,24 @@ function displayDate(raw) {
   return d.toLocaleDateString(
     "en-US",
     {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      timeZone: "UTC"
+      month:
+        "short",
+
+      day:
+        "numeric",
+
+      year:
+        "numeric",
+
+      timeZone:
+        "UTC"
     }
   );
 }
 
-function ageDays(date) {
+function ageDays(
+  date
+) {
   return (
     Date.now() -
     new Date(
@@ -878,7 +1238,9 @@ function extractCandidates(
     const chunk of chunks
   ) {
     const clean =
-      stripHtml(chunk)
+      stripHtml(
+        chunk
+      )
         .replace(
           /\s+/g,
           " "
@@ -890,7 +1252,8 @@ function extractCandidates(
     }
 
     if (
-      chunk === article.title ||
+      chunk ===
+        article.title ||
       clean.length < 35
     ) {
       candidateSentences.push(
@@ -899,7 +1262,9 @@ function extractCandidates(
     }
 
     candidateSentences.push(
-      ...sentences(clean)
+      ...sentences(
+        clean
+      )
     );
   }
 
@@ -914,7 +1279,9 @@ function extractCandidates(
   ) {
     if (
       !sentence ||
-      isPolitical(sentence)
+      isPolitical(
+        sentence
+      )
     ) {
       continue;
     }
@@ -928,7 +1295,9 @@ function extractCandidates(
     }
 
     const stats =
-      findStats(sentence);
+      findStats(
+        sentence
+      );
 
     if (
       !stats.length
@@ -950,16 +1319,27 @@ function extractCandidates(
         `${article.link}|${sentence}|${stat}`;
 
       if (
-        seen.has(key)
+        seen.has(
+          key
+        )
       ) {
         continue;
       }
 
-      seen.add(key);
+      seen.add(
+        key
+      );
+
+      const question =
+        makeQuestion(
+          sentence,
+          stat
+        );
 
       const topic =
-        inferTopic(
-          `${article.title} ${sentence}`
+        inferTopicFromFinding(
+          sentence,
+          article.title
         );
 
       const published =
@@ -978,12 +1358,7 @@ function extractCandidates(
 
         topic,
 
-        question:
-          makeQuestion(
-            sentence,
-            stat,
-            article.title
-          ),
+        question,
 
         answer:
           stat,
@@ -996,10 +1371,10 @@ function extractCandidates(
             : "From a recent survey finding.",
 
         talk:
-          talkFor(
+          talkForFinding(
             topic,
-            article.title,
-            sentence
+            sentence,
+            article.title
           ),
 
         source:
@@ -1022,7 +1397,9 @@ function extractCandidates(
 
   return out;
 }
-function explainUsability(item) {
+function explainUsability(
+  item
+) {
   if (
     !item ||
     !item.question ||
@@ -1034,7 +1411,7 @@ function explainUsability(item) {
 
   if (
     item.question.length < 25 ||
-    item.question.length > 280
+    item.question.length > 240
   ) {
     return "question_length";
   }
@@ -1071,77 +1448,13 @@ function explainUsability(item) {
   return "ok";
 }
 
-function isUsable(item) {
-  return (
-    explainUsability(item) ===
-    "ok"
-  );
-}
-
-function pickWidgetItems(items) {
-  const picked = [];
-
-  const topicCount =
-    new Map();
-
-  for (
-    const item of items
-  ) {
-    const n =
-      topicCount.get(
-        item.topic
-      ) || 0;
-
-    if (
-      n >= 2
-    ) {
-      continue;
-    }
-
-    picked.push(item);
-
-    topicCount.set(
-      item.topic,
-      n + 1
-    );
-
-    if (
-      picked.length >=
-      MAX_WIDGET_ITEMS
-    ) {
-      break;
-    }
-  }
-
-  if (
-    picked.length <
+function pickWidgetItems(
+  items
+) {
+  return items.slice(
+    0,
     MAX_WIDGET_ITEMS
-  ) {
-    for (
-      const item of items
-    ) {
-      if (
-        !picked.some(
-          x =>
-            x.id ===
-            item.id
-        )
-      ) {
-        picked.push(
-          item
-        );
-      }
-
-      if (
-        picked.length >=
-        MAX_WIDGET_ITEMS
-      ) {
-        break;
-      }
-    }
-  }
-
-  return picked;
+  );
 }
 
 function buildWidgetHtml(
@@ -1159,7 +1472,8 @@ function buildWidgetHtml(
   const topics = [
     ...new Set(
       picked.map(
-        x => x.topic
+        x =>
+          x.topic
       )
     )
   ].sort();
@@ -1170,7 +1484,9 @@ function buildWidgetHtml(
         t =>
           `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`
       )
-      .join("\n");
+      .join(
+        "\n"
+      );
 
   const cards =
     picked
@@ -1210,8 +1526,9 @@ function buildWidgetHtml(
       <strong>Talk About It:</strong>
       ${escapeHtml(
         item.talk ||
-        talkFor(
-          item.topic
+        talkForFinding(
+          item.topic,
+          item.question
         )
       )}
     </p>
@@ -1235,7 +1552,9 @@ function buildWidgetHtml(
   </div>
 </article>`
       )
-      .join("\n");
+      .join(
+        "\n"
+      );
 
   return `<!doctype html>
 <html lang="en">
@@ -1590,7 +1909,9 @@ function readRotationState() {
   }
 }
 
-function writeRotationState(state) {
+function writeRotationState(
+  state
+) {
   fs.writeFileSync(
     ROTATION_STATE,
     JSON.stringify(
@@ -1633,7 +1954,9 @@ function recentShownIds(
       );
 
     if (
-      !Number.isFinite(t) ||
+      !Number.isFinite(
+        t
+      ) ||
       t < cutoff
     ) {
       continue;
@@ -1643,11 +1966,24 @@ function recentShownIds(
       const id of
       row.ids || []
     ) {
-      ids.add(id);
+      ids.add(
+        id
+      );
     }
   }
 
   return ids;
+}
+
+function sourceCount(
+  chosen,
+  source
+) {
+  return chosen.filter(
+    x =>
+      x.source ===
+      source
+  ).length;
 }
 
 function pickDailyRotation(
@@ -1656,7 +1992,9 @@ function pickDailyRotation(
   state
 ) {
   const recent =
-    recentShownIds(state);
+    recentShownIds(
+      state
+    );
 
   const newestFirst =
     arr =>
@@ -1675,24 +2013,29 @@ function pickDailyRotation(
           )
       );
 
-  const ordered = [
-    ...newestFirst(
+  const fresh =
+    newestFirst(
       pool.filter(
         x =>
           !recent.has(
             x.id
           )
       )
-    ),
+    );
 
-    ...newestFirst(
+  const fallback =
+    newestFirst(
       pool.filter(
         x =>
           recent.has(
             x.id
           )
       )
-    )
+    );
+
+  const ordered = [
+    ...fresh,
+    ...fallback
   ];
 
   const chosen = [];
@@ -1716,15 +2059,24 @@ function pickDailyRotation(
   const usedTopics =
     new Set(
       chosen.map(
-        x => x.topic
+        x =>
+          x.topic
       )
     );
 
+  /*
+   * PASS 1:
+   * Prefer new topics and never exceed
+   * two items from the same source.
+   */
+
   for (
-    const item of ordered
+    const item of
+    ordered
   ) {
     if (
-      chosen.length >= count
+      chosen.length >=
+      count
     ) {
       break;
     }
@@ -1740,40 +2092,105 @@ function pickDailyRotation(
     }
 
     if (
-      !usedTopics.has(
+      sourceCount(
+        chosen,
+        item.source
+      ) >=
+      MAX_PER_SOURCE
+    ) {
+      continue;
+    }
+
+    if (
+      usedTopics.has(
         item.topic
       )
     ) {
-      chosen.push(
-        item
-      );
-
-      usedTopics.add(
-        item.topic
-      );
+      continue;
     }
+
+    chosen.push(
+      item
+    );
+
+    usedTopics.add(
+      item.topic
+    );
   }
 
+  /*
+   * PASS 2:
+   * Fill remaining spots while still
+   * respecting max two per source.
+   */
+
   for (
-    const item of ordered
+    const item of
+    ordered
   ) {
     if (
-      chosen.length >= count
+      chosen.length >=
+      count
     ) {
       break;
     }
 
     if (
-      !chosen.some(
+      chosen.some(
         x =>
           x.id ===
           item.id
       )
     ) {
-      chosen.push(
-        item
-      );
+      continue;
     }
+
+    if (
+      sourceCount(
+        chosen,
+        item.source
+      ) >=
+      MAX_PER_SOURCE
+    ) {
+      continue;
+    }
+
+    chosen.push(
+      item
+    );
+  }
+
+  /*
+   * PASS 3:
+   * Only relax source limit if there
+   * are not enough distinct-source
+   * items to fill the widget.
+   */
+
+  for (
+    const item of
+    ordered
+  ) {
+    if (
+      chosen.length >=
+      count
+    ) {
+      break;
+    }
+
+    if (
+      chosen.some(
+        x =>
+          x.id ===
+          item.id
+      )
+    ) {
+      continue;
+    }
+
+    chosen.push(
+      item
+    );
   }
 
   return chosen.slice(
@@ -1782,14 +2199,16 @@ function pickDailyRotation(
   );
 }
 
-async function fetchText(url) {
+async function fetchText(
+  url
+) {
   const r =
     await fetch(
       url,
       {
         headers: {
           "user-agent":
-            "MediaJobsReport-SurveySays/2.0 (+https://www.mediajobsreport.com/)"
+            "MediaJobsReport-SurveySays/2.1 (+https://www.mediajobsreport.com/)"
         },
 
         redirect:
@@ -1820,9 +2239,13 @@ async function fetchText(url) {
     source => {
 
       if (
-        !diag[source]
+        !diag[
+          source
+        ]
       ) {
-        diag[source] = {
+        diag[
+          source
+        ] = {
           discovered: 0,
           rejectedMissing: 0,
           rejectedQuestionLength: 0,
@@ -1834,7 +2257,9 @@ async function fetchText(url) {
         };
       }
 
-      return diag[source];
+      return diag[
+        source
+      ];
     };
 
   const seed =
@@ -1894,7 +2319,9 @@ async function fetchText(url) {
         );
 
       let articles =
-        parseRss(xml);
+        parseRss(
+          xml
+        );
 
       console.log(
         `  RSS items: ${articles.length}`
@@ -1942,7 +2369,9 @@ async function fetchText(url) {
         `  Findings discovered from ${source.name}: ${added}`
       );
 
-    } catch (err) {
+    } catch (
+      err
+    ) {
 
       console.warn(
         `  Source failed: ${err.message}`
@@ -2055,7 +2484,8 @@ async function fetchText(url) {
       key,
       {
         ...item,
-        id: key
+        id:
+          key
       }
     );
   }
@@ -2086,7 +2516,8 @@ async function fetchText(url) {
   const finalIds =
     new Set(
       items.map(
-        x => x.id
+        x =>
+          x.id
       )
     );
 
@@ -2122,8 +2553,11 @@ async function fetchText(url) {
   }
 
   for (
-    const [source, d]
-    of Object.entries(
+    const [
+      source,
+      d
+    ] of
+    Object.entries(
       diag
     )
   ) {
@@ -2156,7 +2590,8 @@ async function fetchText(url) {
       OUT_JSON
     ),
     {
-      recursive: true
+      recursive:
+        true
     }
   );
 
@@ -2230,16 +2665,19 @@ async function fetchText(url) {
 
       ids:
         daily7.map(
-          x => x.id
+          x =>
+            x.id
         )
     },
 
-    ...(rotationState.history || [])
-      .filter(
-        x =>
-          x.date !==
-          dateKey()
-      )
+    ...(
+      rotationState.history ||
+      []
+    ).filter(
+      x =>
+        x.date !==
+        dateKey()
+    )
 
   ].slice(
     0,
@@ -2256,11 +2694,18 @@ async function fetchText(url) {
 
   const mix3 =
     daily3.reduce(
-      (m, x) => {
+      (
+        m,
+        x
+      ) => {
 
-        m[x.source] =
+        m[
+          x.source
+        ] =
           (
-            m[x.source] ||
+            m[
+              x.source
+            ] ||
             0
           ) + 1;
 
@@ -2271,11 +2716,18 @@ async function fetchText(url) {
 
   const mix7 =
     daily7.reduce(
-      (m, x) => {
+      (
+        m,
+        x
+      ) => {
 
-        m[x.source] =
+        m[
+          x.source
+        ] =
           (
-            m[x.source] ||
+            m[
+              x.source
+            ] ||
             0
           ) + 1;
 
@@ -2297,15 +2749,23 @@ async function fetchText(url) {
   );
 
   console.log(
+    `Source diversity target: maximum ${MAX_PER_SOURCE} items per source when enough alternatives exist.`
+  );
+
+  console.log(
     "Static widgets: 3 / 5 / 7 generated in docs/"
   );
 
 })().catch(
   err => {
 
-    console.error(err);
+    console.error(
+      err
+    );
 
-    process.exit(1);
+    process.exit(
+      1
+    );
 
   }
 );
