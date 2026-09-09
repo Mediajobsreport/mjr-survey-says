@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-09-09T15:21:21.479Z",
-  "count": 16,
+  "updated_at": "2026-09-09T15:28:34.887Z",
+  "count": 12,
   "items": [
     {
       "id": "ipsos-human-food-20260828",
@@ -161,62 +161,6 @@
       "source_url": "https://apnorc.org/projects/epic-climate-change-2025/?utm_source=rss&utm_medium=rss&utm_campaign=epic-climate-change-2025",
       "source_date": "2025-10-23",
       "published_at": "2025-10-23",
-      "auto_generated": true
-    },
-    {
-      "id": "771ba27b224e213e",
-      "topic": "Technology",
-      "question": "How many those who have experienced extreme weather recently believe that climate change was a contributing factor?",
-      "answer": "9 in 10",
-      "stat": "9 in 10",
-      "context": "From “Public attitudes toward climate policy, technology, and the environment.”",
-      "talk": "Would this number be higher or lower among your friends and coworkers?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/epic-climate-change-2025/?utm_source=rss&utm_medium=rss&utm_campaign=epic-climate-change-2025",
-      "source_date": "2025-10-23",
-      "published_at": "2025-10-23",
-      "auto_generated": true
-    },
-    {
-      "id": "7ef4b86f57476d1a",
-      "topic": "Entertainment",
-      "question": "How many people are sports super fans who have adopted sports streaming services?",
-      "answer": "1 in 5",
-      "stat": "1 in 5",
-      "context": "From “Half the public are fans of sports, but it’s the 1 in 5 who are super fans adopting sports streaming services.”",
-      "talk": "Have streaming services made it easier or harder for you to watch the sports you want?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services/?utm_source=rss&utm_medium=rss&utm_campaign=half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services",
-      "source_date": "2025-09-16",
-      "published_at": "2025-09-16",
-      "auto_generated": true
-    },
-    {
-      "id": "2365b07198be1fa2",
-      "topic": "Entertainment",
-      "question": "How many people are sports super fans who have adopted sports streaming services?",
-      "answer": "1 in 5",
-      "stat": "1 in 5",
-      "context": "From “Half the public are fans of sports, but it’s the 1 in 5 who are super fans adopting sports streaming services.”",
-      "talk": "Have streaming services made it easier or harder for you to watch the sports you want?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services/?utm_source=rss&utm_medium=rss&utm_campaign=half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services",
-      "source_date": "2025-09-16",
-      "published_at": "2025-09-16",
-      "auto_generated": true
-    },
-    {
-      "id": "de2bf40544448d3d",
-      "topic": "Entertainment",
-      "question": "How many people are sports super fans who have adopted sports streaming services?",
-      "answer": "1 in 5",
-      "stat": "1 in 5",
-      "context": "From “Half the public are fans of sports, but it’s the 1 in 5 who are super fans adopting sports streaming services.”",
-      "talk": "Have streaming services made it easier or harder for you to watch the sports you want?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services/?utm_source=rss&utm_medium=rss&utm_campaign=half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services",
-      "source_date": "2025-09-16",
-      "published_at": "2025-09-16",
       "auto_generated": true
     }
   ]
