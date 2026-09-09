@@ -28,7 +28,7 @@ jobs:
         run: |
           git config user.name "mjr-survey-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/surveys.json docs/survey-says.html
+          git add docs/ mjr-survey-rotation.json
           if git diff --cached --quiet; then
             echo "No changes."
           else
