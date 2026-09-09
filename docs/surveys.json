@@ -1,14 +1,14 @@
 {
-  "updated_at": "2026-09-09T16:05:31.645Z",
-  "count": 44,
+  "updated_at": "2026-09-09T16:13:43.970Z",
+  "count": 46,
   "items": [
     {
-      "id": "819595f28c2741c4",
+      "id": "a5a0027251a14974",
       "topic": "Family & Life",
       "question": "How many parents believe that raising children today requires a wider circle of trust than it did a generation ago, according to new research?",
       "answer": "7 in 10",
       "stat": "7 in 10",
-      "context": "Finding: Seven in 10 parents believe that raising children today requires a wider circle of trust than it did a generation ago, according to new research.",
+      "context": "Finding: Seven in 10 parents believe that raising children today requires a wider circle of trust than it did a generation ago, according to new research",
       "talk": "Who do parents rely on most today when they need help, advice or someone they can trust with their kids?",
       "source": "Talker Research",
       "source_url": "https://talker.news/2026/09/09/lengths-parents-will-go-to-find-best-care-for-their-kids/",
@@ -42,6 +42,34 @@
       "source_url": "https://talker.news/2026/09/09/lengths-parents-will-go-to-find-best-care-for-their-kids/",
       "source_date": "2026-09-09",
       "published_at": "2026-09-09",
+      "auto_generated": true
+    },
+    {
+      "id": "819595f28c2741c4",
+      "topic": "Family & Life",
+      "question": "How many parents believe that raising children today requires a wider circle of trust than it did a generation ago, according to new research?",
+      "answer": "7 in 10",
+      "stat": "7 in 10",
+      "context": "Finding: Seven in 10 parents believe that raising children today requires a wider circle of trust than it did a generation ago, according to new research.",
+      "talk": "Who do parents rely on most today when they need help, advice or someone they can trust with their kids?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/09/09/lengths-parents-will-go-to-find-best-care-for-their-kids/",
+      "source_date": "2026-09-09",
+      "published_at": "2026-09-09",
+      "auto_generated": true
+    },
+    {
+      "id": "9502aefe02070071",
+      "topic": "Health",
+      "question": "What percentage of U.S. adults are ‘Very’ Likely to Switch Health Insurance Soon?",
+      "answer": "16%",
+      "stat": "16%",
+      "context": "Finding: 16% of U.S. Adults Are ‘Very’ Likely to Switch Health Insurance Soon",
+      "talk": "Has this changed the way you think about your own health choices?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/16-of-u-s-adults-are-very-likely-to-switch-health-insurance-soon-heres-what-to-know/",
+      "source_date": "2026-09-01",
+      "published_at": "2026-09-01",
       "auto_generated": true
     },
     {
@@ -85,20 +113,6 @@
       "published_at": "2026-08-28"
     },
     {
-      "id": "b94390bc7fc2c05c",
-      "topic": "Life & Culture",
-      "question": "What percentage of Millennials plan to give more this year?",
-      "answer": "75%",
-      "stat": "75%",
-      "context": "Finding: 75% of Millennials plan to give more this year.",
-      "talk": "Does this number surprise you, or does it sound about right?",
-      "source": "The Harris Poll",
-      "source_url": "https://theharrispoll.com/articles/america-this-week-august-20-2026/",
-      "source_date": "2026-08-21",
-      "published_at": "2026-08-21",
-      "auto_generated": true
-    },
-    {
       "id": "59bcf23211924f31",
       "topic": "Life & Culture",
       "question": "what percentage are already use donor-advised funds?",
@@ -110,6 +124,20 @@
       "source_url": "https://theharrispoll.com/articles/america-this-week-august-20-2026/",
       "source_date": "2026-08-21",
       "published_at": "2026-08-21",
+      "auto_generated": true
+    },
+    {
+      "id": "b2b732a0a79d2860",
+      "topic": "Money",
+      "question": "What percentage of Gen Z adults skip weekend plans to save money?",
+      "answer": "62%",
+      "stat": "62%",
+      "context": "Finding: 62% of Gen Z Skip Weekend Plans to Save Money",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "The Harris Poll",
+      "source_url": "https://theharrispoll.com/articles/america-this-week-august-6-2026/",
+      "source_date": "2026-08-06",
+      "published_at": "2026-08-06",
       "auto_generated": true
     },
     {
