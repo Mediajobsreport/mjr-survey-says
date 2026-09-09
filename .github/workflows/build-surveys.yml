@@ -1,9 +1,9 @@
-name: Build MJR Survey Says
+name: Build Survey Says
 
 on:
   workflow_dispatch:
+
   schedule:
-    # 08:15 UTC daily. During EDT this is 4:15 a.m. ET.
     - cron: "15 8 * * *"
 
 permissions:
@@ -12,26 +12,35 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Build Survey Says feed and widget
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Survey Says
         run: npm run build
+
+      - name: Run Odum diagnostic
+        run: node scripts/test-odum.js
 
       - name: Commit updated Survey Says files
         run: |
-          git config user.name "mjr-survey-bot"
-          git config user.email "actions@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add docs/ mjr-survey-rotation.json
+
           if git diff --cached --quiet; then
-            echo "No changes."
+            echo "No Survey Says changes to commit."
           else
-            git commit -m "Update Survey Says"
+            git commit -m "Update MJR Survey Says"
             git push
           fi
