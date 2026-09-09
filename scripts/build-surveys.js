@@ -11,14 +11,20 @@ const SEED = path.join(process.cwd(), "data-seed.json");
 
 const SOURCES = [
   {
+    name: "Talker Research",
+    url: "https://talker.news/feed/",
+    mode: "rss",
+    filter: "talker-research"
+  },
+  {
     name: "Pew Research Center",
     url: "https://www.pewresearch.org/publications/feed/",
     mode: "rss"
   }
 ];
 
-const MAX_POOL = 60;
-const MAX_AGE_DAYS = 120;
+const MAX_POOL = 90;
+const MAX_AGE_DAYS = 180;
 const MAX_WIDGET_ITEMS = 7;
 
 function decodeXml(s="") {
@@ -44,6 +50,10 @@ function tag(block, name) {
   const m = block.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`, "i"));
   return m ? stripHtml(m[1]) : "";
 }
+function tags(block, name) {
+  const re = new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`, "gi");
+  return [...block.matchAll(re)].map(m => stripHtml(m[1])).filter(Boolean);
+}
 function parseRss(xml) {
   const blocks = xml.match(/<item\b[\s\S]*?<\/item>/gi) || [];
   return blocks.map(b => ({
@@ -51,8 +61,20 @@ function parseRss(xml) {
     link: tag(b, "link"),
     date: tag(b, "pubDate"),
     description: tag(b, "description"),
-    content: tag(b, "content:encoded")
+    content: tag(b, "content:encoded"),
+    creator: tag(b, "dc:creator") || tag(b, "author"),
+    categories: tags(b, "category")
   }));
+}
+function isTalkerResearchArticle(article) {
+  const haystack = [
+    article.creator || "",
+    ...(article.categories || []),
+    article.title || "",
+    article.description || "",
+    article.content || ""
+  ].join(" ");
+  return /\bTalker Research\b/i.test(haystack);
 }
 function sentences(text="") {
   return text
@@ -100,6 +122,8 @@ function makeQuestion(sentence, pct) {
   if (m) return `What percentage of ${m[1].replace(/[.!?]+$/,"")}?`;
   m = s.match(new RegExp(`^(Among\\s+[^,]+,\\s*)${escaped}\\s+(.+?)[.!]?$`, "i"));
   if (m) return `${m[1]}what percentage ${m[2].replace(/[.!?]+$/,"")}?`;
+  m = s.match(new RegExp(`^(.+?)\\s+\\(${escaped}\\)(.+?)[.!]?$`, "i"));
+  if (m) return `What percentage ${m[2].replace(/^[,;:\s-]+/,"").replace(/[.!?]+$/,"")}?`;
   const replaced = s.replace(new RegExp(escaped, "i"), "what percentage");
   return replaced.replace(/[.!]+$/, "") + (replaced.endsWith("?") ? "" : "?");
 }
@@ -237,8 +261,12 @@ async function fetchText(url) {
     try {
       console.log(`Fetching ${source.name}: ${source.url}`);
       const xml = await fetchText(source.url);
-      const articles = parseRss(xml);
+      let articles = parseRss(xml);
       console.log(`  RSS items: ${articles.length}`);
+      if (source.filter === "talker-research") {
+        articles = articles.filter(isTalkerResearchArticle);
+        console.log(`  Talker Research items: ${articles.length}`);
+      }
       for (const article of articles) discovered.push(...extractCandidates(article, source.name));
     } catch (err) {
       console.warn(`  Source failed: ${err.message}`);
