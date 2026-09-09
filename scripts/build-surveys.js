@@ -687,6 +687,46 @@ function contextHasUndefinedPopulation(context = '') {
   return /^(?:assume|assumes|are|is|were|was|have|has|had|say|says|said|feel|feels|felt|think|thinks|thought|use|uses|used|plan|plans|planned|expect|expects|expected|want|wants|wanted|prefer|prefers|preferred|believe|believes|believed|report|reports|reported|skip|skips|avoid|avoids|would|will|can|could|they|their|them)\b/i.test(tail);
 }
 
+// v3.1: semantic-integrity rule — one statistic, one measured clause, one question.
+// Reject a finding when a numeric result shares a sentence with a separate qualitative
+// measurement ("most", "many", "some", etc.) joined by and/while/but/though. This keeps
+// the numeric answer from being accidentally applied to both clauses.
+function contextHasMixedMeasurementClauses(context = '') {
+  const c = String(context).replace(/\s+/g, ' ').trim();
+  const finding = c.replace(/^.*?Finding:\s*/i, '').trim();
+  if (!finding) return false;
+
+  const statMatches = [...finding.matchAll(/\b(?:\d{1,3}%|(?:[1-9]|10)\s+in\s+(?:[2-9]|10))\b/gi)];
+  if (statMatches.length !== 1) return false;
+
+  const statIndex = statMatches[0].index ?? -1;
+  if (statIndex < 0) return false;
+
+  const connectorRe = /\b(?:and|while|but|though|although|whereas|however)\b|[:;]/gi;
+  const connectors = [...finding.matchAll(connectorRe)];
+  if (!connectors.length) return false;
+
+  const qualitativeRe = /\b(?:most|many|some|few|a majority|the majority|a minority|the minority|more than half|less than half|about half|nearly half)\b/i;
+
+  for (const m of connectors) {
+    const idx = m.index ?? -1;
+    if (idx < 0) continue;
+    const left = finding.slice(0, idx).trim();
+    const right = finding.slice(idx + m[0].length).trim();
+    const statOnLeft = statIndex < idx;
+    const otherSide = statOnLeft ? right : left;
+    const statSide = statOnLeft ? left : right;
+
+    // The nonnumeric side contains its own qualitative measurement, while the numeric
+    // side contains our answer. Those are two separate findings and must not be merged.
+    if (qualitativeRe.test(otherSide) && /\b(?:\d{1,3}%|(?:[1-9]|10)\s+in\s+(?:[2-9]|10))\b/i.test(statSide)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function finalBroadcastQualityGate(item) {
   if (!item || !item.question) return false;
   const q = String(item.question).replace(/\s+/g, ' ').trim();
@@ -702,6 +742,7 @@ function finalBroadcastQualityGate(item) {
   if (isAmbiguousMultiYearQuestion(q)) return false;
   if (containsUndefinedReference(q)) return false;
   if (contextHasUndefinedPopulation(item.context || '')) return false;
+  if (contextHasMixedMeasurementClauses(item.context || '')) return false;
 
   // Catch copy collisions and headline prose that are technically grammatical but not an on-air question.
   if (/\b(?:In a nationwide poll of|In a survey of|The survey found|The poll found|we conducted with|highlighting the critical role)\b[^?]{90,}/i.test(q)) return false;
@@ -722,6 +763,7 @@ function explainUsability(item) {
   if (hasIncompleteMoreLessObject(item.question)) return 'standalone';
   if (hasMalformedPercentagePopulation(item.question)) return 'standalone';
   if (/\bFinding:\s*\d{1,3}%\s+(?:are|is|were|was|have|has|had|say|says|said|use|uses|used|plan|plans|planned|they|their|them)\b/i.test(item.context || '')) return 'standalone';
+  if (contextHasMixedMeasurementClauses(item.context || '')) return 'standalone';
   if (item.auto_generated && ageDays(item.published_at || item.source_date) > maxAgeDaysForSource(item.source)) return 'age';
   return 'ok';
 }
@@ -875,7 +917,7 @@ function pickDailyRotation(pool, count, state) {
 async function fetchText(url) {
   const r = await fetch(url, {
     headers: {
-      'user-agent': 'MediaJobsReport-SurveySays/2.8 (+https://www.mediajobsreport.com/)',
+      'user-agent': 'MediaJobsReport-SurveySays/3.1 (+https://www.mediajobsreport.com/)',
       accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, text/html;q=0.9, */*;q=0.5'
     },
     redirect: 'follow'
@@ -951,7 +993,7 @@ async function fetchHtmlDiscoverySource(source) {
 
 (async () => {
   console.log('Building MJR Survey Says feed + static widget...');
-  console.log('v3.0 final broadcast-quality gate: ON (all fresh, cached, transformed, and seeded items)');
+  console.log('v3.1 final broadcast-quality gate: ON (one statistic = one measured clause = one question)');
 
   const diag = {};
   const ensureDiag = source => {
