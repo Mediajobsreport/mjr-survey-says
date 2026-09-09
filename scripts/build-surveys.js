@@ -354,9 +354,7 @@ function stripTrailingSemicolonClause(sentence = "", stat = "") {
 
   const statIndex = s
     .toLowerCase()
-    .indexOf(
-      String(stat).toLowerCase()
-    );
+    .indexOf(String(stat).toLowerCase());
 
   if (
     statIndex >= 0 &&
@@ -405,13 +403,6 @@ function isMalformedDonationQuestion(
   const h =
     `${context} ${sourceUrl}`.toLowerCase();
 
-  /*
-   * Cached failure:
-   * "How many people donated between $51 and $100?"
-   *
-   * If the material is specifically crowdfunding,
-   * the donor population must be stated.
-   */
   if (
     /^how many people\s+(donated|gave|contributed)\b/i.test(q) &&
     /\bcrowdfund(?:ing|ed)?\b/.test(h)
@@ -419,11 +410,6 @@ function isMalformedDonationQuestion(
     return true;
   }
 
-  /*
-   * Any "How many people donated..." question
-   * with a dollar range is too ambiguous without
-   * explicitly naming who those people were.
-   */
   if (
     /^how many people\s+(donated|gave|contributed)\b/i.test(q) &&
     /\$\s*\d/.test(q)
@@ -449,10 +435,6 @@ function isAmbiguousMultiYearQuestion(question = "") {
     return false;
   }
 
-  /*
-   * Reject questions asking one statistic to
-   * represent a comparison across several years.
-   */
   if (
     /\b(compared|compare|versus|vs\.?|than)\b/i.test(q)
   ) {
@@ -474,6 +456,20 @@ function isAmbiguousMultiYearQuestion(question = "") {
   }
 
   return false;
+}
+
+function isUnsupportedSportsSuperFanQuestion(
+  question = "",
+  context = ""
+) {
+  const h =
+    `${question} ${context}`.toLowerCase();
+
+  return (
+    /\bsuper fans?\b/.test(h) &&
+    /\bsports streaming services?\b/.test(h) &&
+    /\b1 in 5\b/.test(h)
+  );
 }
 
 function hasBadQuestionLanguage(question = "") {
@@ -512,6 +508,12 @@ function hasBadQuestionLanguage(question = "") {
   }
 
   if (
+    /^how many\s+those who\b/i.test(q)
+  ) {
+    return true;
+  }
+
+  if (
     /\bhow many\s+(donated|said|used|use|listening|watching|getting|prefer|agreed|believe|think)\b/i.test(
       q
     )
@@ -533,10 +535,6 @@ function hasBadQuestionLanguage(question = "") {
     return true;
   }
 
-  /*
-   * No second raw statistic should survive
-   * inside the finished question.
-   */
   if (
     /\b\d{1,3}%\b/.test(q) ||
     /\b\d+\s+in\s+\d+\b/i.test(q)
@@ -581,12 +579,6 @@ function isolateFindingClause(
     return "";
   }
 
-  /*
-   * Comparative sentences spanning two or
-   * more explicit years are risky because
-   * one extracted stat may not clearly belong
-   * to one specific year.
-   */
   const sentenceYears =
     s.match(/\b(?:19|20)\d{2}\b/g) || [];
 
@@ -709,6 +701,35 @@ function cleanRatioTail(tail = "") {
     .trim();
 }
 
+function makeThoseWhoQuestion(tail = "") {
+  const clean = tail
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[.!?]+$/, "");
+
+  const m = clean.match(
+    /^those who (.+?)\s+(believe|believed|think|thought|say|said|report|reported|feel|felt|agree|agreed|expect|expected|use|used|have|had|are|were|want|wanted|prefer|preferred)\s+(.+)$/i
+  );
+
+  if (!m) {
+    return "";
+  }
+
+  const population = m[1].trim();
+  const verb = m[2].trim();
+  const remainder = m[3].trim();
+
+  if (
+    !population ||
+    !verb ||
+    !remainder
+  ) {
+    return "";
+  }
+
+  return `Among those who ${population}, how many ${verb} ${remainder}?`;
+}
+
 function makeRatioQuestion(
   sentence,
   stat,
@@ -739,6 +760,25 @@ function makeRatioQuestion(
 
     if (!tail) {
       return "";
+    }
+
+    /*
+     * Never infer what the 1-in-5 sports-super-fan
+     * statistic measures. The source wording does
+     * not clearly establish that 1 in 5 adopted
+     * streaming services.
+     */
+    if (
+      /\bsuper fans?\b/i.test(tail) &&
+      /\bsports streaming services?\b/i.test(tail)
+    ) {
+      return "";
+    }
+
+    if (
+      /^those who\b/i.test(tail)
+    ) {
+      return makeThoseWhoQuestion(tail);
     }
 
     if (
@@ -813,28 +853,21 @@ function makeRatioQuestion(
     return "";
   }
 
+  /*
+   * Reject the ambiguous sports-super-fan
+   * relationship instead of rewriting it.
+   */
   if (
-    /\bsports\b/i.test(s) &&
-    /^who are super fans\b/i.test(after)
+    /\bsuper fans?\b/i.test(`${s} ${after}`) &&
+    /\bsports streaming services?\b/i.test(`${s} ${after}`)
   ) {
-    after = after
-      .replace(
-        /^who are super fans\s+/i,
-        ""
-      )
-      .replace(
-        /^have adopted\s+/i,
-        ""
-      )
-      .trim();
-
-    if (
-      /\bsports streaming services\b/i.test(after)
-    ) {
-      return "How many people are sports super fans who have adopted sports streaming services?";
-    }
-
     return "";
+  }
+
+  if (
+    /^those who\b/i.test(after)
+  ) {
+    return makeThoseWhoQuestion(after);
   }
 
   if (/^among\b/i.test(before)) {
@@ -1219,6 +1252,18 @@ function extractCandidates(
       continue;
     }
 
+    /*
+     * Reject the ambiguous AP-NORC sports
+     * super-fan headline before question
+     * generation.
+     */
+    if (
+      /\bsuper fans?\b/i.test(sentence) &&
+      /\bsports streaming services?\b/i.test(sentence)
+    ) {
+      continue;
+    }
+
     if (
       /\b(discount|off sale|battery|humidity|chance of rain)\b/i.test(
         sentence
@@ -1356,6 +1401,19 @@ function explainUsability(item) {
   if (
     isAmbiguousMultiYearQuestion(
       item.question
+    )
+  ) {
+    return "standalone";
+  }
+
+  /*
+   * Purges the older cached sports-super-fan
+   * question from surveys.json too.
+   */
+  if (
+    isUnsupportedSportsSuperFanQuestion(
+      item.question,
+      item.context || ""
     )
   ) {
     return "standalone";
@@ -2128,7 +2186,7 @@ async function fetchText(url) {
       {
         headers: {
           "user-agent":
-            "MediaJobsReport-SurveySays/2.4 (+https://www.mediajobsreport.com/)"
+            "MediaJobsReport-SurveySays/2.5 (+https://www.mediajobsreport.com/)"
         },
 
         redirect:
