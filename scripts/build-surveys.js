@@ -23,27 +23,7 @@ const SOURCES = [
   },
   {
     name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/culture-and-society/feed/",
-    mode: "rss"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/science-and-technology/feed/",
-    mode: "rss"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/younger-generations/feed/",
-    mode: "rss"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/education/feed/",
-    mode: "rss"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/media-insight-project/feed/",
+    url: "https://apnorc.org/feed/",
     mode: "rss"
   },
   {
