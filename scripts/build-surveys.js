@@ -644,8 +644,74 @@ function extractCandidates(article, sourceName) {
   return out;
 }
 
+
+
+// v3.0: one final broadcast-quality gate for EVERY record immediately before publication.
+// This is deliberately independent of extraction path so fresh, cached, transformed,
+// and seeded items all have to pass the same on-air readability test.
+const BROADCAST_POPULATION_RE = /\b(?:Americans?|U\.S\. adults?|US adults?|adults?|parents?|mothers?|fathers?|workers?|employees?|employers?|consumers?|respondents?|listeners?|viewers?|shoppers?|teens?|teenagers?|children|kids?|students?|people|women|men|young women|young men|Gen Zers?|Gen Z adults?|Millennials?|Baby Boomers?|boomers?|sports fans?|hiring managers?|households?|dual-income households?|donors?|voters?|users?|customers?|families|caregivers?|homeowners?|renters?|drivers?|travelers?|diners?|patients?|podcast listeners?|radio listeners?|TV viewers?)\b/i;
+
+function hasHeadlineDebris(question = '') {
+  const q = String(question).replace(/\s+/g, ' ').trim();
+  return /\bHere[’']s What to Know\b|\bIn a new poll(?: we conducted)?\b|\bRead More\b|\bWhat You Need to Know\b|\bEverything You Need to Know\b|\baccording to a new poll from\b[^?]{80,}/i.test(q);
+}
+
+function hasUndefinedQuestionPopulation(question = '') {
+  const q = String(question).replace(/\s+/g, ' ').trim();
+  if (!q) return true;
+
+  // Any normal Survey Says question needs a named group somewhere before the measured behavior.
+  // Allow an introductory condition such as "When ordering fast food, ..." or "Among employed U.S. adults, ...".
+  if (!BROADCAST_POPULATION_RE.test(q)) return true;
+
+  // "What percentage assume/use/say..." is missing the population even if a population is mentioned later.
+  if (/^(?:when\s+[^,]+,\s*)?what percentage\s+(?!of\b)(?:assume|assumes|believe|believes|think|thinks|say|says|use|uses|used|are|is|were|was|have|has|had|plan|plans|prefer|prefers|want|wants|expect|expects|report|reports|feel|feels)\b/i.test(q)) return true;
+
+  // "How many say/use/think..." likewise has no named group after How many.
+  if (/^how many\s+(?:assume|assumes|believe|believes|think|thinks|say|says|use|uses|used|are|is|were|was|have|has|had|plan|plans|prefer|prefers|want|wants|expect|expects|report|reports|feel|feels)\b/i.test(q)) return true;
+
+  return false;
+}
+
+function contextHasUndefinedPopulation(context = '') {
+  const c = String(context).replace(/\s+/g, ' ').trim();
+  const finding = c.replace(/^.*?Finding:\s*/i, '').trim();
+  if (!finding) return false;
+
+  // Bare-stat findings must name the population immediately after the stat or before it.
+  const m = finding.match(/^\s*(?:\d{1,3}%|(?:[1-9]|10)\s+in\s+(?:[2-9]|10))\s+(.+)$/i);
+  if (!m) return false;
+  const tail = m[1].trim();
+  if (/^of\s+/i.test(tail) && BROADCAST_POPULATION_RE.test(tail)) return false;
+  if (BROADCAST_POPULATION_RE.test(finding)) return false;
+  return /^(?:assume|assumes|are|is|were|was|have|has|had|say|says|said|feel|feels|felt|think|thinks|thought|use|uses|used|plan|plans|planned|expect|expects|expected|want|wants|wanted|prefer|prefers|preferred|believe|believes|believed|report|reports|reported|skip|skips|avoid|avoids|would|will|can|could|they|their|them)\b/i.test(tail);
+}
+
+function finalBroadcastQualityGate(item) {
+  if (!item || !item.question) return false;
+  const q = String(item.question).replace(/\s+/g, ' ').trim();
+
+  if (q.length < 25 || q.length > 240) return false;
+  if (!/\?$/.test(q)) return false;
+  if (containsVisibleStat(q)) return false;
+  if (hasHeadlineDebris(q)) return false;
+  if (hasBadQuestionLanguage(q)) return false;
+  if (hasMalformedPercentagePopulation(q)) return false;
+  if (hasUndefinedQuestionPopulation(q)) return false;
+  if (hasIncompleteMoreLessObject(q)) return false;
+  if (isAmbiguousMultiYearQuestion(q)) return false;
+  if (containsUndefinedReference(q)) return false;
+  if (contextHasUndefinedPopulation(item.context || '')) return false;
+
+  // Catch copy collisions and headline prose that are technically grammatical but not an on-air question.
+  if (/\b(?:In a nationwide poll of|In a survey of|The survey found|The poll found|we conducted with|highlighting the critical role)\b[^?]{90,}/i.test(q)) return false;
+
+  return true;
+}
+
 function explainUsability(item) {
   if (!item || !item.question || !item.source_url || !item.stat) return 'missing';
+  if (!finalBroadcastQualityGate(item)) return 'standalone';
   if (item.question.length < 25 || item.question.length > 240) return 'question_length';
   if (!questionHasStandaloneContext(item.question)) return 'standalone';
   if (containsVisibleStat(item.question)) return 'standalone';
@@ -885,6 +951,7 @@ async function fetchHtmlDiscoverySource(source) {
 
 (async () => {
   console.log('Building MJR Survey Says feed + static widget...');
+  console.log('v3.0 final broadcast-quality gate: ON (all fresh, cached, transformed, and seeded items)');
 
   const diag = {};
   const ensureDiag = source => {
