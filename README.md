@@ -98,3 +98,20 @@ Replaced the five AP-NORC topic feeds with AP-NORC's main official RSS feed:
 `https://apnorc.org/feed/`
 
 Reason: the topic feeds were producing many usable findings, but most were older than the 180-day freshness window. The main feed prioritizes AP-NORC's newest research. The existing political-content filter remains active, so current political polling is excluded from MJR Survey Says while lifestyle, technology, media, work, education, consumer, and culture findings remain eligible.
+
+
+## AP-NORC expanded archive (v1.9)
+AP-NORC now uses both its main RSS feed and the five productive topic feeds:
+- Culture & Society
+- Science & Technology
+- Younger Generations
+- Education
+- Media Insight Project
+
+Freshness is now source-specific:
+- Talker Research: 180 days
+- Pew Research Center: 180 days
+- Edison Research: 180 days
+- AP-NORC Center: 365 days
+
+This allows high-quality nonpolitical AP-NORC findings from the last year to enter the rotating pool while keeping the other feeds tighter and more current. Existing political and quality filters remain in place.
