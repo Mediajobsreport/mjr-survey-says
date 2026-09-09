@@ -67,3 +67,16 @@ The builder now keeps `mjr-survey-rotation.json` with the IDs shown during recen
 
 ## Source visibility and Talker priority (v1.4)
 The build log now reports how many usable findings were discovered from each source. If the rolling pool contains a usable Talker Research item, the daily selector places one Talker item in the default 3-item view before filling the remaining slots by freshness and topic variety. The log also reports the source mix for the default 3 and full 7 selections.
+
+
+## Deployment fix (v1.5)
+The GitHub Action now stages the entire `docs/` folder plus `mjr-survey-rotation.json`.
+
+This ensures that:
+- `survey-says-3.html`
+- `survey-says-5.html`
+- `survey-says-7.html`
+- `survey-says.html`
+- `surveys.json`
+
+are all committed after each build, and the daily rotation history persists between GitHub Action runs.
