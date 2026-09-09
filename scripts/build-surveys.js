@@ -293,6 +293,36 @@ function containsUndefinedReference(text = '') {
   return /\b(these|those|such)\s+(factors?|issues?|things?|reasons?|circumstances?|conditions?|changes?|effects?|events?|concerns?|problems?|pressures?|challenges?|results?|findings?)\b|\b(say|says|said|feel|feels|felt|do|does|did|think|thinks|thought)\s+the same\b|\bthe same\s*[–—-]/i.test(text);
 }
 
+function hasIncompleteMoreLessObject(text = '') {
+  const t = String(text).replace(/\s+/g, ' ').trim();
+  return /\b(?:plan|plans|planned|planning|expect|expects|expected|want|wants|wanted|intend|intends|intended|likely)\s+(?:to\s+)?(?:give|spend|use|do|buy|save|pay|cut|consume|shop|travel|work)\s+(?:more|less)\b(?!\s+(?:on|for|to|than|money|time|hours?|dollars?|percent|percentage)\b)/i.test(t);
+}
+
+function cleanHeadlineCollision(text = '') {
+  let t = String(text).replace(/\s+/g, ' ').trim();
+  t = t
+    .replace(/\s+[–—-]\s+Here[’']s What to Know.*$/i, '')
+    .replace(/\s+Here[’']s What to Know.*$/i, '')
+    .replace(/\s+In a new poll we conducted with\b.*$/i, '')
+    .replace(/\s+In a new poll\b.*$/i, '')
+    .replace(/\s+According to new research\b.*$/i, ' according to new research')
+    .trim();
+  return t;
+}
+
+function hasUnsafeCompoundStatAttachment(sentence = '', target = null) {
+  if (!target) return false;
+  const raw = target.raw || target.stat || '';
+  const s = String(sentence).replace(/\s+/g, ' ').trim();
+  const idx = s.toLowerCase().indexOf(String(raw).toLowerCase());
+  if (idx < 0) return true;
+  const before = s.slice(0, idx);
+  const m = before.match(/\b(while|whereas|but)\b([^.!?]*)$/i);
+  if (!m) return false;
+  const clause = m[2] || '';
+  return !/\b(Americans|U\.S\. adults|US adults|adults|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|teens|teenagers|students|people|women|men|Gen Zers|Millennials|Gen Z|sports fans|hiring managers|households|dual-income households)\b/i.test(clause);
+}
+
 function isAmbiguousMultiYearQuestion(question = '') {
   const years = question.match(/\b(?:19|20)\d{2}\b/g) || [];
   const uniqueYears = [...new Set(years)];
@@ -310,6 +340,7 @@ function hasBadQuestionLanguage(question = '') {
   if (/^in a survey about\b/i.test(q)) return true;
   if (/\b(matched this survey finding|matched the survey finding|this survey finding|this finding|the finding above|the survey finding above|the research topic)\b/i.test(q)) return true;
   if (containsUndefinedReference(q)) return true;
+  if (hasIncompleteMoreLessObject(q)) return true;
   if (isAmbiguousMultiYearQuestion(q)) return true;
   if (/^how many\s+those who\b/i.test(q)) return true;
   if (/\bhow many\s+(donated|said|used|use|listening|watching|getting|prefer|agreed|believe|think)\b/i.test(q)) return true;
@@ -369,8 +400,10 @@ function stripTrailingSemicolonClause(sentence = '', rawStat = '') {
 
 function isolateFindingClause(sentence, target, allStats = []) {
   const raw = target.raw || target.stat;
-  let s = stripTrailingSemicolonClause(sentence, raw);
+  let s = cleanHeadlineCollision(stripTrailingSemicolonClause(sentence, raw));
   if (containsUndefinedReference(s)) return '';
+  if (hasIncompleteMoreLessObject(s)) return '';
+  if (hasUnsafeCompoundStatAttachment(s, target)) return '';
   const years = s.match(/\b(?:19|20)\d{2}\b/g) || [];
   if (new Set(years).size >= 2 && /\b(compared|compare|versus|vs\.?|than|this year)\b/i.test(s)) return '';
 
@@ -463,7 +496,7 @@ function makeRatioQuestion(sentence, target, articleTitle = '') {
 }
 
 function makePercentageQuestion(sentence, target) {
-  const s = sentence.replace(/\s+/g, ' ').trim();
+  const s = cleanHeadlineCollision(sentence).replace(/\s+/g, ' ').trim();
   const raw = target.raw || target.stat;
   const escaped = regexEscape(raw);
 
@@ -490,7 +523,12 @@ function makeQuestion(sentence, target, articleTitle = '', allStats = []) {
   const isolated = isolateFindingClause(sentence, target, allStats);
   if (!isolated) return '';
   let q = target.type === 'ratio' ? makeRatioQuestion(isolated, target, articleTitle) : makePercentageQuestion(isolated, target);
-  q = fixBroadcastGrammar(q).replace(/\s+\?/g, '?').replace(/\s+/g, ' ').trim();
+  q = fixBroadcastGrammar(q)
+    .replace(/\bU\.S\. Adults Are\b/g, 'U.S. adults are')
+    .replace(/\bGen Z Skip Weekend Plans to Save Money\b/g, 'Gen Z adults skip weekend plans to save money')
+    .replace(/\s+\?/g, '?')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (!questionHasStandaloneContext(q)) return '';
   if (containsVisibleStat(q)) return '';
   return q;
@@ -530,8 +568,9 @@ function extractCandidates(article, sourceName) {
 
   const seen = new Set();
   const out = [];
-  for (const sentence of candidateSentences) {
-    if (!sentence || isPolitical(sentence) || containsUndefinedReference(sentence)) continue;
+  for (const originalSentence of candidateSentences) {
+    const sentence = cleanHeadlineCollision(originalSentence);
+    if (!sentence || isPolitical(sentence) || containsUndefinedReference(sentence) || hasIncompleteMoreLessObject(sentence)) continue;
     const years = sentence.match(/\b(?:19|20)\d{2}\b/g) || [];
     if (new Set(years).size >= 2 && /\b(compared|compare|versus|vs\.?|than|this year)\b/i.test(sentence)) continue;
     if (/\bsuper fans?\b/i.test(sentence) && /\bsports streaming services?\b/i.test(sentence) && /\b1\s+in\s+5\b/i.test(sentence)) continue;
@@ -579,6 +618,7 @@ function explainUsability(item) {
   if (isUnsupportedSportsSuperFanQuestion(item.question, item.context || '')) return 'standalone';
   if (isPolitical(`${item.question} ${item.context || ''}`)) return 'political';
   if (containsUndefinedReference(`${item.question} ${item.context || ''}`)) return 'standalone';
+  if (hasIncompleteMoreLessObject(item.question)) return 'standalone';
   if (item.auto_generated && ageDays(item.published_at || item.source_date) > maxAgeDaysForSource(item.source)) return 'age';
   return 'ok';
 }
@@ -732,7 +772,7 @@ function pickDailyRotation(pool, count, state) {
 async function fetchText(url) {
   const r = await fetch(url, {
     headers: {
-      'user-agent': 'MediaJobsReport-SurveySays/2.7 (+https://www.mediajobsreport.com/)',
+      'user-agent': 'MediaJobsReport-SurveySays/2.8 (+https://www.mediajobsreport.com/)',
       accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, text/html;q=0.9, */*;q=0.5'
     },
     redirect: 'follow'
