@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-09-09T16:41:51.049Z",
-  "count": 34,
+  "updated_at": "2026-09-09T16:49:59.200Z",
+  "count": 30,
   "items": [
     {
       "id": "a5a0027251a14974",
@@ -155,20 +155,6 @@
       "auto_generated": true
     },
     {
-      "id": "2e092e3bbf80dbfa",
-      "topic": "Technology",
-      "question": "What percentage of Americans see China as more advanced than the U.S. in AI development say U.S. leadership in AI is extremely or very important?",
-      "answer": "43%",
-      "stat": "43%",
-      "context": "Finding: Most Americans see China as more advanced than the U.S. in AI development, while 43% say U.S. leadership in AI is extremely or very important.",
-      "talk": "What everyday task are you most willing to hand over to AI?",
-      "source": "Pew Research Center",
-      "source_url": "https://www.pewresearch.org/short-reads/2026/07/23/what-americans-think-about-the-global-ai-race/",
-      "source_date": "2026-07-23",
-      "published_at": "2026-07-23",
-      "auto_generated": true
-    },
-    {
       "id": "5b8219cf60d8502f",
       "topic": "Health",
       "question": "How many young women get health and wellness information from influencers?",
@@ -225,20 +211,6 @@
       "auto_generated": true
     },
     {
-      "id": "ebd4f4b7a435b025",
-      "topic": "Money",
-      "question": "What percentage of adults report being scammed into providing personal information have been scammed into giving away money?",
-      "answer": "17%",
-      "stat": "17%",
-      "context": "Finding: A quarter of adults report being scammed into providing personal information, and 17% have been scammed into giving away money.",
-      "talk": "Does this finding match the way you are spending, saving or giving right now?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/fifty-eight-percent-of-adults-report-receiving-scam-attempts-daily/?utm_source=rss&utm_medium=rss&utm_campaign=fifty-eight-percent-of-adults-report-receiving-scam-attempts-daily",
-      "source_date": "2026-06-25",
-      "published_at": "2026-06-25",
-      "auto_generated": true
-    },
-    {
       "id": "pew-ai-search-20260617",
       "topic": "Technology",
       "question": "What percentage of U.S. adults say they use AI chatbots to search for information?",
@@ -263,20 +235,6 @@
       "source_url": "https://www.pewresearch.org/internet/2026/06/17/americans-and-ai-2026-chatbots-smart-devices-and-views-on-impact/",
       "source_date": "2026-06-17",
       "published_at": "2026-06-17"
-    },
-    {
-      "id": "fb6333e88bdf029c",
-      "topic": "Life & Culture",
-      "question": "What percentage of people say they feel \"hopeful\" and say they're \"happy\" when thinking about the future?",
-      "answer": "54%",
-      "stat": "54%",
-      "context": "Finding: Still, many express some optimism: Most people say they feel \"hopeful\" and 54% say they're \"happy\" when thinking about the future.",
-      "talk": "Does this number surprise you, or does it sound about right?",
-      "source": "Pew Research Center",
-      "source_url": "https://www.pewresearch.org/2026/06/12/on-the-countrys-250th-anniversary-the-american-people-are-in-a-sour-mood/",
-      "source_date": "2026-06-12",
-      "published_at": "2026-06-12",
-      "auto_generated": true
     },
     {
       "id": "76943abacdbe235d",
@@ -317,20 +275,6 @@
       "source_url": "https://www.ipsos.com/en-us/latest-us-opinion-polls",
       "source_date": "2026-04-10",
       "published_at": "2026-04-10"
-    },
-    {
-      "id": "925fd2ed8ff18f8d",
-      "topic": "Money",
-      "question": "What percentage of adults report that they have started a crowdfunding campaign for a personal expense and have done so for someone else?",
-      "answer": "5%",
-      "stat": "5%",
-      "context": "Finding: Three percent of adults report that they have started a crowdfunding campaign for a personal expense and 5% have done so for someone else.",
-      "talk": "Have you ever donated to a crowdfunding campaign? What made you decide to give?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/crowdfunding-contributions-tend-to-be-small-donations-to-help-others-in-need/?utm_source=rss&utm_medium=rss&utm_campaign=crowdfunding-contributions-tend-to-be-small-donations-to-help-others-in-need",
-      "source_date": "2026-01-08",
-      "published_at": "2026-01-08",
-      "auto_generated": true
     },
     {
       "id": "859485dcb3e85b1d",
