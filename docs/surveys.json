@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-09-09T14:52:45.972Z",
-  "count": 24,
+  "updated_at": "2026-09-09T15:05:49.057Z",
+  "count": 23,
   "items": [
     {
       "id": "ipsos-human-food-20260828",
@@ -138,11 +138,11 @@
     {
       "id": "14d39b8d25fbf148",
       "topic": "Money",
-      "question": "How many people gave money to someone they knew personally, donated while checking out at a store, or provided non-financial support to people in their community?",
+      "question": "Among adults who made charitable donations, how many gave money to someone they knew personally, donated while checking out at a store, or provided non-financial support to people in their community?",
       "answer": "4 in 10",
       "stat": "4 in 10",
       "context": "From “Most adults have donated to charities this year.”",
-      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "talk": "What type of cause are you most likely to donate to, and what makes you trust an organization enough to give?",
       "source": "AP-NORC Center",
       "source_url": "https://apnorc.org/projects/most-adults-have-donated-to-charities-this-year/?utm_source=rss&utm_medium=rss&utm_campaign=most-adults-have-donated-to-charities-this-year",
       "source_date": "2025-12-22",
@@ -156,7 +156,7 @@
       "answer": "4 in 10",
       "stat": "4 in 10",
       "context": "From “Most adults have donated to charities this year.”",
-      "talk": "Does this number surprise you, or does it sound about right?",
+      "talk": "What type of cause are you most likely to donate to, and what makes you trust an organization enough to give?",
       "source": "AP-NORC Center",
       "source_url": "https://apnorc.org/projects/most-adults-have-donated-to-charities-this-year/?utm_source=rss&utm_medium=rss&utm_campaign=most-adults-have-donated-to-charities-this-year",
       "source_date": "2025-12-22",
@@ -170,7 +170,7 @@
       "answer": "2 in 10",
       "stat": "2 in 10",
       "context": "From “Most adults have donated to charities this year.”",
-      "talk": "Does this number surprise you, or does it sound about right?",
+      "talk": "What type of cause are you most likely to donate to, and what makes you trust an organization enough to give?",
       "source": "AP-NORC Center",
       "source_url": "https://apnorc.org/projects/most-adults-have-donated-to-charities-this-year/?utm_source=rss&utm_medium=rss&utm_campaign=most-adults-have-donated-to-charities-this-year",
       "source_date": "2025-12-22",
@@ -231,20 +231,6 @@
       "source_url": "https://apnorc.org/projects/epic-climate-change-2025/?utm_source=rss&utm_medium=rss&utm_campaign=epic-climate-change-2025",
       "source_date": "2025-10-23",
       "published_at": "2025-10-23",
-      "auto_generated": true
-    },
-    {
-      "id": "1991d95d6d6e5984",
-      "topic": "Entertainment",
-      "question": "How many fans use sports-only streaming platforms such as ESPN+, MLB TV, NFL Sunday Ticket, or NBA League Pass, including 6 in 10 super fans?",
-      "answer": "4 in 10",
-      "stat": "4 in 10",
-      "context": "From “Half the public are fans of sports, but it&#8217;s the 1 in 5 who are super fans adopting sports streaming services.”",
-      "talk": "Does this match your own viewing, listening or entertainment habits?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services/?utm_source=rss&utm_medium=rss&utm_campaign=half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services",
-      "source_date": "2025-09-16",
-      "published_at": "2025-09-16",
       "auto_generated": true
     },
     {
