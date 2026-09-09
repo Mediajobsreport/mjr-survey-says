@@ -3,85 +3,24 @@ const path = require("path");
 const crypto = require("crypto");
 
 const ROOT = process.cwd();
-
-const OUT_JSON = path.join(
-  ROOT,
-  "docs",
-  "surveys.json"
-);
-
-const OUT_HTML = path.join(
-  ROOT,
-  "docs",
-  "survey-says.html"
-);
-
-const OUT_HTML_3 = path.join(
-  ROOT,
-  "docs",
-  "survey-says-3.html"
-);
-
-const OUT_HTML_5 = path.join(
-  ROOT,
-  "docs",
-  "survey-says-5.html"
-);
-
-const OUT_HTML_7 = path.join(
-  ROOT,
-  "docs",
-  "survey-says-7.html"
-);
-
-const SEED = path.join(
-  ROOT,
-  "data-seed.json"
-);
-
-const ROTATION_STATE = path.join(
-  ROOT,
-  "mjr-survey-rotation.json"
-);
+const OUT_JSON = path.join(ROOT, "docs", "surveys.json");
+const OUT_HTML = path.join(ROOT, "docs", "survey-says.html");
+const OUT_HTML_3 = path.join(ROOT, "docs", "survey-says-3.html");
+const OUT_HTML_5 = path.join(ROOT, "docs", "survey-says-5.html");
+const OUT_HTML_7 = path.join(ROOT, "docs", "survey-says-7.html");
+const SEED = path.join(ROOT, "data-seed.json");
+const ROTATION_STATE = path.join(ROOT, "mjr-survey-rotation.json");
 
 const SOURCES = [
-  {
-    name: "Talker Research",
-    url: "https://talker.news/feed/",
-    filter: "talker-research"
-  },
-  {
-    name: "Pew Research Center",
-    url: "https://www.pewresearch.org/publications/feed/"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/feed/"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/culture-and-society/feed/"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/science-and-technology/feed/"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/younger-generations/feed/"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/education/feed/"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/media-insight-project/feed/"
-  },
-  {
-    name: "Edison Research",
-    url: "https://www.edisonresearch.com/feed/"
-  }
+  { name: "Talker Research", url: "https://talker.news/feed/", filter: "talker-research" },
+  { name: "Pew Research Center", url: "https://www.pewresearch.org/publications/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/topics/culture-and-society/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/topics/science-and-technology/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/topics/younger-generations/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/topics/education/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/topics/media-insight-project/feed/" },
+  { name: "Edison Research", url: "https://www.edisonresearch.com/feed/" }
 ];
 
 const MAX_POOL = 140;
@@ -98,177 +37,72 @@ function maxAgeDaysForSource(source) {
 }
 
 function decodeXml(s = "") {
-  return String(s)
-    .replace(
-      /<!\[CDATA\[([\s\S]*?)\]\]>/g,
-      "$1"
-    )
-    .replace(
-      /&amp;/g,
-      "&"
-    )
-    .replace(
-      /&lt;/g,
-      "<"
-    )
-    .replace(
-      /&gt;/g,
-      ">"
-    )
-    .replace(
-      /&quot;/g,
-      '"'
-    )
-    .replace(
-      /&#039;|&apos;/g,
-      "'"
-    )
-    .replace(
-      /&#038;/g,
-      "&"
-    );
+  return s
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;|&apos;/g, "'")
+    .replace(/&#038;/g, "&");
 }
 
 function stripHtml(s = "") {
-  return decodeXml(s)
-    .replace(
-      /<script[\s\S]*?<\/script>/gi,
-      " "
-    )
-    .replace(
-      /<style[\s\S]*?<\/style>/gi,
-      " "
-    )
-    .replace(
-      /<[^>]+>/g,
-      " "
-    )
-    .replace(
-      /\s+/g,
-      " "
-    )
+  return decodeXml(String(s))
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
 function escapeHtml(s = "") {
   return String(s)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function tag(block, name) {
-  const m =
-    block.match(
-      new RegExp(
-        `<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`,
-        "i"
-      )
-    );
+  const m = block.match(
+    new RegExp(
+      `<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`,
+      "i"
+    )
+  );
 
-  return m
-    ? stripHtml(
-        m[1]
-      )
-    : "";
+  return m ? stripHtml(m[1]) : "";
 }
 
 function tags(block, name) {
-  const re =
-    new RegExp(
-      `<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`,
-      "gi"
-    );
+  const re = new RegExp(
+    `<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`,
+    "gi"
+  );
 
-  return [
-    ...block.matchAll(re)
-  ]
-    .map(
-      m =>
-        stripHtml(
-          m[1]
-        )
-    )
+  return [...block.matchAll(re)]
+    .map(m => stripHtml(m[1]))
     .filter(Boolean);
 }
 
 function parseRss(xml) {
   const blocks =
-    xml.match(
-      /<item\b[\s\S]*?<\/item>/gi
-    ) || [];
+    xml.match(/<item\b[\s\S]*?<\/item>/gi) || [];
 
-  return blocks.map(
-    b => ({
-      title:
-        tag(
-          b,
-          "title"
-        ),
-
-      link:
-        tag(
-          b,
-          "link"
-        ),
-
-      date:
-        tag(
-          b,
-          "pubDate"
-        ),
-
-      description:
-        tag(
-          b,
-          "description"
-        ),
-
-      content:
-        tag(
-          b,
-          "content:encoded"
-        ),
-
-      creator:
-        tag(
-          b,
-          "dc:creator"
-        ) ||
-        tag(
-          b,
-          "author"
-        ),
-
-      categories:
-        tags(
-          b,
-          "category"
-        )
-    })
-  );
+  return blocks.map(b => ({
+    title: tag(b, "title"),
+    link: tag(b, "link"),
+    date: tag(b, "pubDate"),
+    description: tag(b, "description"),
+    content: tag(b, "content:encoded"),
+    creator: tag(b, "dc:creator") || tag(b, "author"),
+    categories: tags(b, "category")
+  }));
 }
 
-function isTalkerResearchArticle(
-  article
-) {
+function isTalkerResearchArticle(article) {
   const haystack = [
     article.creator || "",
     ...(article.categories || []),
@@ -277,84 +111,57 @@ function isTalkerResearchArticle(
     article.content || ""
   ].join(" ");
 
-  return /\bTalker Research\b/i.test(
-    haystack
-  );
+  return /\bTalker Research\b/i.test(haystack);
 }
 
 function sentences(text = "") {
-  return String(text)
-    .replace(
-      /\s+/g,
-      " "
-    )
-    .split(
-      /(?<=[.!?])\s+(?=[A-Z0-9])/
-    )
-    .map(
-      s =>
-        s.trim()
-    )
-    .filter(
-      s =>
-        s.length >= 35 &&
-        s.length <= 330
-    );
+  return text
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
+    .map(s => s.trim())
+    .filter(s => s.length >= 35 && s.length <= 330);
 }
 
 function inferTopic(text = "") {
-  const t =
-    text.toLowerCase();
+  const t = text.toLowerCase();
 
   const rules = [
     [
       "Technology",
       /\b(ai|artificial intelligence|chatbot|smartphone|internet|online|social media|technology|digital|crypto|cryptocurrency)\b/
     ],
-
     [
       "Entertainment",
       /\b(streaming|streamed radio|radio|television|tv|movie|music|podcast|entertainment|audio)\b/
     ],
-
     [
       "Money",
-      /\b(money|cost|price|inflation|financial|finance|economy|spending|income|cash|debt|donation|donate|crowdfunding|expense)\b/
+      /\b(money|cost|price|inflation|financial|finance|economy|spending|income|cash|debt|donation|donate|crowdfunding|expense|charity|charitable)\b/
     ],
-
     [
       "Work",
       /\b(work|job|employee|employer|workplace|career|office|worker)\b/
     ],
-
     [
       "Shopping",
       /\b(shop|shopping|retail|store|purchase|consumer|buy|bought)\b/
     ],
-
     [
       "Food & Dining",
       /\b(food|restaurant|meal|fast food|grocery|dining|eat|eating)\b/
     ],
-
     [
       "Family & Life",
       /\b(parent|child|children|family|relationship|dating|marriage|home|caregiver|childcare|daycare)\b/
     ],
-
     [
       "Health",
       /\b(health|wellness|doctor|medical|hospital|fitness|sleep|medicine)\b/
     ]
   ];
 
-  for (
-    const [name, re]
-    of rules
-  ) {
-    if (
-      re.test(t)
-    ) {
+  for (const [name, re] of rules) {
+    if (re.test(t)) {
       return name;
     }
   }
@@ -362,25 +169,12 @@ function inferTopic(text = "") {
   return "Life & Culture";
 }
 
-function inferTopicFromFinding(
-  sentence = "",
-  title = ""
-) {
-  const fromSentence =
-    inferTopic(
-      sentence
-    );
+function inferTopicFromFinding(sentence = "", title = "") {
+  const fromSentence = inferTopic(sentence);
 
-  if (
-    fromSentence !==
-    "Life & Culture"
-  ) {
-    return fromSentence;
-  }
-
-  return inferTopic(
-    title
-  );
+  return fromSentence !== "Life & Culture"
+    ? fromSentence
+    : inferTopic(title);
 }
 
 function isPolitical(text = "") {
@@ -389,88 +183,59 @@ function isPolitical(text = "") {
   );
 }
 
-function talkForFinding(
-  topic,
-  sentence = "",
-  title = ""
-) {
-  const h =
-    `${sentence} ${title}`
-      .toLowerCase();
+function talkForFinding(topic, sentence = "", title = "") {
+  const sentenceLower = sentence.toLowerCase();
+  const h = `${sentence} ${title}`.toLowerCase();
 
-  if (
-    /\bcrowdfund(?:ing|ed)?\b/.test(
-      h
-    )
-  ) {
+  if (/\bcrowdfund(?:ing|ed)?\b/.test(h)) {
     return "Have you ever donated to a crowdfunding campaign? What made you decide to give?";
   }
 
   if (
+    /\bcharit(?:y|ies|able)\b/.test(h) ||
+    /\bdonat(?:e|ed|ion|ions)\b/.test(sentenceLower)
+  ) {
+    return "What type of cause are you most likely to donate to, and what makes you trust an organization enough to give?";
+  }
+
+  if (
     /\bstreamed radio|streaming radio|radio stream\b/.test(
-      h
+      sentenceLower
     )
   ) {
     return "How often do you listen to a radio station through an app or stream instead of a regular radio?";
   }
 
-  if (
-    /\bradio\b/.test(
-      sentence.toLowerCase()
-    )
-  ) {
+  if (/\bradio\b/.test(sentenceLower)) {
     return "Does this match the way you or the people around you use radio?";
   }
 
-  if (
-    /\bpodcast\b/.test(
-      sentence.toLowerCase()
-    )
-  ) {
+  if (/\bpodcast\b/.test(sentenceLower)) {
     return "How do your own podcast habits compare with this finding?";
   }
 
   if (
-    /\bhealth|wellness\b/.test(
-      sentence.toLowerCase()
-    ) &&
-    /\binfluencer/.test(
-      sentence.toLowerCase()
-    )
+    /\bhealth|wellness\b/.test(sentenceLower) &&
+    /\binfluencer/.test(sentenceLower)
   ) {
     return "Would you trust health advice from an influencer, or do you want it from a medical professional?";
   }
 
-  if (
-    /\bcrypto|cryptocurrency\b/.test(
-      sentence.toLowerCase()
-    )
-  ) {
+  if (/\bcrypto|cryptocurrency\b/.test(sentenceLower)) {
     return "Have you ever owned or used cryptocurrency, or have you stayed away from it completely?";
   }
 
-  if (
-    /\bsocial media\b/.test(
-      sentence.toLowerCase()
-    )
-  ) {
+  if (/\bsocial media\b/.test(sentenceLower)) {
     return "Does this match the way you and your friends actually use social media?";
   }
 
-  if (
-    /\b(ai|artificial intelligence|chatbot)\b/.test(
-      sentence.toLowerCase()
-    )
-  ) {
+  if (/\b(ai|artificial intelligence|chatbot)\b/.test(sentenceLower)) {
     return "What everyday task are you most willing to hand over to AI?";
   }
 
   if (
-    /\b(parent|parents|child|children|kid|kids)\b/.test(
-      sentence.toLowerCase()
-    ) &&
-    /\b(care|childcare|daycare)\b/.test(
-      sentence.toLowerCase()
+    /\b(parent|parents|kid|kids|child|children)\b[\s\S]{0,100}\b(care|childcare|daycare)\b|\b(care|childcare|daycare)\b[\s\S]{0,100}\b(parent|parents|kid|kids|child|children)\b/.test(
+      h
     )
   ) {
     return "When choosing care for a child, what matters most: cost, location, trust or flexibility?";
@@ -505,92 +270,80 @@ function talkForFinding(
       "Does this number surprise you, or does it sound about right?"
   };
 
-  return (
-    prompts[topic] ||
-    prompts["Life & Culture"]
-  );
+  return prompts[topic] || prompts["Life & Culture"];
 }
 
-function startsWithVerbPhrase(
-  text = ""
-) {
+function startsWithVerbPhrase(text = "") {
   return /^(donated|donate|gave|give|spent|spend|said|say|use|used|uses|watch|watched|watches|listen|listened|listens|listening|buy|bought|buys|shop|shopped|shops|prefer|preferred|prefers|agree|agreed|agrees|believe|believed|believes|think|thought|thinks|reported|report|reports|have|had|has|are|were|is|want|wanted|wants|plan|planned|plans|expect|expected|expects|feel|felt|feels|chose|choose|chooses|selected|select|selects|experienced|experience|experiences|received|receive|receives|paid|pay|pays|borrowed|borrow|borrows|saved|save|saves|get|gets|got)\b/i.test(
     text.trim()
   );
 }
 
-function fixBroadcastGrammar(
-  text = ""
-) {
-  let t =
-    text
-      .replace(
-        /\s+/g,
-        " "
-      )
-      .trim();
-
-  t =
-    t.replace(
+function fixBroadcastGrammar(text = "") {
+  return text
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(
       /\bAustralians\s+(\d{1,2})-(\d{1,2})\b/gi,
       "Australians ages $1–$2"
-    );
-
-  t =
-    t.replace(
+    )
+    .replace(
       /\bAmericans\s+(\d{1,2})-(\d{1,2})\b/gi,
       "Americans ages $1–$2"
-    );
-
-  t =
-    t.replace(
+    )
+    .replace(
       /\badults\s+(\d{1,2})-(\d{1,2})\b/gi,
       "adults ages $1–$2"
-    );
-
-  t =
-    t.replace(
+    )
+    .replace(
       /\bpeople\s+(\d{1,2})-(\d{1,2})\b/gi,
       "people ages $1–$2"
-    );
-
-  t =
-    t.replace(
-      /\b(listening)\s+to\b/gi,
+    )
+    .replace(
+      /\blistening\s+to\b/gi,
       "listen to"
-    );
-
-  t =
-    t.replace(
-      /\b(using)\s+/gi,
+    )
+    .replace(
+      /\busing\s+/gi,
       "use "
-    );
-
-  t =
-    t.replace(
-      /\b(watching)\s+/gi,
+    )
+    .replace(
+      /\bwatching\s+/gi,
       "watch "
-    );
-
-  t =
-    t.replace(
-      /\b(getting)\s+/gi,
+    )
+    .replace(
+      /\bgetting\s+/gi,
       "get "
     );
-
-  return t;
 }
 
-function hasBadQuestionLanguage(
-  question = ""
+function contextualPopulationFromTitle(
+  title = "",
+  sentence = ""
 ) {
-  const q =
-    question
-      .replace(
-        /\s+/g,
-        " "
-      )
-      .trim();
+  const h = `${title} ${sentence}`.toLowerCase();
+
+  if (/\bcrowdfund(?:ing|ed)?\b/.test(h)) {
+    return "people who donated to a crowdfunding campaign";
+  }
+
+  if (/\bcharit(?:y|ies|able)\b/.test(h)) {
+    return "adults who made charitable donations";
+  }
+
+  if (
+    /\bstreamed radio|streaming radio\b/.test(h)
+  ) {
+    return "people who listen to streamed radio";
+  }
+
+  return "";
+}
+
+function hasBadQuestionLanguage(question = "") {
+  const q = question
+    .replace(/\s+/g, " ")
+    .trim();
 
   if (!q) {
     return true;
@@ -620,25 +373,28 @@ function hasBadQuestionLanguage(
     return true;
   }
 
+  /*
+   * A finished question should never
+   * contain another raw survey statistic.
+   * This catches compound-stat failures.
+   */
+
+  if (
+    /\b\d{1,3}%\b/.test(q) ||
+    /\b\d+\s+in\s+\d+\b/i.test(q)
+  ) {
+    return true;
+  }
+
   return false;
 }
 
-function questionHasStandaloneContext(
-  question = ""
-) {
-  const q =
-    question
-      .replace(
-        /\s+/g,
-        " "
-      )
-      .trim();
+function questionHasStandaloneContext(question = "") {
+  const q = question
+    .replace(/\s+/g, " ")
+    .trim();
 
-  if (
-    hasBadQuestionLanguage(
-      q
-    )
-  ) {
+  if (hasBadQuestionLanguage(q)) {
     return false;
   }
 
@@ -653,15 +409,105 @@ function questionHasStandaloneContext(
   return true;
 }
 
-function stripRatioLead(
+function isolateFindingClause(
   sentence,
-  stat
+  targetStat,
+  allStats = []
 ) {
-  const escaped =
-    stat.replace(
-      /[.*+?^${}()|[\]\\]/g,
-      "\\$&"
+  let s = sentence
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (allStats.length <= 1) {
+    return s;
+  }
+
+  const targetIndex = s
+    .toLowerCase()
+    .indexOf(
+      targetStat.toLowerCase()
     );
+
+  if (targetIndex < 0) {
+    return "";
+  }
+
+  const otherStatPatterns = [
+    /\b(?:about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\s*\d{1,3}%\b/gi,
+    /\b(?:about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\s*\d+\s+in\s+\d+\b/gi
+  ];
+
+  const boundaries = [];
+
+  for (const re of otherStatPatterns) {
+    for (const m of s.matchAll(re)) {
+      if (
+        m.index === targetIndex ||
+        m[0]
+          .toLowerCase()
+          .includes(
+            targetStat.toLowerCase()
+          )
+      ) {
+        continue;
+      }
+
+      if (m.index > targetIndex) {
+        const between = s.slice(
+          targetIndex + targetStat.length,
+          m.index
+        );
+
+        const conjunction = between.match(
+          /\s+(?:and|while|but|whereas)\s+$/i
+        );
+
+        if (conjunction) {
+          boundaries.push(
+            m.index - conjunction[0].length
+          );
+        } else {
+          const punct =
+            between.search(/[;—]/);
+
+          if (punct >= 0) {
+            boundaries.push(
+              targetIndex +
+              targetStat.length +
+              punct
+            );
+          }
+        }
+      }
+    }
+  }
+
+  if (boundaries.length) {
+    s = s
+      .slice(
+        0,
+        Math.min(...boundaries)
+      )
+      .trim();
+  }
+
+  /*
+   * If more than one statistic still
+   * remains, reject instead of guessing.
+   */
+
+  if (findStats(s).length > 1) {
+    return "";
+  }
+
+  return s;
+}
+
+function stripRatioLead(sentence, stat) {
+  const escaped = stat.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&"
+  );
 
   return sentence
     .replace(
@@ -671,176 +517,144 @@ function stripRatioLead(
       ),
       ""
     )
-    .replace(
-      /[.!?]+$/,
-      ""
-    )
+    .replace(/[.!?]+$/, "")
     .trim();
 }
 
 function makeRatioQuestion(
   sentence,
-  stat
+  stat,
+  articleTitle = ""
 ) {
-  const s =
-    sentence
-      .replace(
-        /\s+/g,
-        " "
-      )
-      .trim();
+  const s = sentence
+    .replace(/\s+/g, " ")
+    .trim();
 
-  const escaped =
-    stat.replace(
-      /[.*+?^${}()|[\]\\]/g,
-      "\\$&"
-    );
+  const escaped = stat.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&"
+  );
 
   const beginsWithRatio =
     new RegExp(
       `^(about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\\s*${escaped}\\s+`,
       "i"
-    ).test(
-      s
-    );
+    ).test(s);
 
-  if (
-    beginsWithRatio
-  ) {
-    let tail =
-      stripRatioLead(
-        s,
-        stat
-      );
+  if (beginsWithRatio) {
+    let tail = stripRatioLead(
+      s,
+      stat
+    )
+      .replace(/^of\s+/i, "");
 
-    tail =
-      tail.replace(
-        /^of\s+/i,
-        ""
-      );
-
-    tail =
-      fixBroadcastGrammar(
-        tail
-      );
+    tail = fixBroadcastGrammar(tail);
 
     if (!tail) {
       return "";
     }
 
+    /*
+     * "3 in 10 donated $51-$100"
+     * needs the missing population.
+     */
+
     if (
-      startsWithVerbPhrase(
+      /^(donated|gave|contributed)\b/i.test(
         tail
       )
     ) {
+      const population =
+        contextualPopulationFromTitle(
+          articleTitle,
+          s
+        );
+
+      if (!population) {
+        return "";
+      }
+
+      return `Among ${population}, how many ${tail}?`;
+    }
+
+    if (startsWithVerbPhrase(tail)) {
       return `How many people ${tail}?`;
     }
 
     return `How many ${tail}?`;
   }
 
-  const idx =
-    s
-      .toLowerCase()
-      .indexOf(
-        stat.toLowerCase()
-      );
+  const idx = s
+    .toLowerCase()
+    .indexOf(
+      stat.toLowerCase()
+    );
 
-  if (
-    idx < 0
-  ) {
+  if (idx < 0) {
     return "";
   }
 
-  let before =
-    s
-      .slice(
-        0,
-        idx
-      )
-      .replace(
-        /[,;:\s-]+$/,
-        ""
-      )
-      .trim();
+  let before = s
+    .slice(0, idx)
+    .replace(/[,;:\s-]+$/, "")
+    .trim();
 
-  let after =
-    s
-      .slice(
-        idx +
-        stat.length
-      )
-      .replace(
-        /^[,;:\s-]+/,
-        ""
-      )
-      .replace(
-        /[.!?]+$/,
-        ""
-      )
-      .trim();
+  let after = s
+    .slice(
+      idx + stat.length
+    )
+    .replace(/^[,;:\s-]+/, "")
+    .replace(/[.!?]+$/, "")
+    .trim()
+    .replace(/^of\s+/i, "");
 
-  after =
-    after.replace(
-      /^of\s+/i,
-      ""
-    );
-
-  after =
-    fixBroadcastGrammar(
-      after
-    );
+  after = fixBroadcastGrammar(after);
 
   if (!after) {
     return "";
   }
 
-  if (
-    /^among\b/i.test(
-      before
-    )
-  ) {
-    const population =
-      before
-        .replace(
-          /^among\s+/i,
-          ""
-        )
-        .trim();
+  if (/^among\b/i.test(before)) {
+    const population = before
+      .replace(/^among\s+/i, "")
+      .trim();
 
-    if (
-      startsWithVerbPhrase(
-        after
-      )
-    ) {
-      return `Among ${population}, how many people ${after}?`;
-    }
-
-    return `Among ${population}, how many ${after}?`;
+    return `Among ${population}, how many ${
+      startsWithVerbPhrase(after)
+        ? `people ${after}`
+        : after
+    }?`;
   }
 
-  const populationMatch =
-    before.match(
-      /\b(Americans|Australians|adults|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|teens|teenagers|children|students|people|women|men)\b[^,;:]*/i
-    );
+  const populationMatch = before.match(
+    /\b(Americans|Australians|adults|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|teens|teenagers|children|students|people|women|men)\b[^,;:]*/i
+  );
 
-  if (
-    populationMatch
-  ) {
-    let population =
+  if (populationMatch) {
+    const population =
       fixBroadcastGrammar(
         populationMatch[0]
       );
 
-    if (
-      startsWithVerbPhrase(
-        after
-      )
-    ) {
-      return `How many ${population} ${after}?`;
+    return `How many ${population} ${after}?`;
+  }
+
+  if (
+    /^(donated|gave|contributed)\b/i.test(
+      after
+    )
+  ) {
+    const population =
+      contextualPopulationFromTitle(
+        articleTitle,
+        s
+      );
+
+    if (!population) {
+      return "";
     }
 
-    return `How many ${population} ${after}?`;
+    return `Among ${population}, how many ${after}?`;
   }
 
   return "";
@@ -850,13 +664,9 @@ function makePercentageQuestion(
   sentence,
   stat
 ) {
-  const s =
-    sentence
-      .replace(
-        /\s+/g,
-        " "
-      )
-      .trim();
+  const s = sentence
+    .replace(/\s+/g, " ")
+    .trim();
 
   const escaped =
     stat.replace(
@@ -864,43 +674,31 @@ function makePercentageQuestion(
       "\\%"
     );
 
-  let m =
-    s.match(
-      new RegExp(
-        `^${escaped}\\s+of\\s+(.+?)[.!]?$`,
-        "i"
-      )
-    );
+  let m = s.match(
+    new RegExp(
+      `^${escaped}\\s+of\\s+(.+?)[.!]?$`,
+      "i"
+    )
+  );
 
-  if (
-    m
-  ) {
+  if (m) {
     return `What percentage of ${fixBroadcastGrammar(
       m[1]
-        .replace(
-          /[.!?]+$/,
-          ""
-        )
+        .replace(/[.!?]+$/, "")
     )}?`;
   }
 
-  m =
-    s.match(
-      new RegExp(
-        `^(Among\\s+[^,]+,\\s*)${escaped}\\s+(.+?)[.!]?$`,
-        "i"
-      )
-    );
+  m = s.match(
+    new RegExp(
+      `^(Among\\s+[^,]+,\\s*)${escaped}\\s+(.+?)[.!]?$`,
+      "i"
+    )
+  );
 
-  if (
-    m
-  ) {
+  if (m) {
     return `${m[1]}what percentage ${fixBroadcastGrammar(
       m[2]
-        .replace(
-          /[.!?]+$/,
-          ""
-        )
+        .replace(/[.!?]+$/, "")
     )}?`;
   }
 
@@ -916,11 +714,7 @@ function makePercentageQuestion(
     );
 
   return (
-    replaced
-      .replace(
-        /[.!]+$/,
-        ""
-      ) +
+    replaced.replace(/[.!]+$/, "") +
     (
       replaced.endsWith("?")
         ? ""
@@ -931,55 +725,52 @@ function makePercentageQuestion(
 
 function makeQuestion(
   sentence,
-  stat
+  stat,
+  articleTitle = "",
+  allStats = []
 ) {
+  const isolated =
+    isolateFindingClause(
+      sentence,
+      stat,
+      allStats
+    );
+
+  if (!isolated) {
+    return "";
+  }
+
   let q = "";
 
   if (
-    /\bin\b/i.test(
-      stat
-    ) &&
-    !stat.includes(
-      "%"
-    )
+    /\bin\b/i.test(stat) &&
+    !stat.includes("%")
   ) {
-    q =
-      makeRatioQuestion(
-        sentence,
-        stat
-      );
+    q = makeRatioQuestion(
+      isolated,
+      stat,
+      articleTitle
+    );
   } else {
-    q =
-      makePercentageQuestion(
-        sentence,
-        stat
-      );
+    q = makePercentageQuestion(
+      isolated,
+      stat
+    );
   }
 
-  q =
-    fixBroadcastGrammar(
-      q
-    )
-      .replace(
-        /\s+\?/g,
-        "?"
-      )
-      .trim();
+  q = fixBroadcastGrammar(q)
+    .replace(/\s+\?/g, "?")
+    .trim();
 
   if (
-    !questionHasStandaloneContext(
-      q
-    )
+    !questionHasStandaloneContext(q)
   ) {
     return "";
   }
 
   return q;
 }
-
-function findStats(
-  sentence
-) {
+function findStats(sentence) {
   const found = [];
 
   for (
@@ -988,24 +779,16 @@ function findStats(
       /\b(?!1000)(\d{1,2}|100)%\b/g
     )
   ) {
-    const n =
-      Number(
-        m[1]
-      );
+    const n = Number(m[1]);
 
     if (
       n >= 5 &&
       n <= 95
     ) {
       found.push({
-        stat:
-          m[0],
-
-        index:
-          m.index,
-
-        type:
-          "percent"
+        stat: m[0],
+        index: m.index,
+        type: "percent"
       });
     }
   }
@@ -1016,28 +799,14 @@ function findStats(
       /\b([1-9]|10)\s+in\s+([2-9]|10)\b/gi
     )
   ) {
-    const a =
-      Number(
-        m[1]
-      );
+    const a = Number(m[1]);
+    const b = Number(m[2]);
 
-    const b =
-      Number(
-        m[2]
-      );
-
-    if (
-      a < b
-    ) {
+    if (a < b) {
       found.push({
-        stat:
-          `${a} in ${b}`,
-
-        index:
-          m.index,
-
-        type:
-          "ratio"
+        stat: `${a} in ${b}`,
+        index: m.index,
+        type: "ratio"
       });
     }
   }
@@ -1060,118 +829,64 @@ function findStats(
 
   for (
     const m of
-    sentence.matchAll(
-      wordRe
-    )
+    sentence.matchAll(wordRe)
   ) {
     const a =
-      nums[
-        m[1]
-          .toLowerCase()
-      ];
+      nums[m[1].toLowerCase()];
 
     const b =
-      nums[
-        m[2]
-          .toLowerCase()
-      ];
+      nums[m[2].toLowerCase()];
 
-    if (
-      a < b
-    ) {
+    if (a < b) {
       found.push({
-        stat:
-          `${a} in ${b}`,
-
-        index:
-          m.index,
-
-        type:
-          "ratio"
+        stat: `${a} in ${b}`,
+        index: m.index,
+        type: "ratio"
       });
     }
   }
 
-  const seen =
-    new Set();
+  const seen = new Set();
 
   return found
     .sort(
       (a, b) =>
-        a.index -
-        b.index
+        a.index - b.index
     )
-    .filter(
-      x => {
-        const k =
-          `${x.stat}|${x.index}`;
+    .filter(x => {
+      const k =
+        `${x.stat}|${x.index}`;
 
-        if (
-          seen.has(
-            k
-          )
-        ) {
-          return false;
-        }
-
-        seen.add(
-          k
-        );
-
-        return true;
+      if (seen.has(k)) {
+        return false;
       }
-    );
+
+      seen.add(k);
+      return true;
+    });
 }
 
-function hashId(
-  parts
-) {
+function hashId(parts) {
   return crypto
-    .createHash(
-      "sha1"
-    )
-    .update(
-      parts.join(
-        "|"
-      )
-    )
-    .digest(
-      "hex"
-    )
-    .slice(
-      0,
-      16
-    );
+    .createHash("sha1")
+    .update(parts.join("|"))
+    .digest("hex")
+    .slice(0, 16);
 }
 
-function isoDate(
-  raw
-) {
-  const d =
-    new Date(
-      raw
-    );
+function isoDate(raw) {
+  const d = new Date(raw);
 
-  return Number.isNaN(
-    d.getTime()
-  )
+  return Number.isNaN(d.getTime())
     ? new Date()
         .toISOString()
-        .slice(
-          0,
-          10
-        )
+        .slice(0, 10)
     : d
         .toISOString()
-        .slice(
-          0,
-          10
-        );
+        .slice(0, 10);
 }
 
-function displayDate(
-  raw
-) {
+function displayDate(raw) {
   const d =
     new Date(
       `${raw}T12:00:00Z`
@@ -1188,24 +903,15 @@ function displayDate(
   return d.toLocaleDateString(
     "en-US",
     {
-      month:
-        "short",
-
-      day:
-        "numeric",
-
-      year:
-        "numeric",
-
-      timeZone:
-        "UTC"
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "UTC"
     }
   );
 }
 
-function ageDays(
-  date
-) {
+function ageDays(date) {
   return (
     Date.now() -
     new Date(
@@ -1234,43 +940,28 @@ function extractCandidates(
 
   const candidateSentences = [];
 
-  for (
-    const chunk of chunks
-  ) {
-    const clean =
-      stripHtml(
-        chunk
-      )
-        .replace(
-          /\s+/g,
-          " "
-        )
-        .trim();
+  for (const chunk of chunks) {
+    const clean = stripHtml(chunk)
+      .replace(/\s+/g, " ")
+      .trim();
 
     if (!clean) {
       continue;
     }
 
     if (
-      chunk ===
-        article.title ||
+      chunk === article.title ||
       clean.length < 35
     ) {
-      candidateSentences.push(
-        clean
-      );
+      candidateSentences.push(clean);
     }
 
     candidateSentences.push(
-      ...sentences(
-        clean
-      )
+      ...sentences(clean)
     );
   }
 
-  const seen =
-    new Set();
-
+  const seen = new Set();
   const out = [];
 
   for (
@@ -1279,9 +970,7 @@ function extractCandidates(
   ) {
     if (
       !sentence ||
-      isPolitical(
-        sentence
-      )
+      isPolitical(sentence)
     ) {
       continue;
     }
@@ -1295,45 +984,33 @@ function extractCandidates(
     }
 
     const stats =
-      findStats(
-        sentence
-      );
+      findStats(sentence);
 
-    if (
-      !stats.length
-    ) {
+    if (!stats.length) {
       continue;
     }
 
     for (
       const found of
-      stats.slice(
-        0,
-        2
-      )
+      stats.slice(0, 2)
     ) {
-      const stat =
-        found.stat;
+      const stat = found.stat;
 
       const key =
         `${article.link}|${sentence}|${stat}`;
 
-      if (
-        seen.has(
-          key
-        )
-      ) {
+      if (seen.has(key)) {
         continue;
       }
 
-      seen.add(
-        key
-      );
+      seen.add(key);
 
       const question =
         makeQuestion(
           sentence,
-          stat
+          stat,
+          article.title,
+          stats
         );
 
       const topic =
@@ -1360,8 +1037,7 @@ function extractCandidates(
 
         question,
 
-        answer:
-          stat,
+        answer: stat,
 
         stat,
 
@@ -1397,9 +1073,8 @@ function extractCandidates(
 
   return out;
 }
-function explainUsability(
-  item
-) {
+
+function explainUsability(item) {
   if (
     !item ||
     !item.question ||
@@ -1448,13 +1123,65 @@ function explainUsability(
   return "ok";
 }
 
-function pickWidgetItems(
-  items
-) {
-  return items.slice(
-    0,
+function pickWidgetItems(items) {
+  const picked = [];
+  const topicCount =
+    new Map();
+
+  for (
+    const item of items
+  ) {
+    const n =
+      topicCount.get(
+        item.topic
+      ) || 0;
+
+    if (n >= 2) {
+      continue;
+    }
+
+    picked.push(item);
+
+    topicCount.set(
+      item.topic,
+      n + 1
+    );
+
+    if (
+      picked.length >=
+      MAX_WIDGET_ITEMS
+    ) {
+      break;
+    }
+  }
+
+  if (
+    picked.length <
     MAX_WIDGET_ITEMS
-  );
+  ) {
+    for (
+      const item of items
+    ) {
+      if (
+        !picked.some(
+          x =>
+            x.id ===
+            item.id
+        )
+      ) {
+        picked.push(item);
+      }
+
+      if (
+        picked.length >=
+        MAX_WIDGET_ITEMS
+      ) {
+        break;
+      }
+    }
+  }
+
+  return picked;
 }
 
 function buildWidgetHtml(
@@ -1462,18 +1189,13 @@ function buildWidgetHtml(
   limit = 3
 ) {
   const picked =
-    pickWidgetItems(
-      items
-    ).slice(
-      0,
-      limit
-    );
+    pickWidgetItems(items)
+      .slice(0, limit);
 
   const topics = [
     ...new Set(
       picked.map(
-        x =>
-          x.topic
+        x => x.topic
       )
     )
   ].sort();
@@ -1484,9 +1206,7 @@ function buildWidgetHtml(
         t =>
           `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`
       )
-      .join(
-        "\n"
-      );
+      .join("\n");
 
   const cards =
     picked
@@ -1514,8 +1234,7 @@ function buildWidgetHtml(
       ${escapeHtml(
         item.answer ||
         item.stat
-      )}
-      ${
+      )}${
         item.context
           ? ` — ${escapeHtml(item.context)}`
           : ""
@@ -1552,9 +1271,7 @@ function buildWidgetHtml(
   </div>
 </article>`
       )
-      .join(
-        "\n"
-      );
+      .join("\n");
 
   return `<!doctype html>
 <html lang="en">
@@ -1896,22 +1613,16 @@ function readRotationState() {
       parsed.history
     )
       ? parsed
-      : {
-          history: []
-        };
+      : { history: [] };
 
   } catch {
-
     return {
       history: []
     };
-
   }
 }
 
-function writeRotationState(
-  state
-) {
+function writeRotationState(state) {
   fs.writeFileSync(
     ROTATION_STATE,
     JSON.stringify(
@@ -1922,15 +1633,10 @@ function writeRotationState(
   );
 }
 
-function dateKey(
-  d = new Date()
-) {
+function dateKey(d = new Date()) {
   return d
     .toISOString()
-    .slice(
-      0,
-      10
-    );
+    .slice(0, 10);
 }
 
 function recentShownIds(
@@ -1941,8 +1647,7 @@ function recentShownIds(
     Date.now() -
     days * 86400000;
 
-  const ids =
-    new Set();
+  const ids = new Set();
 
   for (
     const row of
@@ -1954,9 +1659,7 @@ function recentShownIds(
       );
 
     if (
-      !Number.isFinite(
-        t
-      ) ||
+      !Number.isFinite(t) ||
       t < cutoff
     ) {
       continue;
@@ -1966,9 +1669,7 @@ function recentShownIds(
       const id of
       row.ids || []
     ) {
-      ids.add(
-        id
-      );
+      ids.add(id);
     }
   }
 
@@ -1981,8 +1682,7 @@ function sourceCount(
 ) {
   return chosen.filter(
     x =>
-      x.source ===
-      source
+      x.source === source
   ).length;
 }
 
@@ -1992,9 +1692,7 @@ function pickDailyRotation(
   state
 ) {
   const recent =
-    recentShownIds(
-      state
-    );
+    recentShownIds(state);
 
   const newestFirst =
     arr =>
@@ -2013,29 +1711,19 @@ function pickDailyRotation(
           )
       );
 
-  const fresh =
-    newestFirst(
-      pool.filter(
-        x =>
-          !recent.has(
-            x.id
-          )
-      )
-    );
-
-  const fallback =
-    newestFirst(
-      pool.filter(
-        x =>
-          recent.has(
-            x.id
-          )
-      )
-    );
-
   const ordered = [
-    ...fresh,
-    ...fallback
+    ...newestFirst(
+      pool.filter(
+        x =>
+          !recent.has(x.id)
+      )
+    ),
+    ...newestFirst(
+      pool.filter(
+        x =>
+          recent.has(x.id)
+      )
+    )
   ];
 
   const chosen = [];
@@ -2051,9 +1739,7 @@ function pickDailyRotation(
     talker &&
     count > 0
   ) {
-    chosen.push(
-      talker
-    );
+    chosen.push(talker);
   }
 
   const usedTopics =
@@ -2065,9 +1751,8 @@ function pickDailyRotation(
     );
 
   /*
-   * PASS 1:
-   * Prefer new topics and never exceed
-   * two items from the same source.
+   * First pass:
+   * new topics + max two/source.
    */
 
   for (
@@ -2075,8 +1760,7 @@ function pickDailyRotation(
     ordered
   ) {
     if (
-      chosen.length >=
-      count
+      chosen.length >= count
     ) {
       break;
     }
@@ -2095,8 +1779,7 @@ function pickDailyRotation(
       sourceCount(
         chosen,
         item.source
-      ) >=
-      MAX_PER_SOURCE
+      ) >= MAX_PER_SOURCE
     ) {
       continue;
     }
@@ -2109,19 +1792,14 @@ function pickDailyRotation(
       continue;
     }
 
-    chosen.push(
-      item
-    );
-
-    usedTopics.add(
-      item.topic
-    );
+    chosen.push(item);
+    usedTopics.add(item.topic);
   }
 
   /*
-   * PASS 2:
-   * Fill remaining spots while still
-   * respecting max two per source.
+   * Second pass:
+   * repeat topics if needed but
+   * still respect source cap.
    */
 
   for (
@@ -2129,8 +1807,7 @@ function pickDailyRotation(
     ordered
   ) {
     if (
-      chosen.length >=
-      count
+      chosen.length >= count
     ) {
       break;
     }
@@ -2149,22 +1826,19 @@ function pickDailyRotation(
       sourceCount(
         chosen,
         item.source
-      ) >=
-      MAX_PER_SOURCE
+      ) >= MAX_PER_SOURCE
     ) {
       continue;
     }
 
-    chosen.push(
-      item
-    );
+    chosen.push(item);
   }
 
   /*
-   * PASS 3:
-   * Only relax source limit if there
-   * are not enough distinct-source
-   * items to fill the widget.
+   * Third pass:
+   * relax source cap only if
+   * seven items cannot otherwise
+   * be filled.
    */
 
   for (
@@ -2172,8 +1846,7 @@ function pickDailyRotation(
     ordered
   ) {
     if (
-      chosen.length >=
-      count
+      chosen.length >= count
     ) {
       break;
     }
@@ -2188,9 +1861,7 @@ function pickDailyRotation(
       continue;
     }
 
-    chosen.push(
-      item
-    );
+    chosen.push(item);
   }
 
   return chosen.slice(
@@ -2199,16 +1870,14 @@ function pickDailyRotation(
   );
 }
 
-async function fetchText(
-  url
-) {
+async function fetchText(url) {
   const r =
     await fetch(
       url,
       {
         headers: {
           "user-agent":
-            "MediaJobsReport-SurveySays/2.1 (+https://www.mediajobsreport.com/)"
+            "MediaJobsReport-SurveySays/2.2 (+https://www.mediajobsreport.com/)"
         },
 
         redirect:
@@ -2216,9 +1885,7 @@ async function fetchText(
       }
     );
 
-  if (
-    !r.ok
-  ) {
+  if (!r.ok) {
     throw new Error(
       `${r.status} ${r.statusText}`
     );
@@ -2238,14 +1905,8 @@ async function fetchText(
   const ensureDiag =
     source => {
 
-      if (
-        !diag[
-          source
-        ]
-      ) {
-        diag[
-          source
-        ] = {
+      if (!diag[source]) {
+        diag[source] = {
           discovered: 0,
           rejectedMissing: 0,
           rejectedQuestionLength: 0,
@@ -2257,15 +1918,11 @@ async function fetchText(
         };
       }
 
-      return diag[
-        source
-      ];
+      return diag[source];
     };
 
   const seed =
-    fs.existsSync(
-      SEED
-    )
+    fs.existsSync(SEED)
       ? JSON.parse(
           fs.readFileSync(
             SEED,
@@ -2282,7 +1939,6 @@ async function fetchText(
     )
   ) {
     try {
-
       const old =
         JSON.parse(
           fs.readFileSync(
@@ -2308,7 +1964,6 @@ async function fetchText(
     SOURCES
   ) {
     try {
-
       console.log(
         `Fetching ${source.name}: ${source.url}`
       );
@@ -2319,9 +1974,7 @@ async function fetchText(
         );
 
       let articles =
-        parseRss(
-          xml
-        );
+        parseRss(xml);
 
       console.log(
         `  RSS items: ${articles.length}`
@@ -2362,21 +2015,16 @@ async function fetchText(
 
       ensureDiag(
         source.name
-      ).discovered +=
-        added;
+      ).discovered += added;
 
       console.log(
         `  Findings discovered from ${source.name}: ${added}`
       );
 
-    } catch (
-      err
-    ) {
-
+    } catch (err) {
       console.warn(
         `  Source failed: ${err.message}`
       );
-
     }
   }
 
@@ -2387,12 +2035,9 @@ async function fetchText(
   ];
 
   const discoveredObjects =
-    new Set(
-      discovered
-    );
+    new Set(discovered);
 
-  const dedup =
-    new Map();
+  const dedup = new Map();
 
   for (
     const item of
@@ -2407,14 +2052,10 @@ async function fetchText(
       ]);
 
     const reason =
-      explainUsability(
-        item
-      );
+      explainUsability(item);
 
     if (
-      discoveredObjects.has(
-        item
-      )
+      discoveredObjects.has(item)
     ) {
       const d =
         ensureDiag(
@@ -2423,8 +2064,7 @@ async function fetchText(
         );
 
       if (
-        reason ===
-        "missing"
+        reason === "missing"
       ) {
         d.rejectedMissing++;
 
@@ -2447,29 +2087,23 @@ async function fetchText(
         d.rejectedPolitical++;
 
       } else if (
-        reason ===
-        "age"
+        reason === "age"
       ) {
         d.rejectedAge++;
       }
     }
 
     if (
-      reason !==
-      "ok"
+      reason !== "ok"
     ) {
       continue;
     }
 
     if (
-      dedup.has(
-        key
-      )
+      dedup.has(key)
     ) {
       if (
-        discoveredObjects.has(
-          item
-        )
+        discoveredObjects.has(item)
       ) {
         ensureDiag(
           item.source ||
@@ -2484,8 +2118,7 @@ async function fetchText(
       key,
       {
         ...item,
-        id:
-          key
+        id: key
       }
     );
   }
@@ -2516,8 +2149,7 @@ async function fetchText(
   const finalIds =
     new Set(
       items.map(
-        x =>
-          x.id
+        x => x.id
       )
     );
 
@@ -2526,9 +2158,7 @@ async function fetchText(
     discovered
   ) {
     const reason =
-      explainUsability(
-        item
-      );
+      explainUsability(item);
 
     const key =
       item.id ||
@@ -2539,11 +2169,8 @@ async function fetchText(
       ]);
 
     if (
-      reason ===
-        "ok" &&
-      finalIds.has(
-        key
-      )
+      reason === "ok" &&
+      finalIds.has(key)
     ) {
       ensureDiag(
         item.source ||
@@ -2557,9 +2184,7 @@ async function fetchText(
       source,
       d
     ] of
-    Object.entries(
-      diag
-    )
+    Object.entries(diag)
   ) {
     console.log(
       `Diagnostics ${source}: ` +
@@ -2590,8 +2215,7 @@ async function fetchText(
       OUT_JSON
     ),
     {
-      recursive:
-        true
+      recursive: true
     }
   );
 
@@ -2694,18 +2318,10 @@ async function fetchText(
 
   const mix3 =
     daily3.reduce(
-      (
-        m,
-        x
-      ) => {
-
-        m[
-          x.source
-        ] =
+      (m, x) => {
+        m[x.source] =
           (
-            m[
-              x.source
-            ] ||
+            m[x.source] ||
             0
           ) + 1;
 
@@ -2716,18 +2332,10 @@ async function fetchText(
 
   const mix7 =
     daily7.reduce(
-      (
-        m,
-        x
-      ) => {
-
-        m[
-          x.source
-        ] =
+      (m, x) => {
+        m[x.source] =
           (
-            m[
-              x.source
-            ] ||
+            m[x.source] ||
             0
           ) + 1;
 
@@ -2758,14 +2366,7 @@ async function fetchText(
 
 })().catch(
   err => {
-
-    console.error(
-      err
-    );
-
-    process.exit(
-      1
-    );
-
+    console.error(err);
+    process.exit(1);
   }
 );
