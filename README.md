@@ -91,3 +91,10 @@ The build now reports, by source, how many newly discovered findings are rejecte
 - duplicate ID
 
 It also reports how many newly discovered findings survive into the published rolling pool.
+
+
+## AP-NORC main feed (v1.8)
+Replaced the five AP-NORC topic feeds with AP-NORC's main official RSS feed:
+`https://apnorc.org/feed/`
+
+Reason: the topic feeds were producing many usable findings, but most were older than the 180-day freshness window. The main feed prioritizes AP-NORC's newest research. The existing political-content filter remains active, so current political polling is excluded from MJR Survey Says while lifestyle, technology, media, work, education, consumer, and culture findings remain eligible.
