@@ -115,9 +115,29 @@ function talkFor(topic) {
   };
   return prompts[topic] || prompts["Life & Culture"];
 }
-function makeQuestion(sentence, pct) {
+function makeQuestion(sentence, stat) {
   let s = sentence.replace(/\s+/g, " ").trim();
-  const escaped = pct.replace("%", "\\%");
+
+  // Ratio-style stats are common in Talker Research: "2 in 3", "four in five", etc.
+  if (/\bin\b/i.test(stat) && !stat.includes("%")) {
+    const escaped = stat.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    let cleaned = s.replace(/^(only|nearly|about|roughly|almost)\s+/i, "");
+
+    // "2 in 3 Americans say..." -> "How many Americans say...?"
+    if (new RegExp(`^${escaped}\\s+`, "i").test(cleaned)) {
+      let tail = cleaned.replace(new RegExp(`^${escaped}\\s+`, "i"), "").replace(/[.!]+$/, "");
+      tail = tail.replace(/^of\s+/i, "");
+      return `How many ${tail}?`;
+    }
+
+    // Ratio appears later in the sentence.
+    const replaced = cleaned.replace(new RegExp(escaped, "i"), "how many");
+    if (/^how many\b/i.test(replaced)) return replaced.replace(/[.!]+$/, "") + "?";
+    return `According to the survey, ${replaced.replace(/[.!]+$/, "")}?`;
+  }
+
+  // Percentage-style stats.
+  const escaped = stat.replace("%", "\\%");
   let m = s.match(new RegExp(`^${escaped}\\s+of\\s+(.+?)[.!]?$`, "i"));
   if (m) return `What percentage of ${m[1].replace(/[.!?]+$/,"")}?`;
   m = s.match(new RegExp(`^(Among\\s+[^,]+,\\s*)${escaped}\\s+(.+?)[.!]?$`, "i"));
@@ -126,6 +146,58 @@ function makeQuestion(sentence, pct) {
   if (m) return `What percentage ${m[2].replace(/^[,;:\s-]+/,"").replace(/[.!?]+$/,"")}?`;
   const replaced = s.replace(new RegExp(escaped, "i"), "what percentage");
   return replaced.replace(/[.!]+$/, "") + (replaced.endsWith("?") ? "" : "?");
+}
+
+function normalizeRatio(raw) {
+  return raw
+    .replace(/\s+/g, " ")
+    .replace(/\bOne\b/i, "1")
+    .replace(/\bTwo\b/i, "2")
+    .replace(/\bThree\b/i, "3")
+    .replace(/\bFour\b/i, "4")
+    .replace(/\bFive\b/i, "5")
+    .replace(/\bSix\b/i, "6")
+    .replace(/\bSeven\b/i, "7")
+    .replace(/\bEight\b/i, "8")
+    .replace(/\bNine\b/i, "9")
+    .replace(/\bTen\b/i, "10")
+    .trim();
+}
+
+function findStats(sentence) {
+  const found = [];
+
+  // Percentages.
+  for (const m of sentence.matchAll(/\b(?!1000)(\d{1,2}|100)%\b/g)) {
+    const n = Number(m[1]);
+    if (n >= 5 && n <= 95) found.push({stat:m[0], index:m.index, type:"percent"});
+  }
+
+  // Numeric ratios, e.g. "2 in 3", "4 in 5".
+  for (const m of sentence.matchAll(/\b([1-9]|10)\s+in\s+([2-9]|10)\b/gi)) {
+    const a = Number(m[1]), b = Number(m[2]);
+    if (a < b) found.push({stat:`${a} in ${b}`, index:m.index, type:"ratio"});
+  }
+
+  // Word ratios, e.g. "two in three", "four in five".
+  const words = "(?:one|two|three|four|five|six|seven|eight|nine|ten)";
+  const wordRe = new RegExp(`\\b(${words})\\s+in\\s+(${words})\\b`, "gi");
+  const nums = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};
+  for (const m of sentence.matchAll(wordRe)) {
+    const a = nums[m[1].toLowerCase()], b = nums[m[2].toLowerCase()];
+    if (a < b) found.push({stat:`${a} in ${b}`, index:m.index, type:"ratio"});
+  }
+
+  // Deduplicate by normalized stat and position order.
+  const seen = new Set();
+  return found
+    .sort((a,b)=>a.index-b.index)
+    .filter(x => {
+      const k = `${x.stat}|${x.index}`;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
 }
 function hashId(parts) {
   return crypto.createHash("sha1").update(parts.join("|")).digest("hex").slice(0, 16);
@@ -144,21 +216,33 @@ function ageDays(date) {
 }
 function extractCandidates(article, sourceName) {
   if (isPolitical(`${article.title} ${article.description} ${article.content}`)) return [];
-  const base = [article.description, article.content].filter(Boolean).join(" ");
+
+  // Talker frequently puts the strongest survey stat in the headline,
+  // so scan title as well as the official RSS excerpt/content.
+  const chunks = [article.title, article.description, article.content].filter(Boolean);
+  const candidateSentences = [];
+  for (const chunk of chunks) {
+    const clean = stripHtml(chunk).replace(/\s+/g, " ").trim();
+    if (!clean) continue;
+    if (chunk === article.title || clean.length < 35) candidateSentences.push(clean);
+    candidateSentences.push(...sentences(clean));
+  }
+
   const seen = new Set();
   const out = [];
-  for (const sentence of sentences(base)) {
-    if (isPolitical(sentence)) continue;
-    const matches = [...sentence.matchAll(/\b(?!1000)(\d{1,2}|100)%\b/g)];
-    if (!matches.length) continue;
+  for (const sentence of candidateSentences) {
+    if (!sentence || isPolitical(sentence)) continue;
     if (/\b(discount|off sale|battery|humidity|chance of rain)\b/i.test(sentence)) continue;
-    for (const match of matches.slice(0,2)) {
-      const stat = match[0];
-      const n = Number(match[1]);
-      if (n < 5 || n > 95) continue;
+
+    const stats = findStats(sentence);
+    if (!stats.length) continue;
+
+    for (const found of stats.slice(0,2)) {
+      const stat = found.stat;
       const key = `${article.link}|${sentence}|${stat}`;
       if (seen.has(key)) continue;
       seen.add(key);
+
       const topic = inferTopic(`${article.title} ${sentence}`);
       const published = isoDate(article.date);
       out.push({
