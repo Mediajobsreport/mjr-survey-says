@@ -12,15 +12,43 @@ const SEED = path.join(ROOT, "data-seed.json");
 const ROTATION_STATE = path.join(ROOT, "mjr-survey-rotation.json");
 
 const SOURCES = [
-  { name: "Talker Research", url: "https://talker.news/feed/", filter: "talker-research" },
-  { name: "Pew Research Center", url: "https://www.pewresearch.org/publications/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/topics/culture-and-society/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/topics/science-and-technology/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/topics/younger-generations/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/topics/education/feed/" },
-  { name: "AP-NORC Center", url: "https://apnorc.org/topics/media-insight-project/feed/" },
-  { name: "Edison Research", url: "https://www.edisonresearch.com/feed/" }
+  {
+    name: "Talker Research",
+    url: "https://talker.news/feed/",
+    filter: "talker-research"
+  },
+  {
+    name: "Pew Research Center",
+    url: "https://www.pewresearch.org/publications/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/culture-and-society/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/science-and-technology/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/younger-generations/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/education/feed/"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/media-insight-project/feed/"
+  },
+  {
+    name: "Edison Research",
+    url: "https://www.edisonresearch.com/feed/"
+  }
 ];
 
 const MAX_POOL = 140;
@@ -44,7 +72,13 @@ function decodeXml(s = "") {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#039;|&apos;/g, "'")
-    .replace(/&#038;/g, "&");
+    .replace(/&#038;/g, "&")
+    .replace(/&#8217;/g, "’")
+    .replace(/&#8216;/g, "‘")
+    .replace(/&#8220;/g, "“")
+    .replace(/&#8221;/g, "”")
+    .replace(/&#8211;/g, "–")
+    .replace(/&#8212;/g, "—");
 }
 
 function stripHtml(s = "") {
@@ -125,22 +159,27 @@ function sentences(text = "") {
 function inferTopic(text = "") {
   const t = text.toLowerCase();
 
+  /*
+   * Work goes before Technology so
+   * AI-at-work findings stay under Work.
+   */
+
   const rules = [
     [
+      "Work",
+      /\b(work|job|employee|employees|employer|workplace|career|office|worker|workers|employed)\b/
+    ],
+    [
       "Technology",
-      /\b(ai|artificial intelligence|chatbot|smartphone|internet|online|social media|technology|digital|crypto|cryptocurrency)\b/
+      /\b(ai|artificial intelligence|chatbot|chatbots|smartphone|internet|online|social media|technology|digital|crypto|cryptocurrency)\b/
     ],
     [
       "Entertainment",
-      /\b(streaming|streamed radio|radio|television|tv|movie|music|podcast|entertainment|audio)\b/
+      /\b(streaming|streamed radio|radio|television|tv|movie|movies|music|podcast|podcasts|entertainment|audio|sports streaming)\b/
     ],
     [
       "Money",
-      /\b(money|cost|price|inflation|financial|finance|economy|spending|income|cash|debt|donation|donate|crowdfunding|expense|charity|charitable)\b/
-    ],
-    [
-      "Work",
-      /\b(work|job|employee|employer|workplace|career|office|worker)\b/
+      /\b(money|cost|price|inflation|financial|finance|economy|spending|income|cash|debt|donation|donate|donated|crowdfunding|expense|charity|charitable)\b/
     ],
     [
       "Shopping",
@@ -152,7 +191,7 @@ function inferTopic(text = "") {
     ],
     [
       "Family & Life",
-      /\b(parent|child|children|family|relationship|dating|marriage|home|caregiver|childcare|daycare)\b/
+      /\b(parent|parents|child|children|family|relationship|dating|marriage|home|caregiver|childcare|daycare)\b/
     ],
     [
       "Health",
@@ -178,13 +217,13 @@ function inferTopicFromFinding(sentence = "", title = "") {
 }
 
 function isPolitical(text = "") {
-  return /\b(trump|biden|democrat|republican|congress|senate|house of representatives|election|vote|voter|partisan|political party|white house|supreme court|immigration policy|foreign policy|president|governor)\b/i.test(
+  return /\b(trump|biden|democrats?|republicans?|congress|senate|house of representatives|election|elections|vote|votes|voter|voters|partisan|political party|white house|supreme court|immigration policy|foreign policy|president|presidential|governor|governors)\b/i.test(
     text
   );
 }
 
 function talkForFinding(topic, sentence = "", title = "") {
-  const sentenceLower = sentence.toLowerCase();
+  const s = sentence.toLowerCase();
   const h = `${sentence} ${title}`.toLowerCase();
 
   if (/\bcrowdfund(?:ing|ed)?\b/.test(h)) {
@@ -193,43 +232,45 @@ function talkForFinding(topic, sentence = "", title = "") {
 
   if (
     /\bcharit(?:y|ies|able)\b/.test(h) ||
-    /\bdonat(?:e|ed|ion|ions)\b/.test(sentenceLower)
+    /\bdonat(?:e|ed|ion|ions)\b/.test(s)
   ) {
     return "What type of cause are you most likely to donate to, and what makes you trust an organization enough to give?";
   }
 
   if (
-    /\bstreamed radio|streaming radio|radio stream\b/.test(
-      sentenceLower
-    )
+    /\bstreamed radio|streaming radio|radio stream\b/.test(s)
   ) {
     return "How often do you listen to a radio station through an app or stream instead of a regular radio?";
   }
 
-  if (/\bradio\b/.test(sentenceLower)) {
+  if (/\bsports streaming\b/.test(h)) {
+    return "Have streaming services made it easier or harder for you to watch the sports you want?";
+  }
+
+  if (/\bradio\b/.test(s)) {
     return "Does this match the way you or the people around you use radio?";
   }
 
-  if (/\bpodcast\b/.test(sentenceLower)) {
+  if (/\bpodcast\b/.test(s)) {
     return "How do your own podcast habits compare with this finding?";
   }
 
   if (
-    /\bhealth|wellness\b/.test(sentenceLower) &&
-    /\binfluencer/.test(sentenceLower)
+    /\bhealth|wellness\b/.test(s) &&
+    /\binfluencer/.test(s)
   ) {
     return "Would you trust health advice from an influencer, or do you want it from a medical professional?";
   }
 
-  if (/\bcrypto|cryptocurrency\b/.test(sentenceLower)) {
+  if (/\bcrypto|cryptocurrency\b/.test(s)) {
     return "Have you ever owned or used cryptocurrency, or have you stayed away from it completely?";
   }
 
-  if (/\bsocial media\b/.test(sentenceLower)) {
+  if (/\bsocial media\b/.test(s)) {
     return "Does this match the way you and your friends actually use social media?";
   }
 
-  if (/\b(ai|artificial intelligence|chatbot)\b/.test(sentenceLower)) {
+  if (/\b(ai|artificial intelligence|chatbot)\b/.test(s)) {
     return "What everyday task are you most willing to hand over to AI?";
   }
 
@@ -274,7 +315,7 @@ function talkForFinding(topic, sentence = "", title = "") {
 }
 
 function startsWithVerbPhrase(text = "") {
-  return /^(donated|donate|gave|give|spent|spend|said|say|use|used|uses|watch|watched|watches|listen|listened|listens|listening|buy|bought|buys|shop|shopped|shops|prefer|preferred|prefers|agree|agreed|agrees|believe|believed|believes|think|thought|thinks|reported|report|reports|have|had|has|are|were|is|want|wanted|wants|plan|planned|plans|expect|expected|expects|feel|felt|feels|chose|choose|chooses|selected|select|selects|experienced|experience|experiences|received|receive|receives|paid|pay|pays|borrowed|borrow|borrows|saved|save|saves|get|gets|got)\b/i.test(
+  return /^(donated|donate|gave|give|contributed|contribute|spent|spend|said|say|use|used|uses|watch|watched|watches|listen|listened|listens|buy|bought|buys|shop|shopped|shops|prefer|preferred|prefers|agree|agreed|agrees|believe|believed|believes|think|thought|thinks|reported|report|reports|have|had|has|are|were|is|want|wanted|wants|plan|planned|plans|expect|expected|expects|feel|felt|feels|chose|choose|chooses|selected|select|selects|experienced|experience|experiences|received|receive|receives|paid|pay|pays|borrowed|borrow|borrows|saved|save|saves|get|gets|got)\b/i.test(
     text.trim()
   );
 }
@@ -317,6 +358,47 @@ function fixBroadcastGrammar(text = "") {
     );
 }
 
+/*
+ * If a statistic appears before a semicolon,
+ * discard the unrelated trailing headline clause.
+ *
+ * Example:
+ * About 1 in 5 Americans have used crypto;
+ * Republicans' use has ticked up.
+ *
+ * becomes:
+ * About 1 in 5 Americans have used crypto
+ */
+function stripTrailingSemicolonClause(sentence = "", stat = "") {
+  const s = sentence
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const semi = s.indexOf(";");
+
+  if (semi < 0) {
+    return s;
+  }
+
+  const statIndex = s
+    .toLowerCase()
+    .indexOf(
+      String(stat)
+        .toLowerCase()
+    );
+
+  if (
+    statIndex >= 0 &&
+    statIndex < semi
+  ) {
+    return s
+      .slice(0, semi)
+      .trim();
+  }
+
+  return s;
+}
+
 function contextualPopulationFromTitle(
   title = "",
   sentence = ""
@@ -331,13 +413,13 @@ function contextualPopulationFromTitle(
     return "adults who made charitable donations";
   }
 
-  if (
-    /\bstreamed radio|streaming radio\b/.test(h)
-  ) {
-    return "people who listen to streamed radio";
-  }
-
   return "";
+}
+
+function containsUndefinedReference(text = "") {
+  return /\b(these|those|such)\s+(factors?|issues?|things?|reasons?|circumstances?|conditions?|changes?|effects?|events?|concerns?|problems?|pressures?|challenges?|results?|findings?)\b/i.test(
+    text
+  );
 }
 
 function hasBadQuestionLanguage(question = "") {
@@ -350,9 +432,21 @@ function hasBadQuestionLanguage(question = "") {
   }
 
   if (
+    /^in a survey about\b/i.test(q)
+  ) {
+    return true;
+  }
+
+  if (
     /\b(matched this survey finding|matched the survey finding|this survey finding|this finding|the finding above|the survey finding above|the research topic)\b/i.test(
       q
     )
+  ) {
+    return true;
+  }
+
+  if (
+    containsUndefinedReference(q)
   ) {
     return true;
   }
@@ -366,19 +460,24 @@ function hasBadQuestionLanguage(question = "") {
   }
 
   if (
-    /\bhow many\s+[^?]{0,70}\b(listening|using|watching|getting)\b/i.test(
+    /\bhow many\s+[^?]{0,80}\b(listening|using|watching|getting|adopting)\b/i.test(
       q
     )
   ) {
     return true;
   }
 
-  /*
-   * A finished question should never
-   * contain another raw survey statistic.
-   * This catches compound-stat failures.
-   */
+  if (
+    /;\s*[^?]+\?/i.test(q)
+  ) {
+    return true;
+  }
 
+  /*
+   * The finished question should not
+   * accidentally contain a second
+   * raw percentage or ratio.
+   */
   if (
     /\b\d{1,3}%\b/.test(q) ||
     /\b\d+\s+in\s+\d+\b/i.test(q)
@@ -399,7 +498,7 @@ function questionHasStandaloneContext(question = "") {
   }
 
   if (
-    /\b(this|that|these|those)\s+(number|result|stat|statistic|finding|survey)\b/i.test(
+    /\b(this|that|these|those)\s+(number|result|stat|statistic|finding|survey|factor|issue|thing|reason|condition|effect)\b/i.test(
       q
     )
   ) {
@@ -414,9 +513,14 @@ function isolateFindingClause(
   targetStat,
   allStats = []
 ) {
-  let s = sentence
-    .replace(/\s+/g, " ")
-    .trim();
+  let s = stripTrailingSemicolonClause(
+    sentence,
+    targetStat
+  );
+
+  if (containsUndefinedReference(s)) {
+    return "";
+  }
 
   if (allStats.length <= 1) {
     return s;
@@ -432,22 +536,20 @@ function isolateFindingClause(
     return "";
   }
 
-  const otherStatPatterns = [
+  const otherPatterns = [
     /\b(?:about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\s*\d{1,3}%\b/gi,
     /\b(?:about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\s*\d+\s+in\s+\d+\b/gi
   ];
 
   const boundaries = [];
 
-  for (const re of otherStatPatterns) {
+  for (const re of otherPatterns) {
     for (const m of s.matchAll(re)) {
+      const raw = m[0].trim();
+
       if (
-        m.index === targetIndex ||
-        m[0]
-          .toLowerCase()
-          .includes(
-            targetStat.toLowerCase()
-          )
+        raw.includes(targetStat) ||
+        targetStat.includes(raw)
       ) {
         continue;
       }
@@ -458,13 +560,15 @@ function isolateFindingClause(
           m.index
         );
 
-        const conjunction = between.match(
-          /\s+(?:and|while|but|whereas)\s+$/i
-        );
+        const conjunction =
+          between.match(
+            /\s+(?:and|while|but|whereas)\s+$/i
+          );
 
         if (conjunction) {
           boundaries.push(
-            m.index - conjunction[0].length
+            m.index -
+            conjunction[0].length
           );
         } else {
           const punct =
@@ -491,12 +595,11 @@ function isolateFindingClause(
       .trim();
   }
 
-  /*
-   * If more than one statistic still
-   * remains, reject instead of guessing.
-   */
-
   if (findStats(s).length > 1) {
+    return "";
+  }
+
+  if (containsUndefinedReference(s)) {
     return "";
   }
 
@@ -517,7 +620,15 @@ function stripRatioLead(sentence, stat) {
       ),
       ""
     )
+    .replace(/^of\s+/i, "")
     .replace(/[.!?]+$/, "")
+    .trim();
+}
+
+function cleanRatioTail(tail = "") {
+  return fixBroadcastGrammar(tail)
+    .replace(/\badopting\b/gi, "have adopted")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -542,22 +653,26 @@ function makeRatioQuestion(
     ).test(s);
 
   if (beginsWithRatio) {
-    let tail = stripRatioLead(
-      s,
-      stat
-    )
-      .replace(/^of\s+/i, "");
-
-    tail = fixBroadcastGrammar(tail);
+    let tail = cleanRatioTail(
+      stripRatioLead(
+        s,
+        stat
+      )
+    );
 
     if (!tail) {
       return "";
     }
 
     /*
-     * "3 in 10 donated $51-$100"
-     * needs the missing population.
+     * About 1 in 5 Americans have used crypto
+     * -> How many Americans have used cryptocurrency?
      */
+    if (
+      /^Americans\s+have used crypto\b/i.test(tail)
+    ) {
+      return "How many Americans have used cryptocurrency?";
+    }
 
     if (
       /^(donated|gave|contributed)\b/i.test(
@@ -575,6 +690,19 @@ function makeRatioQuestion(
       }
 
       return `Among ${population}, how many ${tail}?`;
+    }
+
+    /*
+     * "Americans have..."
+     * "young women get..."
+     * "adults say..."
+     */
+    if (
+      /^(Americans|Australians|adults|people|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|students|teens|teenagers|women|men|young women|young men)\b/i.test(
+        tail
+      )
+    ) {
+      return `How many ${tail}?`;
     }
 
     if (startsWithVerbPhrase(tail)) {
@@ -608,9 +736,43 @@ function makeRatioQuestion(
     .trim()
     .replace(/^of\s+/i, "");
 
-  after = fixBroadcastGrammar(after);
+  after = cleanRatioTail(after);
 
-  if (!after) {
+  if (
+    !after ||
+    containsUndefinedReference(after)
+  ) {
+    return "";
+  }
+
+  /*
+   * Special sports pattern:
+   *
+   * "Half the public are fans of sports,
+   * but it's the 1 in 5 who are super fans
+   * adopting sports streaming services."
+   */
+  if (
+    /\bsports\b/i.test(s) &&
+    /^who are super fans\b/i.test(after)
+  ) {
+    after = after
+      .replace(
+        /^who are super fans\s+/i,
+        ""
+      )
+      .replace(
+        /^have adopted\s+/i,
+        ""
+      )
+      .trim();
+
+    if (
+      /\bsports streaming services\b/i.test(after)
+    ) {
+      return "How many people are sports super fans who have adopted sports streaming services?";
+    }
+
     return "";
   }
 
@@ -619,11 +781,15 @@ function makeRatioQuestion(
       .replace(/^among\s+/i, "")
       .trim();
 
-    return `Among ${population}, how many ${
-      startsWithVerbPhrase(after)
-        ? `people ${after}`
-        : after
-    }?`;
+    if (!population) {
+      return "";
+    }
+
+    if (startsWithVerbPhrase(after)) {
+      return `Among ${population}, how many people ${after}?`;
+    }
+
+    return `Among ${population}, how many ${after}?`;
   }
 
   const populationMatch = before.match(
@@ -636,7 +802,17 @@ function makeRatioQuestion(
         populationMatch[0]
       );
 
-    return `How many ${population} ${after}?`;
+    if (
+      /^who\b/i.test(after)
+    ) {
+      return `How many ${population} ${after}?`;
+    }
+
+    if (
+      startsWithVerbPhrase(after)
+    ) {
+      return `How many ${population} ${after}?`;
+    }
   }
 
   if (
@@ -760,6 +936,7 @@ function makeQuestion(
 
   q = fixBroadcastGrammar(q)
     .replace(/\s+\?/g, "?")
+    .replace(/\s+/g, " ")
     .trim();
 
   if (
@@ -770,12 +947,12 @@ function makeQuestion(
 
   return q;
 }
+
 function findStats(sentence) {
   const found = [];
 
   for (
-    const m of
-    sentence.matchAll(
+    const m of sentence.matchAll(
       /\b(?!1000)(\d{1,2}|100)%\b/g
     )
   ) {
@@ -794,8 +971,7 @@ function findStats(sentence) {
   }
 
   for (
-    const m of
-    sentence.matchAll(
+    const m of sentence.matchAll(
       /\b([1-9]|10)\s+in\s+([2-9]|10)\b/gi
     )
   ) {
@@ -828,8 +1004,7 @@ function findStats(sentence) {
   };
 
   for (
-    const m of
-    sentence.matchAll(wordRe)
+    const m of sentence.matchAll(wordRe)
   ) {
     const a =
       nums[m[1].toLowerCase()];
@@ -924,14 +1099,6 @@ function extractCandidates(
   article,
   sourceName
 ) {
-  if (
-    isPolitical(
-      `${article.title} ${article.description} ${article.content}`
-    )
-  ) {
-    return [];
-  }
-
   const chunks = [
     article.title,
     article.description,
@@ -971,6 +1138,12 @@ function extractCandidates(
     if (
       !sentence ||
       isPolitical(sentence)
+    ) {
+      continue;
+    }
+
+    if (
+      containsUndefinedReference(sentence)
     ) {
       continue;
     }
@@ -1099,12 +1272,24 @@ function explainUsability(item) {
     return "standalone";
   }
 
+  /*
+   * This catches older cached items such as:
+   * "...Republicans' use has ticked up."
+   */
   if (
     isPolitical(
       `${item.question} ${item.context || ""}`
     )
   ) {
     return "political";
+  }
+
+  if (
+    containsUndefinedReference(
+      `${item.question} ${item.context || ""}`
+    )
+  ) {
+    return "standalone";
   }
 
   if (
@@ -1122,7 +1307,6 @@ function explainUsability(item) {
 
   return "ok";
 }
-
 function pickWidgetItems(items) {
   const picked = [];
   const topicCount =
@@ -1751,10 +1935,10 @@ function pickDailyRotation(
     );
 
   /*
-   * First pass:
-   * new topics + max two/source.
+   * Pass 1:
+   * favor topic diversity and
+   * limit each source to two.
    */
-
   for (
     const item of
     ordered
@@ -1797,11 +1981,10 @@ function pickDailyRotation(
   }
 
   /*
-   * Second pass:
-   * repeat topics if needed but
-   * still respect source cap.
+   * Pass 2:
+   * allow repeat topics,
+   * retain source limit.
    */
-
   for (
     const item of
     ordered
@@ -1835,12 +2018,10 @@ function pickDailyRotation(
   }
 
   /*
-   * Third pass:
-   * relax source cap only if
-   * seven items cannot otherwise
-   * be filled.
+   * Pass 3:
+   * relax source limit only
+   * if necessary to fill widget.
    */
-
   for (
     const item of
     ordered
@@ -1877,7 +2058,7 @@ async function fetchText(url) {
       {
         headers: {
           "user-agent":
-            "MediaJobsReport-SurveySays/2.2 (+https://www.mediajobsreport.com/)"
+            "MediaJobsReport-SurveySays/2.3 (+https://www.mediajobsreport.com/)"
         },
 
         redirect:
