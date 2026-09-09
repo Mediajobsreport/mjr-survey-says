@@ -687,10 +687,15 @@ function contextHasUndefinedPopulation(context = '') {
   return /^(?:assume|assumes|are|is|were|was|have|has|had|say|says|said|feel|feels|felt|think|thinks|thought|use|uses|used|plan|plans|planned|expect|expects|expected|want|wants|wanted|prefer|prefers|preferred|believe|believes|believed|report|reports|reported|skip|skips|avoid|avoids|would|will|can|could|they|their|them)\b/i.test(tail);
 }
 
-// v3.1: semantic-integrity rule — one statistic, one measured clause, one question.
-// Reject a finding when a numeric result shares a sentence with a separate qualitative
-// measurement ("most", "many", "some", etc.) joined by and/while/but/though. This keeps
-// the numeric answer from being accidentally applied to both clauses.
+// v3.2: semantic-integrity rule — written fractions count as statistics too.
+// This prevents a sentence such as "A quarter of adults ..., and 17% ..." from being
+// treated as a one-stat finding just because the first statistic is written in words.
+const WRITTEN_STAT_RE = /\b(?:a\s+quarter|one[-\s]+quarter|a\s+third|one[-\s]+third|half|one[-\s]+half|two[-\s]+thirds|three[-\s]+quarters|one[-\s]+fifth|two[-\s]+fifths|three[-\s]+fifths|four[-\s]+fifths)\b/i;
+
+function containsWrittenStat(text = '') {
+  return WRITTEN_STAT_RE.test(String(text).replace(/\s+/g, ' ').trim());
+}
+
 function contextHasMixedMeasurementClauses(context = '') {
   const c = String(context).replace(/\s+/g, ' ').trim();
   const finding = c.replace(/^.*?Finding:\s*/i, '').trim();
@@ -706,7 +711,7 @@ function contextHasMixedMeasurementClauses(context = '') {
   const connectors = [...finding.matchAll(connectorRe)];
   if (!connectors.length) return false;
 
-  const qualitativeRe = /\b(?:most|many|some|few|a majority|the majority|a minority|the minority|more than half|less than half|about half|nearly half)\b/i;
+  const qualitativeOrWrittenStatRe = /\b(?:most|many|some|few|a majority|the majority|a minority|the minority|more than half|less than half|about half|nearly half|a quarter|one[-\s]+quarter|a third|one[-\s]+third|half|one[-\s]+half|two[-\s]+thirds|three[-\s]+quarters|one[-\s]+fifth|two[-\s]+fifths|three[-\s]+fifths|four[-\s]+fifths)\b/i;
 
   for (const m of connectors) {
     const idx = m.index ?? -1;
@@ -717,9 +722,9 @@ function contextHasMixedMeasurementClauses(context = '') {
     const otherSide = statOnLeft ? right : left;
     const statSide = statOnLeft ? left : right;
 
-    // The nonnumeric side contains its own qualitative measurement, while the numeric
-    // side contains our answer. Those are two separate findings and must not be merged.
-    if (qualitativeRe.test(otherSide) && /\b(?:\d{1,3}%|(?:[1-9]|10)\s+in\s+(?:[2-9]|10))\b/i.test(statSide)) {
+    // The other clause contains its own qualitative or written-fraction measurement, while
+    // the numeric clause contains our answer. Those are separate findings and must not merge.
+    if (qualitativeOrWrittenStatRe.test(otherSide) && /\b(?:\d{1,3}%|(?:[1-9]|10)\s+in\s+(?:[2-9]|10))\b/i.test(statSide)) {
       return true;
     }
   }
@@ -734,6 +739,7 @@ function finalBroadcastQualityGate(item) {
   if (q.length < 25 || q.length > 240) return false;
   if (!/\?$/.test(q)) return false;
   if (containsVisibleStat(q)) return false;
+  if (containsWrittenStat(q)) return false;
   if (hasHeadlineDebris(q)) return false;
   if (hasBadQuestionLanguage(q)) return false;
   if (hasMalformedPercentagePopulation(q)) return false;
@@ -756,6 +762,7 @@ function explainUsability(item) {
   if (item.question.length < 25 || item.question.length > 240) return 'question_length';
   if (!questionHasStandaloneContext(item.question)) return 'standalone';
   if (containsVisibleStat(item.question)) return 'standalone';
+  if (containsWrittenStat(item.question)) return 'standalone';
   if (isAmbiguousMultiYearQuestion(item.question)) return 'standalone';
   if (isUnsupportedSportsSuperFanQuestion(item.question, item.context || '')) return 'standalone';
   if (isPolitical(`${item.question} ${item.context || ''}`)) return 'political';
@@ -993,7 +1000,7 @@ async function fetchHtmlDiscoverySource(source) {
 
 (async () => {
   console.log('Building MJR Survey Says feed + static widget...');
-  console.log('v3.1 final broadcast-quality gate: ON (one statistic = one measured clause = one question)');
+  console.log('v3.2 final broadcast-quality gate: ON (written fractions count as statistics)');
 
   const diag = {};
   const ensureDiag = source => {
