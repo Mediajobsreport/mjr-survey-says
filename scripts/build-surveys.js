@@ -298,6 +298,39 @@ function hasIncompleteMoreLessObject(text = '') {
   return /\b(?:plan|plans|planned|planning|expect|expects|expected|want|wants|wanted|intend|intends|intended|likely)\s+(?:to\s+)?(?:give|spend|use|do|buy|save|pay|cut|consume|shop|travel|work)\s+(?:more|less)\b(?!\s+(?:on|for|to|than|money|time|hours?|dollars?|percent|percentage)\b)/i.test(t);
 }
 
+
+// v2.9: reject survey findings where the statistic has no explicit population.
+// Example rejected: "42% are already using donor-advised funds."
+// Example allowed:  "Among Millennials, 42% are already using donor-advised funds."
+function hasUndefinedPopulationFinding(sentence = '', target = null) {
+  if (!target) return false;
+  const s = String(sentence).replace(/\s+/g, ' ').trim();
+  const raw = String(target.raw || target.stat || '').trim();
+  if (!raw) return false;
+  const idx = s.toLowerCase().indexOf(raw.toLowerCase());
+  if (idx < 0) return true;
+
+  const before = s.slice(0, idx).trim();
+  const after = s.slice(idx + raw.length).replace(/^[,;:\s-]+/, '').trim();
+  const population = /\b(Americans|U\.S\. adults|US adults|adults|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|teens|teenagers|children|students|people|women|men|young women|young men|Gen Zers|Millennials|Gen Z|sports fans|hiring managers|households|dual-income households|donors|voters|users|customers|families)\b/i;
+
+  // "42% of Millennials ..." carries its population immediately after the stat.
+  if (/^of\s+/i.test(after) && population.test(after)) return false;
+
+  // "Among Millennials, 42% ..." or "Of U.S. adults, 42% ..." carries it before the stat.
+  if (population.test(before)) return false;
+
+  // A bare stat followed by a verb/pronoun has no standalone population.
+  if (/^(?:are|is|were|was|have|has|had|say|says|said|feel|feels|felt|think|thinks|thought|use|uses|used|plan|plans|planned|expect|expects|expected|want|wants|wanted|prefer|prefers|preferred|believe|believes|believed|report|reports|reported|they|their|them)\b/i.test(after)) return true;
+
+  return false;
+}
+
+function hasMalformedPercentagePopulation(question = '') {
+  const q = String(question).replace(/\s+/g, ' ').trim();
+  return /^what percentage\s+(?:are|is|were|was|have|has|had|say|says|said|use|uses|used|plan|plans|planned|they|their|them)\b/i.test(q);
+}
+
 function cleanHeadlineCollision(text = '') {
   let t = String(text).replace(/\s+/g, ' ').trim();
   t = t
@@ -403,6 +436,7 @@ function isolateFindingClause(sentence, target, allStats = []) {
   let s = cleanHeadlineCollision(stripTrailingSemicolonClause(sentence, raw));
   if (containsUndefinedReference(s)) return '';
   if (hasIncompleteMoreLessObject(s)) return '';
+  if (hasUndefinedPopulationFinding(s, target)) return '';
   if (hasUnsafeCompoundStatAttachment(s, target)) return '';
   const years = s.match(/\b(?:19|20)\d{2}\b/g) || [];
   if (new Set(years).size >= 2 && /\b(compared|compare|versus|vs\.?|than|this year)\b/i.test(s)) return '';
@@ -531,6 +565,7 @@ function makeQuestion(sentence, target, articleTitle = '', allStats = []) {
     .trim();
   if (!questionHasStandaloneContext(q)) return '';
   if (containsVisibleStat(q)) return '';
+  if (hasMalformedPercentagePopulation(q)) return '';
   return q;
 }
 
@@ -619,6 +654,8 @@ function explainUsability(item) {
   if (isPolitical(`${item.question} ${item.context || ''}`)) return 'political';
   if (containsUndefinedReference(`${item.question} ${item.context || ''}`)) return 'standalone';
   if (hasIncompleteMoreLessObject(item.question)) return 'standalone';
+  if (hasMalformedPercentagePopulation(item.question)) return 'standalone';
+  if (/\bFinding:\s*\d{1,3}%\s+(?:are|is|were|was|have|has|had|say|says|said|use|uses|used|plan|plans|planned|they|their|them)\b/i.test(item.context || '')) return 'standalone';
   if (item.auto_generated && ageDays(item.published_at || item.source_date) > maxAgeDaysForSource(item.source)) return 'age';
   return 'ok';
 }
