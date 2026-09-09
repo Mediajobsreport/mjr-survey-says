@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-09-09T13:37:08.272Z",
+  "updated_at": "2026-09-09T13:48:47.393Z",
   "count": 29,
   "items": [
     {
       "id": "869350e1d95ea1ad",
       "topic": "Money",
-      "question": "According to the survey, Nine in ten dual-income households say they work out of necessity, highlighting the critical role trusted childcare plays in helping parents participate in the workforce?",
+      "question": "How many people matched this survey finding?",
       "answer": "9 in 10",
       "stat": "9 in 10",
       "context": "From “Lengths parents will go to find best care for their kids.”",
@@ -72,7 +72,7 @@
     {
       "id": "45d900e8657da8b4",
       "topic": "Entertainment",
-      "question": "According to the survey, Streaming radio also plays an important role in the Australian audio landscape, with how many Australians 25-54 listening to streamed radio weekly?",
+      "question": "How many Australians 25-54 listening to streamed radio weekly?",
       "answer": "1 in 3",
       "stat": "1 in 3",
       "context": "From “Total Podcast Consumption Time Up 386% Since 2016.”",
@@ -152,7 +152,7 @@
     {
       "id": "8c18f47f93b1c842",
       "topic": "Life & Culture",
-      "question": "According to the survey, Another how many donated between $51 and $100?",
+      "question": "How many donated between $51 and $100?",
       "answer": "3 in 10",
       "stat": "3 in 10",
       "context": "From “Crowdfunding contributions tend to be small donations to help others in need.”",
@@ -166,7 +166,7 @@
     {
       "id": "96c0fb23966e3c7e",
       "topic": "Life & Culture",
-      "question": "According to the survey, December 22, 2025 About half have already made a charitable donation this year while how many have donated and plan to donate again before the year ends?",
+      "question": "How many have donated and plan to donate again before the year ends?",
       "answer": "2 in 10",
       "stat": "2 in 10",
       "context": "From “Most adults have donated to charities this year.”",
@@ -222,7 +222,7 @@
     {
       "id": "ff3e3e376a29d8aa",
       "topic": "Life & Culture",
-      "question": "According to the survey, Similarly, how many who have given or plan to give soon said that these factors did not influence which charities they donated to?",
+      "question": "How many who have given or plan to give soon said that these factors did not influence which charities they donated to?",
       "answer": "7 in 10",
       "stat": "7 in 10",
       "context": "From “Most adults have donated to charities this year.”",
@@ -250,7 +250,7 @@
     {
       "id": "fa2d38f447ac0a0b",
       "topic": "Life & Culture",
-      "question": "According to the survey, Three in 4 adults expected to enjoy Halloween in 2019 compared with how many in 2021 and this year?",
+      "question": "How many in 2021 and this year?",
       "answer": "2 in 3",
       "stat": "2 in 3",
       "context": "From “Most are getting into the Halloween spirit, but the holiday has not fully rebounded post-pandemic.”",
@@ -292,7 +292,7 @@
     {
       "id": "e14f444f9f570925",
       "topic": "Life & Culture",
-      "question": "According to the survey, Half of those who use subtitles at least any amount do so because they want to catch every word, while how many use subtitles to understand accents or watch movies and shows in another language?",
+      "question": "How many use subtitles to understand accents or watch movies and shows in another language?",
       "answer": "4 in 10",
       "stat": "4 in 10",
       "context": "From “Closed captioning on? It&#8217;s a generational thing.”",
@@ -306,7 +306,7 @@
     {
       "id": "a7849dd8755e9b54",
       "topic": "Entertainment",
-      "question": "According to the survey, Half the public are fans of sports, but it&#8217;s the how many who are super fans adopting sports streaming services?",
+      "question": "How many who are super fans adopting sports streaming services?",
       "answer": "1 in 5",
       "stat": "1 in 5",
       "context": "From “Half the public are fans of sports, but it&#8217;s the 1 in 5 who are super fans adopting sports streaming services.”",
@@ -320,7 +320,7 @@
     {
       "id": "4d9b06e7840f1672",
       "topic": "Entertainment",
-      "question": "According to the survey, The post Half the public are fans of sports, but it’s the how many who are super fans adopting sports streaming services first appeared on AP-NORC ?",
+      "question": "How many who are super fans adopting sports streaming services first appeared on AP-NORC?",
       "answer": "1 in 5",
       "stat": "1 in 5",
       "context": "From “Half the public are fans of sports, but it&#8217;s the 1 in 5 who are super fans adopting sports streaming services.”",
@@ -334,7 +334,7 @@
     {
       "id": "b3b5fd7044f2e734",
       "topic": "Entertainment",
-      "question": "According to the survey, The post Half the public are fans of sports, but it&#8217;s the how many who are super fans adopting sports streaming services appeared first on AP-NORC ?",
+      "question": "How many who are super fans adopting sports streaming services appeared first on AP-NORC?",
       "answer": "1 in 5",
       "stat": "1 in 5",
       "context": "From “Half the public are fans of sports, but it&#8217;s the 1 in 5 who are super fans adopting sports streaming services.”",
@@ -360,23 +360,9 @@
       "auto_generated": true
     },
     {
-      "id": "800a373f0bbfad20",
-      "topic": "Entertainment",
-      "question": "According to the survey, 4 in 10 fans use sports-only streaming platforms such as ESPN+, MLB TV, NFL Sunday Ticket, or NBA League Pass, including how many super fans?",
-      "answer": "6 in 10",
-      "stat": "6 in 10",
-      "context": "From “Half the public are fans of sports, but it&#8217;s the 1 in 5 who are super fans adopting sports streaming services.”",
-      "talk": "Does this match your own viewing, listening or entertainment habits?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services/?utm_source=rss&#038;utm_medium=rss&#038;utm_campaign=half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services",
-      "source_date": "2025-09-16",
-      "published_at": "2025-09-16",
-      "auto_generated": true
-    },
-    {
       "id": "5a1442dc08f81cf9",
       "topic": "Entertainment",
-      "question": "According to the survey, Three in 10 sports fans watch a game at least a few times a week and another how many tune into a game at least once a month?",
+      "question": "How many tune into a game at least once a month?",
       "answer": "4 in 10",
       "stat": "4 in 10",
       "context": "From “Half the public are fans of sports, but it&#8217;s the 1 in 5 who are super fans adopting sports streaming services.”",
@@ -390,9 +376,23 @@
     {
       "id": "cbb2b58cb9551820",
       "topic": "Entertainment",
-      "question": "According to the survey, half of superfans watch a game several times a week and another how many watch at least monthly?",
+      "question": "How many watch at least monthly?",
       "answer": "4 in 10",
       "stat": "4 in 10",
+      "context": "From “Half the public are fans of sports, but it&#8217;s the 1 in 5 who are super fans adopting sports streaming services.”",
+      "talk": "Does this match your own viewing, listening or entertainment habits?",
+      "source": "AP-NORC Center",
+      "source_url": "https://apnorc.org/projects/half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services/?utm_source=rss&#038;utm_medium=rss&#038;utm_campaign=half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services",
+      "source_date": "2025-09-16",
+      "published_at": "2025-09-16",
+      "auto_generated": true
+    },
+    {
+      "id": "800a373f0bbfad20",
+      "topic": "Entertainment",
+      "question": "According to the survey, 4 in 10 fans use sports-only streaming platforms such as ESPN+, MLB TV, NFL Sunday Ticket, or NBA League Pass, including how many super fans?",
+      "answer": "6 in 10",
+      "stat": "6 in 10",
       "context": "From “Half the public are fans of sports, but it&#8217;s the 1 in 5 who are super fans adopting sports streaming services.”",
       "talk": "Does this match your own viewing, listening or entertainment habits?",
       "source": "AP-NORC Center",
