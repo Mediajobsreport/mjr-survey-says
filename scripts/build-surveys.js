@@ -25,6 +25,8 @@ const SOURCES = [
 
 const MAX_POOL = 90;
 const MAX_AGE_DAYS = 180;
+const ROTATION_STATE = path.join(process.cwd(), "mjr-survey-rotation.json");
+const RECENT_SHOWN_DAYS = 7;
 const MAX_WIDGET_ITEMS = 7;
 
 function decodeXml(s="") {
@@ -326,6 +328,75 @@ html,body{margin:0;padding:0;background:transparent;font-family:Roboto,Arial,san
 </html>`;
 }
 
+
+function readRotationState() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(ROTATION_STATE, "utf8"));
+    return Array.isArray(parsed.history) ? parsed : {history: []};
+  } catch {
+    return {history: []};
+  }
+}
+function writeRotationState(state) {
+  fs.writeFileSync(ROTATION_STATE, JSON.stringify(state, null, 2) + "\n");
+}
+function dateKey(d = new Date()) {
+  return d.toISOString().slice(0,10);
+}
+function recentShownIds(state, days = RECENT_SHOWN_DAYS) {
+  const cutoff = Date.now() - days * 86400000;
+  const ids = new Set();
+  for (const row of state.history || []) {
+    const t = Date.parse(row.date || "");
+    if (!Number.isFinite(t) || t < cutoff) continue;
+    for (const id of row.ids || []) ids.add(id);
+  }
+  return ids;
+}
+function pickDailyRotation(pool, count, state) {
+  const recent = recentShownIds(state);
+  const fresh = pool.filter(x => !recent.has(x.id));
+  const fallback = pool.filter(x => recent.has(x.id));
+
+  // Newest first inside each freshness bucket.
+  const newestFirst = arr => [...arr].sort((a,b) =>
+    String(b.published_at || b.source_date || "").localeCompare(
+      String(a.published_at || a.source_date || "")
+    )
+  );
+
+  const orderedFresh = newestFirst(fresh);
+  const orderedFallback = newestFirst(fallback);
+  const ordered = [...orderedFresh, ...orderedFallback];
+
+  const chosen = [];
+
+  // Guarantee a usable Talker Research item near the top whenever one exists.
+  // This makes the default 3-item view benefit from the new daily source.
+  const talker = ordered.find(x => x.source === "Talker Research");
+  if (talker && count > 0) chosen.push(talker);
+
+  const usedTopics = new Set(chosen.map(x => x.topic));
+
+  // Next maximize topic variety.
+  for (const item of ordered) {
+    if (chosen.length >= count) break;
+    if (chosen.some(x => x.id === item.id)) continue;
+    if (!usedTopics.has(item.topic)) {
+      chosen.push(item);
+      usedTopics.add(item.topic);
+    }
+  }
+
+  // Then fill remaining slots by freshness.
+  for (const item of ordered) {
+    if (chosen.length >= count) break;
+    if (!chosen.some(x => x.id === item.id)) chosen.push(item);
+  }
+
+  return chosen.slice(0, count);
+}
+
 async function fetchText(url) {
   const r = await fetch(url, {headers: {"user-agent":"MediaJobsReport-SurveySays/1.1 (+https://www.mediajobsreport.com/)"}, redirect:"follow"});
   if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
@@ -351,7 +422,11 @@ async function fetchText(url) {
         articles = articles.filter(isTalkerResearchArticle);
         console.log(`  Talker Research items: ${articles.length}`);
       }
+
+      const beforeSource = discovered.length;
       for (const article of articles) discovered.push(...extractCandidates(article, source.name));
+      const addedBySource = discovered.length - beforeSource;
+      console.log(`  Usable findings discovered from ${source.name}: ${addedBySource}`);
     } catch (err) {
       console.warn(`  Source failed: ${err.message}`);
     }
@@ -371,10 +446,28 @@ async function fetchText(url) {
   const payload = {updated_at: new Date().toISOString(), count: items.length, items};
   fs.mkdirSync(path.dirname(OUT_JSON), {recursive:true});
   fs.writeFileSync(OUT_JSON, JSON.stringify(payload, null, 2) + "\n");
-  fs.writeFileSync(OUT_HTML_3, buildWidgetHtml(items, 3));
-  fs.writeFileSync(OUT_HTML_5, buildWidgetHtml(items, 5));
-  fs.writeFileSync(OUT_HTML_7, buildWidgetHtml(items, 7));
-  fs.writeFileSync(OUT_HTML, buildWidgetHtml(items, 3));
+
+  const rotationState = readRotationState();
+  const daily7 = pickDailyRotation(items, 7, rotationState);
+  const daily5 = daily7.slice(0, 5);
+  const daily3 = daily7.slice(0, 3);
+
+  fs.writeFileSync(OUT_HTML_3, buildWidgetHtml(daily3, 3));
+  fs.writeFileSync(OUT_HTML_5, buildWidgetHtml(daily5, 5));
+  fs.writeFileSync(OUT_HTML_7, buildWidgetHtml(daily7, 7));
+  fs.writeFileSync(OUT_HTML, buildWidgetHtml(daily3, 3));
+
+  rotationState.history = [
+    {date: dateKey(), ids: daily7.map(x => x.id)},
+    ...(rotationState.history || []).filter(x => x.date !== dateKey())
+  ].slice(0, 30);
+  writeRotationState(rotationState);
+
   console.log(`Published ${items.length} Survey Says items (${discovered.length} discovered this run).`);
+  const mix3 = daily3.reduce((m,x) => (m[x.source]=(m[x.source]||0)+1, m), {});
+  const mix7 = daily7.reduce((m,x) => (m[x.source]=(m[x.source]||0)+1, m), {});
+  console.log(`Default 3 source mix: ${JSON.stringify(mix3)}`);
+  console.log(`Full 7 source mix: ${JSON.stringify(mix7)}`);
+  console.log(`Daily rotation selected ${daily7.length} items; avoiding the previous ${RECENT_SHOWN_DAYS} days when possible.`);
   console.log(`Static widgets: 3 / 5 / 7 generated in docs/`);
 })().catch(err => { console.error(err); process.exit(1); });
