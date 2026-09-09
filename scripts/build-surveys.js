@@ -2,78 +2,35 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const OUT_JSON = path.join(process.cwd(), "docs", "surveys.json");
-const OUT_HTML = path.join(process.cwd(), "docs", "survey-says.html");
-const OUT_HTML_3 = path.join(process.cwd(), "docs", "survey-says-3.html");
-const OUT_HTML_5 = path.join(process.cwd(), "docs", "survey-says-5.html");
-const OUT_HTML_7 = path.join(process.cwd(), "docs", "survey-says-7.html");
-const SEED = path.join(process.cwd(), "data-seed.json");
+const ROOT = process.cwd();
+const OUT_JSON = path.join(ROOT, "docs", "surveys.json");
+const OUT_HTML = path.join(ROOT, "docs", "survey-says.html");
+const OUT_HTML_3 = path.join(ROOT, "docs", "survey-says-3.html");
+const OUT_HTML_5 = path.join(ROOT, "docs", "survey-says-5.html");
+const OUT_HTML_7 = path.join(ROOT, "docs", "survey-says-7.html");
+const SEED = path.join(ROOT, "data-seed.json");
+const ROTATION_STATE = path.join(ROOT, "mjr-survey-rotation.json");
 
 const SOURCES = [
-  {
-    name: "Talker Research",
-    url: "https://talker.news/feed/",
-    mode: "rss",
-    filter: "talker-research"
-  },
-  {
-    name: "Pew Research Center",
-    url: "https://www.pewresearch.org/publications/feed/",
-    mode: "rss"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/feed/",
-    mode: "rss"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/culture-and-society/feed/",
-    mode: "rss"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/science-and-technology/feed/",
-    mode: "rss"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/younger-generations/feed/",
-    mode: "rss"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/education/feed/",
-    mode: "rss"
-  },
-  {
-    name: "AP-NORC Center",
-    url: "https://apnorc.org/topics/media-insight-project/feed/",
-    mode: "rss"
-  },
-  {
-    name: "Edison Research",
-    url: "https://www.edisonresearch.com/feed/",
-    mode: "rss"
-  }
+  { name: "Talker Research", url: "https://talker.news/feed/", filter: "talker-research" },
+  { name: "Pew Research Center", url: "https://www.pewresearch.org/publications/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/topics/culture-and-society/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/topics/science-and-technology/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/topics/younger-generations/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/topics/education/feed/" },
+  { name: "AP-NORC Center", url: "https://apnorc.org/topics/media-insight-project/feed/" },
+  { name: "Edison Research", url: "https://www.edisonresearch.com/feed/" }
 ];
 
 const MAX_POOL = 140;
 const MAX_AGE_DAYS = 180;
 const AP_NORC_MAX_AGE_DAYS = 365;
-
-const ROTATION_STATE = path.join(
-  process.cwd(),
-  "mjr-survey-rotation.json"
-);
-
 const RECENT_SHOWN_DAYS = 7;
 const MAX_WIDGET_ITEMS = 7;
 
 function maxAgeDaysForSource(source) {
-  return source === "AP-NORC Center"
-    ? AP_NORC_MAX_AGE_DAYS
-    : MAX_AGE_DAYS;
+  return source === "AP-NORC Center" ? AP_NORC_MAX_AGE_DAYS : MAX_AGE_DAYS;
 }
 
 function decodeXml(s = "") {
@@ -83,11 +40,12 @@ function decodeXml(s = "") {
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
-    .replace(/&#039;|&apos;/g, "'");
+    .replace(/&#039;|&apos;/g, "'")
+    .replace(/&#038;/g, "&");
 }
 
 function stripHtml(s = "") {
-  return decodeXml(s)
+  return decodeXml(String(s))
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<[^>]+>/g, " ")
@@ -181,7 +139,7 @@ function inferTopic(text = "") {
     ],
     [
       "Money",
-      /\b(money|cost|price|inflation|financial|economy|spending|income|cash|debt)\b/
+      /\b(money|cost|price|inflation|financial|economy|spending|income|cash|debt|donation|donate|crowdfunding)\b/
     ],
     [
       "Work",
@@ -197,7 +155,7 @@ function inferTopic(text = "") {
     ],
     [
       "Family & Life",
-      /\b(parent|child|family|relationship|dating|marriage|home)\b/
+      /\b(parent|child|family|relationship|dating|marriage|home|caregiver|childcare|daycare)\b/
     ],
     [
       "Health",
@@ -220,7 +178,131 @@ function isPolitical(text = "") {
   );
 }
 
-function talkFor(topic) {
+function surveySubjectFromTitle(title = "") {
+  const t = stripHtml(title)
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const lower = t.toLowerCase();
+
+  const rules = [
+    [
+      /\bcrowdfund(?:ing|ed)?\b/,
+      "crowdfunding donations"
+    ],
+    [
+      /\b(parent|parents|kid|kids|child|children)\b[\s\S]{0,80}\b(care|childcare|daycare)\b|\b(care|childcare|daycare)\b[\s\S]{0,80}\b(parent|parents|kid|kids|child|children)\b/,
+      "how parents find care for their children"
+    ],
+    [
+      /\bpodcast\b/,
+      "podcast listening"
+    ],
+    [
+      /\bradio\b/,
+      "radio listening"
+    ],
+    [
+      /\bstreaming\b/,
+      "streaming habits"
+    ],
+    [
+      /\bsocial media\b/,
+      "social media use"
+    ],
+    [
+      /\b(ai|artificial intelligence|chatbot)\b/,
+      "artificial intelligence"
+    ],
+    [
+      /\bworkplace|employee|employees|worker|workers|job|jobs\b/,
+      "work and the workplace"
+    ],
+    [
+      /\bshopping|shopper|shoppers|consumer|consumers|retail\b/,
+      "consumer and shopping habits"
+    ],
+    [
+      /\bhealth|medical|doctor|hospital|fitness|sleep\b/,
+      "health"
+    ],
+    [
+      /\bparent|parents|family|families|child|children|kid|kids\b/,
+      "family life"
+    ]
+  ];
+
+  for (const [re, subject] of rules) {
+    if (re.test(lower)) {
+      return subject;
+    }
+  }
+
+  if (!t) {
+    return "";
+  }
+
+  const short =
+    t.length > 90
+      ? `${t.slice(0, 87).trim()}...`
+      : t;
+
+  return `the research topic “${short}”`;
+}
+
+function talkFor(
+  topic,
+  articleTitle = "",
+  sentence = ""
+) {
+  const h =
+    `${articleTitle} ${sentence}`
+      .toLowerCase();
+
+  if (
+    /\bcrowdfund(?:ing|ed)?\b/.test(h)
+  ) {
+    return "Have you ever donated to a crowdfunding campaign? What made you decide to give?";
+  }
+
+  if (
+    /\b(parent|parents|kid|kids|child|children)\b[\s\S]{0,100}\b(care|childcare|daycare)\b|\b(care|childcare|daycare)\b[\s\S]{0,100}\b(parent|parents|kid|kids|child|children)\b/.test(
+      h
+    )
+  ) {
+    return "When choosing care for a child, what matters most: cost, location, trust or flexibility?";
+  }
+
+  if (
+    /\bpodcast\b/.test(h)
+  ) {
+    return "How do your own podcast habits compare with this finding?";
+  }
+
+  if (
+    /\bradio\b/.test(h)
+  ) {
+    return "Does this match the way you or the people around you use radio?";
+  }
+
+  if (
+    /\bstreaming|television|tv|movie\b/.test(h)
+  ) {
+    return "Does this match your own viewing or streaming habits?";
+  }
+
+  if (
+    /\bsocial media\b/.test(h)
+  ) {
+    return "Does this match the way you and your friends actually use social media?";
+  }
+
+  if (
+    /\b(ai|artificial intelligence|chatbot)\b/.test(h)
+  ) {
+    return "Where are you most comfortable — or least comfortable — using AI in everyday life?";
+  }
+
   const prompts = {
     Technology:
       "Would this number be higher or lower among your friends and coworkers?",
@@ -229,7 +311,7 @@ function talkFor(topic) {
       "Does this match your own viewing, listening or entertainment habits?",
 
     Money:
-      "Where do you see this showing up most in your own budget?",
+      "Does this finding match the way you are spending, saving or giving right now?",
 
     Work:
       "Does this sound like your workplace, or is your experience completely different?",
@@ -256,112 +338,255 @@ function talkFor(topic) {
   );
 }
 
-function makeQuestion(sentence, stat) {
-  let s = sentence
-    .replace(/\s+/g, " ")
-    .trim();
+function startsWithVerbPhrase(text = "") {
+  return /^(donated|donate|gave|give|spent|spend|said|say|use|used|uses|watch|watched|watches|listen|listened|listens|buy|bought|buys|shop|shopped|shops|prefer|preferred|prefers|agree|agreed|agrees|believe|believed|believes|think|thought|thinks|reported|report|reports|have|had|has|are|were|is|want|wanted|wants|plan|planned|plans|expect|expected|expects|feel|felt|feels|chose|choose|chooses|selected|select|selects|experienced|experience|experiences|received|receive|receives|paid|pay|pays|borrowed|borrow|borrows|saved|save|saves)\b/i.test(
+    text.trim()
+  );
+}
+
+function hasBadQuestionLanguage(question = "") {
+  const q =
+    question
+      .replace(/\s+/g, " ")
+      .trim();
+
+  if (!q) {
+    return true;
+  }
+
+  if (
+    /\b(matched this survey finding|matched the survey finding|this survey finding|this finding|the finding above|the survey finding above)\b/i.test(
+      q
+    )
+  ) {
+    return true;
+  }
+
+  const m =
+    q.match(
+      /^(?:In a survey about .+?,\s*)?How many\s+(.+?)\?/i
+    );
+
+  if (
+    m &&
+    startsWithVerbPhrase(
+      m[1]
+    )
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function questionHasStandaloneContext(question = "") {
+  const q =
+    question
+      .replace(/\s+/g, " ")
+      .trim();
+
+  if (
+    hasBadQuestionLanguage(q)
+  ) {
+    return false;
+  }
+
+  if (
+    /\b(this|that|these|those)\s+(number|result|stat|statistic|finding|survey)\b/i.test(
+      q
+    )
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function makeQuestion(
+  sentence,
+  stat,
+  articleTitle = ""
+) {
+  const s =
+    sentence
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const subject =
+    surveySubjectFromTitle(
+      articleTitle
+    );
+
+  const prefix =
+    subject
+      ? `In a survey about ${subject}, `
+      : "";
 
   /*
    * RATIO QUESTIONS
    *
-   * Examples:
-   * "3 in 10 donated between $51 and $100."
-   * "Another 3 in 10 donated between $51 and $100."
-   * "Nearly 2 in 3 Americans use..."
-   *
-   * We want:
-   * "How many donated between $51 and $100?"
+   * If a ratio cannot be turned into
+   * a clear standalone question,
+   * return an empty string so it
+   * gets rejected.
    */
 
   if (
     /\bin\b/i.test(stat) &&
     !stat.includes("%")
   ) {
-    const escaped = stat.replace(
-      /[.*+?^${}()|[\]\\]/g,
-      "\\$&"
-    );
+    const escaped =
+      stat.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
 
-    /*
-     * Remove transition/qualifier words before
-     * the ratio so they don't become part of
-     * the generated question.
-     */
-    let cleaned = s.replace(
-      /^(another|about|around|roughly|nearly|almost|approximately|only|just|more than|less than)\s+/i,
-      ""
-    );
+    let cleaned =
+      s.replace(
+        /^(another|about|around|roughly|nearly|almost|approximately|only|just|more than|less than)\s+/i,
+        ""
+      );
 
-    /*
-     * Ratio begins the sentence.
-     *
-     * "3 in 10 donated between $51 and $100."
-     *
-     * becomes:
-     *
-     * "How many donated between $51 and $100?"
-     */
     if (
       new RegExp(
         `^${escaped}\\s+`,
         "i"
       ).test(cleaned)
     ) {
-      let tail = cleaned
-        .replace(
-          new RegExp(
-            `^${escaped}\\s+`,
-            "i"
-          ),
-          ""
-        )
-        .replace(/[.!]+$/, "")
-        .trim();
+      let tail =
+        cleaned
+          .replace(
+            new RegExp(
+              `^${escaped}\\s+`,
+              "i"
+            ),
+            ""
+          )
+          .replace(
+            /[.!]+$/,
+            ""
+          )
+          .trim()
+          .replace(
+            /^of\s+/i,
+            ""
+          );
 
-      tail = tail.replace(
-        /^of\s+/i,
-        ""
-      );
-
-      if (tail) {
-        return `How many ${tail}?`;
+      if (!tail) {
+        return "";
       }
+
+      const nounTail =
+        startsWithVerbPhrase(tail)
+          ? `people ${tail}`
+          : tail;
+
+      return `${prefix}how many ${nounTail}?`
+        .replace(
+          /^In a survey about ([^,]+), how/i,
+          "In a survey about $1, how"
+        )
+        .replace(
+          /^how/,
+          "How"
+        );
     }
 
-    /*
-     * Ratio occurs later in the sentence.
-     * Favor the wording after the ratio instead
-     * of inserting "how many" awkwardly.
-     */
-    const ratioMatch = cleaned.match(
-      new RegExp(
-        `${escaped}\\s+(.+?)[.!]?$`,
-        "i"
-      )
-    );
+    const idx =
+      cleaned
+        .toLowerCase()
+        .indexOf(
+          stat.toLowerCase()
+        );
 
     if (
-      ratioMatch &&
-      ratioMatch[1]
+      idx >= 0
     ) {
-      let tail = ratioMatch[1]
-        .replace(/[.!?]+$/, "")
-        .trim();
+      const before =
+        cleaned
+          .slice(
+            0,
+            idx
+          )
+          .replace(
+            /[,;:\s-]+$/,
+            ""
+          )
+          .trim();
 
-      tail = tail.replace(
-        /^of\s+/i,
-        ""
-      );
+      let after =
+        cleaned
+          .slice(
+            idx + stat.length
+          )
+          .replace(
+            /^[,;:\s-]+/,
+            ""
+          )
+          .replace(
+            /[.!?]+$/,
+            ""
+          )
+          .trim()
+          .replace(
+            /^of\s+/i,
+            ""
+          );
 
-      if (tail) {
-        return `How many ${tail}?`;
+      if (!after) {
+        return "";
+      }
+
+      if (
+        /^among\b/i.test(before)
+      ) {
+        return `${before}, how many ${
+          startsWithVerbPhrase(after)
+            ? `people ${after}`
+            : after
+        }?`
+          .replace(
+            /^among/i,
+            "Among"
+          );
+      }
+
+      const population =
+        before.match(
+          /\b(Americans|adults|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|voters|teens|teenagers|children|students|people)\b[^,;:]*/i
+        );
+
+      if (population) {
+        const pop =
+          population[0]
+            .replace(
+              /^(about|around|roughly|nearly|almost|approximately|only|just|more than|less than)\s+/i,
+              ""
+            )
+            .trim();
+
+        return `How many ${pop} ${after}?`
+          .replace(
+            /\s+/g,
+            " "
+          );
+      }
+
+      if (prefix) {
+        const nounTail =
+          startsWithVerbPhrase(after)
+            ? `people ${after}`
+            : after;
+
+        return `${prefix}how many ${nounTail}?`
+          .replace(
+            /^In a survey about ([^,]+), how/i,
+            "In a survey about $1, how"
+          );
       }
     }
 
-    /*
-     * Safe fallback for unusual ratio sentences.
-     */
-    return "How many people matched this survey finding?";
+    return "";
   }
 
   /*
@@ -369,17 +594,18 @@ function makeQuestion(sentence, stat) {
    */
 
   const escaped =
-    stat.replace("%", "\\%");
+    stat.replace(
+      "%",
+      "\\%"
+    );
 
-  /*
-   * "42% of Americans..."
-   */
-  let m = s.match(
-    new RegExp(
-      `^${escaped}\\s+of\\s+(.+?)[.!]?$`,
-      "i"
-    )
-  );
+  let m =
+    s.match(
+      new RegExp(
+        `^${escaped}\\s+of\\s+(.+?)[.!]?$`,
+        "i"
+      )
+    );
 
   if (m) {
     return `What percentage of ${m[1].replace(
@@ -388,15 +614,13 @@ function makeQuestion(sentence, stat) {
     )}?`;
   }
 
-  /*
-   * "Among adults, 42%..."
-   */
-  m = s.match(
-    new RegExp(
-      `^(Among\\s+[^,]+,\\s*)${escaped}\\s+(.+?)[.!]?$`,
-      "i"
-    )
-  );
+  m =
+    s.match(
+      new RegExp(
+        `^(Among\\s+[^,]+,\\s*)${escaped}\\s+(.+?)[.!]?$`,
+        "i"
+      )
+    );
 
   if (m) {
     return `${m[1]}what percentage ${m[2].replace(
@@ -405,38 +629,40 @@ function makeQuestion(sentence, stat) {
     )}?`;
   }
 
-  /*
-   * Percent shown in parentheses.
-   */
-  m = s.match(
-    new RegExp(
-      `^(.+?)\\s+\\(${escaped}\\)(.+?)[.!]?$`,
-      "i"
-    )
-  );
+  m =
+    s.match(
+      new RegExp(
+        `^(.+?)\\s+\\(${escaped}\\)(.+?)[.!]?$`,
+        "i"
+      )
+    );
 
   if (m) {
-    return `What percentage ${m[2]
-      .replace(
-        /^[,;:\s-]+/,
-        ""
-      )
-      .replace(
-        /[.!?]+$/,
-        ""
-      )}?`;
+    const after =
+      m[2]
+        .replace(
+          /^[,;:\s-]+/,
+          ""
+        )
+        .replace(
+          /[.!?]+$/,
+          ""
+        )
+        .trim();
+
+    if (after) {
+      return `What percentage ${after}?`;
+    }
   }
 
-  /*
-   * General percentage fallback.
-   */
-  const replaced = s.replace(
-    new RegExp(
-      escaped,
-      "i"
-    ),
-    "what percentage"
-  );
+  const replaced =
+    s.replace(
+      new RegExp(
+        escaped,
+        "i"
+      ),
+      "what percentage"
+    );
 
   return (
     replaced.replace(
@@ -451,34 +677,16 @@ function makeQuestion(sentence, stat) {
   );
 }
 
-function normalizeRatio(raw) {
-  return raw
-    .replace(/\s+/g, " ")
-    .replace(/\bOne\b/i, "1")
-    .replace(/\bTwo\b/i, "2")
-    .replace(/\bThree\b/i, "3")
-    .replace(/\bFour\b/i, "4")
-    .replace(/\bFive\b/i, "5")
-    .replace(/\bSix\b/i, "6")
-    .replace(/\bSeven\b/i, "7")
-    .replace(/\bEight\b/i, "8")
-    .replace(/\bNine\b/i, "9")
-    .replace(/\bTen\b/i, "10")
-    .trim();
-}
-
 function findStats(sentence) {
   const found = [];
 
-  /*
-   * Percentages
-   */
   for (
     const m of sentence.matchAll(
       /\b(?!1000)(\d{1,2}|100)%\b/g
     )
   ) {
-    const n = Number(m[1]);
+    const n =
+      Number(m[1]);
 
     if (
       n >= 5 &&
@@ -492,18 +700,16 @@ function findStats(sentence) {
     }
   }
 
-  /*
-   * Numeric ratios:
-   * 2 in 3
-   * 4 in 5
-   */
   for (
     const m of sentence.matchAll(
       /\b([1-9]|10)\s+in\s+([2-9]|10)\b/gi
     )
   ) {
-    const a = Number(m[1]);
-    const b = Number(m[2]);
+    const a =
+      Number(m[1]);
+
+    const b =
+      Number(m[2]);
 
     if (a < b) {
       found.push({
@@ -514,18 +720,8 @@ function findStats(sentence) {
     }
   }
 
-  /*
-   * Word ratios:
-   * two in three
-   * four in five
-   */
-  const words =
-    "(?:one|two|three|four|five|six|seven|eight|nine|ten)";
-
-  const wordRe = new RegExp(
-    `\\b(${words})\\s+in\\s+(${words})\\b`,
-    "gi"
-  );
+  const wordRe =
+    /\b(one|two|three|four|five|six|seven|eight|nine|ten)\s+in\s+(one|two|three|four|five|six|seven|eight|nine|ten)\b/gi;
 
   const nums = {
     one: 1,
@@ -546,10 +742,14 @@ function findStats(sentence) {
     )
   ) {
     const a =
-      nums[m[1].toLowerCase()];
+      nums[
+        m[1].toLowerCase()
+      ];
 
     const b =
-      nums[m[2].toLowerCase()];
+      nums[
+        m[2].toLowerCase()
+      ];
 
     if (a < b) {
       found.push({
@@ -560,25 +760,30 @@ function findStats(sentence) {
     }
   }
 
-  const seen = new Set();
+  const seen =
+    new Set();
 
   return found
     .sort(
       (a, b) =>
         a.index - b.index
     )
-    .filter(x => {
-      const k =
-        `${x.stat}|${x.index}`;
+    .filter(
+      x => {
+        const k =
+          `${x.stat}|${x.index}`;
 
-      if (seen.has(k)) {
-        return false;
+        if (
+          seen.has(k)
+        ) {
+          return false;
+        }
+
+        seen.add(k);
+
+        return true;
       }
-
-      seen.add(k);
-
-      return true;
-    });
+    );
 }
 
 function hashId(parts) {
@@ -588,27 +793,38 @@ function hashId(parts) {
       parts.join("|")
     )
     .digest("hex")
-    .slice(0, 16);
+    .slice(
+      0,
+      16
+    );
 }
 
 function isoDate(raw) {
-  const d = new Date(raw);
+  const d =
+    new Date(raw);
 
   return Number.isNaN(
     d.getTime()
   )
     ? new Date()
         .toISOString()
-        .slice(0, 10)
+        .slice(
+          0,
+          10
+        )
     : d
         .toISOString()
-        .slice(0, 10);
+        .slice(
+          0,
+          10
+        );
 }
 
 function displayDate(raw) {
-  const d = new Date(
-    raw + "T12:00:00Z"
-  );
+  const d =
+    new Date(
+      `${raw}T12:00:00Z`
+    );
 
   if (
     Number.isNaN(
@@ -633,7 +849,7 @@ function ageDays(date) {
   return (
     Date.now() -
     new Date(
-      date + "T00:00:00Z"
+      `${date}T00:00:00Z`
     ).getTime()
   ) / 86400000;
 }
@@ -663,7 +879,10 @@ function extractCandidates(
   ) {
     const clean =
       stripHtml(chunk)
-        .replace(/\s+/g, " ")
+        .replace(
+          /\s+/g,
+          " "
+        )
         .trim();
 
     if (!clean) {
@@ -684,7 +903,9 @@ function extractCandidates(
     );
   }
 
-  const seen = new Set();
+  const seen =
+    new Set();
+
   const out = [];
 
   for (
@@ -698,10 +919,6 @@ function extractCandidates(
       continue;
     }
 
-    /*
-     * Remove common false-positive
-     * percentage contexts.
-     */
     if (
       /\b(discount|off sale|battery|humidity|chance of rain)\b/i.test(
         sentence
@@ -713,18 +930,18 @@ function extractCandidates(
     const stats =
       findStats(sentence);
 
-    if (!stats.length) {
+    if (
+      !stats.length
+    ) {
       continue;
     }
 
-    /*
-     * Limit each sentence to two
-     * findings so one paragraph
-     * doesn't overwhelm the pool.
-     */
     for (
       const found of
-      stats.slice(0, 2)
+      stats.slice(
+        0,
+        2
+      )
     ) {
       const stat =
         found.stat;
@@ -746,25 +963,30 @@ function extractCandidates(
         );
 
       const published =
-        isoDate(article.date);
+        isoDate(
+          article.date
+        );
 
       out.push({
-        id: hashId([
-          sourceName,
-          article.link,
-          sentence,
-          stat
-        ]),
+        id:
+          hashId([
+            sourceName,
+            article.link,
+            sentence,
+            stat
+          ]),
 
         topic,
 
         question:
           makeQuestion(
             sentence,
-            stat
+            stat,
+            article.title
           ),
 
-        answer: stat,
+        answer:
+          stat,
 
         stat,
 
@@ -774,7 +996,11 @@ function extractCandidates(
             : "From a recent survey finding.",
 
         talk:
-          talkFor(topic),
+          talkFor(
+            topic,
+            article.title,
+            sentence
+          ),
 
         source:
           sourceName,
@@ -796,22 +1022,29 @@ function extractCandidates(
 
   return out;
 }
-
-function isUsable(item) {
+function explainUsability(item) {
   if (
     !item ||
     !item.question ||
     !item.source_url ||
     !item.stat
   ) {
-    return false;
+    return "missing";
   }
 
   if (
     item.question.length < 25 ||
     item.question.length > 280
   ) {
-    return false;
+    return "question_length";
+  }
+
+  if (
+    !questionHasStandaloneContext(
+      item.question
+    )
+  ) {
+    return "standalone";
   }
 
   if (
@@ -819,7 +1052,7 @@ function isUsable(item) {
       `${item.question} ${item.context || ""}`
     )
   ) {
-    return false;
+    return "political";
   }
 
   if (
@@ -832,16 +1065,22 @@ function isUsable(item) {
       item.source
     )
   ) {
-    return false;
+    return "age";
   }
 
-  return true;
+  return "ok";
 }
 
-function pickWidgetItems(
-  items
-) {
+function isUsable(item) {
+  return (
+    explainUsability(item) ===
+    "ok"
+  );
+}
+
+function pickWidgetItems(items) {
   const picked = [];
+
   const topicCount =
     new Map();
 
@@ -853,7 +1092,9 @@ function pickWidgetItems(
         item.topic
       ) || 0;
 
-    if (n >= 2) {
+    if (
+      n >= 2
+    ) {
       continue;
     }
 
@@ -882,10 +1123,13 @@ function pickWidgetItems(
       if (
         !picked.some(
           x =>
-            x.id === item.id
+            x.id ===
+            item.id
         )
       ) {
-        picked.push(item);
+        picked.push(
+          item
+        );
       }
 
       if (
@@ -905,8 +1149,12 @@ function buildWidgetHtml(
   limit = 3
 ) {
   const picked =
-    pickWidgetItems(items)
-      .slice(0, limit);
+    pickWidgetItems(
+      items
+    ).slice(
+      0,
+      limit
+    );
 
   const topics = [
     ...new Set(
@@ -962,19 +1210,19 @@ function buildWidgetHtml(
       <strong>Talk About It:</strong>
       ${escapeHtml(
         item.talk ||
-        talkFor(item.topic)
+        talkFor(
+          item.topic
+        )
       )}
     </p>
 
     <div class="mjrss-source">
       <strong>Source:</strong>
-      <a href="${escapeHtml(
-        item.source_url
-      )}"
-      target="_blank"
-      rel="noopener noreferrer">${escapeHtml(
-        item.source
-      )}</a>
+      <a
+        href="${escapeHtml(item.source_url)}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >${escapeHtml(item.source)}</a>
     </div>
 
   </div>
@@ -1329,7 +1577,9 @@ function readRotationState() {
       parsed.history
     )
       ? parsed
-      : { history: [] };
+      : {
+          history: []
+        };
 
   } catch {
 
@@ -1340,9 +1590,7 @@ function readRotationState() {
   }
 }
 
-function writeRotationState(
-  state
-) {
+function writeRotationState(state) {
   fs.writeFileSync(
     ROTATION_STATE,
     JSON.stringify(
@@ -1358,7 +1606,10 @@ function dateKey(
 ) {
   return d
     .toISOString()
-    .slice(0, 10);
+    .slice(
+      0,
+      10
+    );
 }
 
 function recentShownIds(
@@ -1407,18 +1658,6 @@ function pickDailyRotation(
   const recent =
     recentShownIds(state);
 
-  const fresh =
-    pool.filter(
-      x =>
-        !recent.has(x.id)
-    );
-
-  const fallback =
-    pool.filter(
-      x =>
-        recent.has(x.id)
-    );
-
   const newestFirst =
     arr =>
       [...arr].sort(
@@ -1436,23 +1675,28 @@ function pickDailyRotation(
           )
       );
 
-  const orderedFresh =
-    newestFirst(fresh);
-
-  const orderedFallback =
-    newestFirst(fallback);
-
   const ordered = [
-    ...orderedFresh,
-    ...orderedFallback
+    ...newestFirst(
+      pool.filter(
+        x =>
+          !recent.has(
+            x.id
+          )
+      )
+    ),
+
+    ...newestFirst(
+      pool.filter(
+        x =>
+          recent.has(
+            x.id
+          )
+      )
+    )
   ];
 
   const chosen = [];
 
-  /*
-   * Keep Talker in the default group
-   * whenever a usable Talker item exists.
-   */
   const talker =
     ordered.find(
       x =>
@@ -1476,9 +1720,6 @@ function pickDailyRotation(
       )
     );
 
-  /*
-   * Prefer topic variety.
-   */
   for (
     const item of ordered
   ) {
@@ -1491,7 +1732,8 @@ function pickDailyRotation(
     if (
       chosen.some(
         x =>
-          x.id === item.id
+          x.id ===
+          item.id
       )
     ) {
       continue;
@@ -1512,10 +1754,6 @@ function pickDailyRotation(
     }
   }
 
-  /*
-   * Fill remaining positions
-   * by freshness.
-   */
   for (
     const item of ordered
   ) {
@@ -1528,7 +1766,8 @@ function pickDailyRotation(
     if (
       !chosen.some(
         x =>
-          x.id === item.id
+          x.id ===
+          item.id
       )
     ) {
       chosen.push(
@@ -1543,22 +1782,24 @@ function pickDailyRotation(
   );
 }
 
-async function fetchText(
-  url
-) {
+async function fetchText(url) {
   const r =
     await fetch(
       url,
       {
         headers: {
           "user-agent":
-            "MediaJobsReport-SurveySays/1.1 (+https://www.mediajobsreport.com/)"
+            "MediaJobsReport-SurveySays/2.0 (+https://www.mediajobsreport.com/)"
         },
-        redirect: "follow"
+
+        redirect:
+          "follow"
       }
     );
 
-  if (!r.ok) {
+  if (
+    !r.ok
+  ) {
     throw new Error(
       `${r.status} ${r.statusText}`
     );
@@ -1573,20 +1814,19 @@ async function fetchText(
     "Building MJR Survey Says feed + static widget..."
   );
 
-  /*
-   * DIAGNOSTICS
-   */
-
   const diag = {};
 
   const ensureDiag =
     source => {
 
-      if (!diag[source]) {
+      if (
+        !diag[source]
+      ) {
         diag[source] = {
           discovered: 0,
           rejectedMissing: 0,
           rejectedQuestionLength: 0,
+          rejectedStandalone: 0,
           rejectedPolitical: 0,
           rejectedAge: 0,
           rejectedDuplicate: 0,
@@ -1597,64 +1837,17 @@ async function fetchText(
       return diag[source];
     };
 
-  const explainUsability =
-    item => {
-
-      if (
-        !item ||
-        !item.question ||
-        !item.source_url ||
-        !item.stat
-      ) {
-        return "missing";
-      }
-
-      if (
-        item.question.length < 25 ||
-        item.question.length > 280
-      ) {
-        return "question_length";
-      }
-
-      if (
-        isPolitical(
-          `${item.question} ${item.context || ""}`
-        )
-      ) {
-        return "political";
-      }
-
-      if (
-        item.auto_generated &&
-        ageDays(
-          item.published_at ||
-          item.source_date
-        ) >
-        maxAgeDaysForSource(
-          item.source
-        )
-      ) {
-        return "age";
-      }
-
-      return "ok";
-    };
-
-  /*
-   * LOAD SEED DATA
-   */
-
   const seed =
-    JSON.parse(
-      fs.readFileSync(
-        SEED,
-        "utf8"
-      )
-    );
-
-  /*
-   * LOAD PREVIOUS POOL
-   */
+    fs.existsSync(
+      SEED
+    )
+      ? JSON.parse(
+          fs.readFileSync(
+            SEED,
+            "utf8"
+          )
+        )
+      : [];
 
   let previous = [];
 
@@ -1683,14 +1876,11 @@ async function fetchText(
     } catch {}
   }
 
-  /*
-   * FETCH SOURCES
-   */
-
   let discovered = [];
 
   for (
-    const source of SOURCES
+    const source of
+    SOURCES
   ) {
     try {
 
@@ -1710,11 +1900,6 @@ async function fetchText(
         `  RSS items: ${articles.length}`
       );
 
-      /*
-       * Talker publishes several kinds
-       * of stories. Only use material
-       * identified as Talker Research.
-       */
       if (
         source.filter ===
         "talker-research"
@@ -1729,11 +1914,12 @@ async function fetchText(
         );
       }
 
-      const beforeSource =
+      const before =
         discovered.length;
 
       for (
-        const article of articles
+        const article of
+        articles
       ) {
         discovered.push(
           ...extractCandidates(
@@ -1743,17 +1929,17 @@ async function fetchText(
         );
       }
 
-      const addedBySource =
+      const added =
         discovered.length -
-        beforeSource;
+        before;
 
       ensureDiag(
         source.name
       ).discovered +=
-        addedBySource;
+        added;
 
       console.log(
-        `  Usable findings discovered from ${source.name}: ${addedBySource}`
+        `  Findings discovered from ${source.name}: ${added}`
       );
 
     } catch (err) {
@@ -1765,10 +1951,6 @@ async function fetchText(
     }
   }
 
-  /*
-   * MERGE NEW + PREVIOUS + SEED
-   */
-
   const merged = [
     ...discovered,
     ...previous,
@@ -1776,13 +1958,16 @@ async function fetchText(
   ];
 
   const discoveredObjects =
-    new Set(discovered);
+    new Set(
+      discovered
+    );
 
   const dedup =
     new Map();
 
   for (
-    const item of merged
+    const item of
+    merged
   ) {
     const key =
       item.id ||
@@ -1822,6 +2007,12 @@ async function fetchText(
 
       } else if (
         reason ===
+        "standalone"
+      ) {
+        d.rejectedStandalone++;
+
+      } else if (
+        reason ===
         "political"
       ) {
         d.rejectedPolitical++;
@@ -1835,13 +2026,16 @@ async function fetchText(
     }
 
     if (
-      reason !== "ok"
+      reason !==
+      "ok"
     ) {
       continue;
     }
 
     if (
-      dedup.has(key)
+      dedup.has(
+        key
+      )
     ) {
       if (
         discoveredObjects.has(
@@ -1865,10 +2059,6 @@ async function fetchText(
       }
     );
   }
-
-  /*
-   * SORT AND LIMIT ROLLING POOL
-   */
 
   const allUsable = [
     ...dedup.values()
@@ -1900,12 +2090,9 @@ async function fetchText(
       )
     );
 
-  /*
-   * COUNT ACCEPTED NEW FINDINGS
-   */
-
   for (
-    const item of discovered
+    const item of
+    discovered
   ) {
     const reason =
       explainUsability(
@@ -1921,8 +2108,11 @@ async function fetchText(
       ]);
 
     if (
-      reason === "ok" &&
-      finalIds.has(key)
+      reason ===
+        "ok" &&
+      finalIds.has(
+        key
+      )
     ) {
       ensureDiag(
         item.source ||
@@ -1931,29 +2121,24 @@ async function fetchText(
     }
   }
 
-  /*
-   * PRINT DIAGNOSTICS
-   */
-
   for (
     const [source, d]
-    of Object.entries(diag)
+    of Object.entries(
+      diag
+    )
   ) {
     console.log(
       `Diagnostics ${source}: ` +
       `discovered=${d.discovered}, ` +
       `missing=${d.rejectedMissing}, ` +
       `question_length=${d.rejectedQuestionLength}, ` +
+      `standalone=${d.rejectedStandalone}, ` +
       `political=${d.rejectedPolitical}, ` +
       `age=${d.rejectedAge}, ` +
       `duplicate=${d.rejectedDuplicate}, ` +
       `accepted=${d.accepted}`
     );
   }
-
-  /*
-   * WRITE JSON POOL
-   */
 
   const payload = {
     updated_at:
@@ -1984,10 +2169,6 @@ async function fetchText(
     ) + "\n"
   );
 
-  /*
-   * DAILY ROTATION
-   */
-
   const rotationState =
     readRotationState();
 
@@ -2009,10 +2190,6 @@ async function fetchText(
       0,
       3
     );
-
-  /*
-   * GENERATE STATIC PAGES
-   */
 
   fs.writeFileSync(
     OUT_HTML_3,
@@ -2038,10 +2215,6 @@ async function fetchText(
     )
   );
 
-  /*
-   * Default alias = 3 items
-   */
-
   fs.writeFileSync(
     OUT_HTML,
     buildWidgetHtml(
@@ -2049,10 +2222,6 @@ async function fetchText(
       3
     )
   );
-
-  /*
-   * SAVE ROTATION HISTORY
-   */
 
   rotationState.history = [
     {
@@ -2081,10 +2250,6 @@ async function fetchText(
     rotationState
   );
 
-  /*
-   * FINAL BUILD REPORT
-   */
-
   console.log(
     `Published ${items.length} Survey Says items (${discovered.length} discovered this run).`
   );
@@ -2092,6 +2257,7 @@ async function fetchText(
   const mix3 =
     daily3.reduce(
       (m, x) => {
+
         m[x.source] =
           (
             m[x.source] ||
@@ -2106,6 +2272,7 @@ async function fetchText(
   const mix7 =
     daily7.reduce(
       (m, x) => {
+
         m[x.source] =
           (
             m[x.source] ||
