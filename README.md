@@ -80,3 +80,20 @@ This ensures that:
 - `surveys.json`
 
 are all committed after each build, and the daily rotation history persists between GitHub Action runs.
+
+
+## Expanded sources (v1.6)
+
+Added official RSS sources:
+- **AP-NORC Center** — Culture & Society
+- **AP-NORC Center** — Science & Technology
+- **AP-NORC Center** — Younger Generations
+- **AP-NORC Center** — Education
+- **AP-NORC Center** — Media Insight Project
+- **Edison Research** — research, audio, podcast and consumer-media insights
+
+The existing political-content filter remains active. The daily selector now favors both source diversity and topic diversity, while still guaranteeing a Talker Research item in the default 3 whenever a usable Talker item exists.
+
+The rolling pool was increased from 90 to 140 items to accommodate the broader source set.
+
+CivicScience is intentionally NOT included because its published Terms of Service prohibit automated scripts from collecting information from its service.
