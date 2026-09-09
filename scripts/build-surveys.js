@@ -48,6 +48,18 @@ const SOURCES = [
   {
     name: "Edison Research",
     url: "https://www.edisonresearch.com/feed/"
+  },
+  {
+    name: "Ipsos",
+    url: "https://www.ipsos.com/en-us/rss.xml"
+  },
+  {
+    name: "CivicScience",
+    url: "https://civicscience.com/feed/"
+  },
+  {
+    name: "The Harris Poll",
+    url: "https://theharrispoll.com/feed/"
   }
 ];
 
@@ -65,7 +77,7 @@ function maxAgeDaysForSource(source) {
 }
 
 function decodeXml(s = "") {
-  return s
+  return String(s)
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
@@ -78,7 +90,9 @@ function decodeXml(s = "") {
     .replace(/&#8220;/g, "“")
     .replace(/&#8221;/g, "”")
     .replace(/&#8211;/g, "–")
-    .replace(/&#8212;/g, "—");
+    .replace(/&#8212;/g, "—")
+    .replace(/&#8230;/g, "…")
+    .replace(/&nbsp;/g, " ");
 }
 
 function stripHtml(s = "") {
@@ -110,6 +124,19 @@ function tag(block, name) {
   return m ? stripHtml(m[1]) : "";
 }
 
+function rawTag(block, name) {
+  const m = block.match(
+    new RegExp(
+      `<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`,
+      "i"
+    )
+  );
+
+  return m
+    ? decodeXml(m[1]).trim()
+    : "";
+}
+
 function tags(block, name) {
   const re = new RegExp(
     `<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`,
@@ -127,13 +154,69 @@ function parseRss(xml) {
 
   return blocks.map(b => ({
     title: tag(b, "title"),
-    link: tag(b, "link"),
-    date: tag(b, "pubDate"),
-    description: tag(b, "description"),
-    content: tag(b, "content:encoded"),
-    creator: tag(b, "dc:creator") || tag(b, "author"),
-    categories: tags(b, "category")
+    link:
+      tag(b, "link") ||
+      tag(b, "guid"),
+    date:
+      tag(b, "pubDate") ||
+      tag(b, "dc:date"),
+    description:
+      rawTag(b, "description"),
+    content:
+      rawTag(b, "content:encoded"),
+    creator:
+      tag(b, "dc:creator") ||
+      tag(b, "author"),
+    categories:
+      tags(b, "category")
   }));
+}
+
+function parseAtom(xml) {
+  const blocks =
+    xml.match(/<entry\b[\s\S]*?<\/entry>/gi) || [];
+
+  return blocks.map(b => {
+    const linkMatch =
+      b.match(
+        /<link\b[^>]*href=["']([^"']+)["'][^>]*>/i
+      );
+
+    return {
+      title:
+        tag(b, "title"),
+
+      link:
+        linkMatch
+          ? decodeXml(linkMatch[1])
+          : "",
+
+      date:
+        tag(b, "updated") ||
+        tag(b, "published"),
+
+      description:
+        rawTag(b, "summary"),
+
+      content:
+        rawTag(b, "content"),
+
+      creator:
+        tag(b, "name"),
+
+      categories:
+        []
+    };
+  });
+}
+
+function parseFeed(xml) {
+  const rss =
+    parseRss(xml);
+
+  return rss.length
+    ? rss
+    : parseAtom(xml);
 }
 
 function isTalkerResearchArticle(article) {
@@ -141,23 +224,36 @@ function isTalkerResearchArticle(article) {
     article.creator || "",
     ...(article.categories || []),
     article.title || "",
-    article.description || "",
-    article.content || ""
+    stripHtml(
+      article.description || ""
+    ),
+    stripHtml(
+      article.content || ""
+    )
   ].join(" ");
 
-  return /\bTalker Research\b/i.test(haystack);
+  return /\bTalker Research\b/i.test(
+    haystack
+  );
 }
 
 function sentences(text = "") {
-  return text
+  return stripHtml(text)
     .replace(/\s+/g, " ")
-    .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
+    .split(
+      /(?<=[.!?])\s+(?=[A-Z0-9“"'])/
+    )
     .map(s => s.trim())
-    .filter(s => s.length >= 35 && s.length <= 330);
+    .filter(
+      s =>
+        s.length >= 35 &&
+        s.length <= 360
+    );
 }
 
 function inferTopic(text = "") {
-  const t = text.toLowerCase();
+  const t =
+    text.toLowerCase();
 
   const rules = [
     [
@@ -178,11 +274,11 @@ function inferTopic(text = "") {
     ],
     [
       "Shopping",
-      /\b(shop|shopping|retail|store|purchase|consumer|buy|bought)\b/
+      /\b(shop|shopping|retail|store|purchase|consumer|buy|bought|discount|discounts)\b/
     ],
     [
       "Food & Dining",
-      /\b(food|restaurant|meal|fast food|grocery|dining|eat|eating)\b/
+      /\b(food|restaurant|meal|fast food|grocery|dining|eat|eating|order|ordering)\b/
     ],
     [
       "Family & Life",
@@ -190,11 +286,14 @@ function inferTopic(text = "") {
     ],
     [
       "Health",
-      /\b(health|wellness|doctor|medical|hospital|fitness|sleep|medicine)\b/
+      /\b(health|wellness|doctor|medical|hospital|fitness|sleep|medicine|insurance)\b/
     ]
   ];
 
-  for (const [name, re] of rules) {
+  for (
+    const [name, re]
+    of rules
+  ) {
     if (re.test(t)) {
       return name;
     }
@@ -203,25 +302,44 @@ function inferTopic(text = "") {
   return "Life & Culture";
 }
 
-function inferTopicFromFinding(sentence = "", title = "") {
-  const fromSentence = inferTopic(sentence);
+function inferTopicFromFinding(
+  sentence = "",
+  title = ""
+) {
+  const fromSentence =
+    inferTopic(sentence);
 
-  return fromSentence !== "Life & Culture"
-    ? fromSentence
-    : inferTopic(title);
+  return fromSentence !==
+    "Life & Culture"
+      ? fromSentence
+      : inferTopic(title);
 }
 
 function isPolitical(text = "") {
-  return /\b(trump|biden|democrats?|republicans?|congress|senate|house of representatives|election|elections|vote|votes|voter|voters|partisan|political party|white house|supreme court|immigration policy|foreign policy|president|presidential|governor|governors)\b/i.test(
+  return /\b(trump|biden|democrats?|republicans?|congress|senate|house of representatives|election|elections|vote|votes|voter|voters|partisan|political party|white house|supreme court|immigration policy|foreign policy|president|presidential|governor|governors|candidate|candidates)\b/i.test(
     text
   );
 }
+function talkForFinding(
+  topic,
+  sentence = "",
+  title = ""
+) {
+  const s =
+    sentence.toLowerCase();
 
-function talkForFinding(topic, sentence = "", title = "") {
-  const s = sentence.toLowerCase();
-  const h = `${sentence} ${title}`.toLowerCase();
+  const h =
+    `${sentence} ${title}`.toLowerCase();
 
-  if (/\bcrowdfund(?:ing|ed)?\b/.test(h)) {
+  if (
+    /\bnew year(?:'s)? eve\b/.test(h)
+  ) {
+    return "Do you usually stay up until midnight on New Year’s Eve, or are you asleep before the countdown?";
+  }
+
+  if (
+    /\bcrowdfund(?:ing|ed)?\b/.test(h)
+  ) {
     return "Have you ever donated to a crowdfunding campaign? What made you decide to give?";
   }
 
@@ -238,15 +356,21 @@ function talkForFinding(topic, sentence = "", title = "") {
     return "How often do you listen to a radio station through an app or stream instead of a regular radio?";
   }
 
-  if (/\bsports streaming\b/.test(h)) {
+  if (
+    /\bsports streaming\b/.test(h)
+  ) {
     return "Have streaming services made it easier or harder for you to watch the sports you want?";
   }
 
-  if (/\bradio\b/.test(s)) {
+  if (
+    /\bradio\b/.test(s)
+  ) {
     return "Does this match the way you or the people around you use radio?";
   }
 
-  if (/\bpodcast\b/.test(s)) {
+  if (
+    /\bpodcast\b/.test(s)
+  ) {
     return "How do your own podcast habits compare with this finding?";
   }
 
@@ -257,15 +381,21 @@ function talkForFinding(topic, sentence = "", title = "") {
     return "Would you trust health advice from an influencer, or do you want it from a medical professional?";
   }
 
-  if (/\bcrypto|cryptocurrency\b/.test(s)) {
+  if (
+    /\bcrypto|cryptocurrency\b/.test(s)
+  ) {
     return "Have you ever owned or used cryptocurrency, or have you stayed away from it completely?";
   }
 
-  if (/\bsocial media\b/.test(s)) {
+  if (
+    /\bsocial media\b/.test(s)
+  ) {
     return "Does this match the way you and your friends actually use social media?";
   }
 
-  if (/\b(ai|artificial intelligence|chatbot)\b/.test(s)) {
+  if (
+    /\b(ai|artificial intelligence|chatbot)\b/.test(s)
+  ) {
     return "What everyday task are you most willing to hand over to AI?";
   }
 
@@ -306,16 +436,21 @@ function talkForFinding(topic, sentence = "", title = "") {
       "Does this number surprise you, or does it sound about right?"
   };
 
-  return prompts[topic] || prompts["Life & Culture"];
+  return prompts[topic] ||
+    prompts["Life & Culture"];
 }
 
-function startsWithVerbPhrase(text = "") {
+function startsWithVerbPhrase(
+  text = ""
+) {
   return /^(donated|donate|gave|give|contributed|contribute|spent|spend|said|say|use|used|uses|watch|watched|watches|listen|listened|listens|buy|bought|buys|shop|shopped|shops|prefer|preferred|prefers|agree|agreed|agrees|believe|believed|believes|think|thought|thinks|reported|report|reports|have|had|has|are|were|is|want|wanted|wants|plan|planned|plans|expect|expected|expects|feel|felt|feels|chose|choose|chooses|selected|select|selects|experienced|experience|experiences|received|receive|receives|paid|pay|pays|borrowed|borrow|borrows|saved|save|saves|get|gets|got)\b/i.test(
     text.trim()
   );
 }
 
-function fixBroadcastGrammar(text = "") {
+function fixBroadcastGrammar(
+  text = ""
+) {
   return text
     .replace(/\s+/g, " ")
     .trim()
@@ -335,26 +470,54 @@ function fixBroadcastGrammar(text = "") {
       /\bpeople\s+(\d{1,2})-(\d{1,2})\b/gi,
       "people ages $1–$2"
     )
-    .replace(/\blistening\s+to\b/gi, "listen to")
-    .replace(/\busing\s+/gi, "use ")
-    .replace(/\bwatching\s+/gi, "watch ")
-    .replace(/\bgetting\s+/gi, "get ");
+    .replace(
+      /\blistening\s+to\b/gi,
+      "listen to"
+    )
+    .replace(
+      /\busing\s+/gi,
+      "use "
+    )
+    .replace(
+      /\bwatching\s+/gi,
+      "watch "
+    )
+    .replace(
+      /\bgetting\s+/gi,
+      "get "
+    );
 }
 
-function stripTrailingSemicolonClause(sentence = "", stat = "") {
-  const s = sentence
-    .replace(/\s+/g, " ")
-    .trim();
+function regexEscape(s = "") {
+  return String(s).replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&"
+  );
+}
 
-  const semi = s.indexOf(";");
+function stripTrailingSemicolonClause(
+  sentence = "",
+  rawStat = ""
+) {
+  const s =
+    sentence
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const semi =
+    s.indexOf(";");
 
   if (semi < 0) {
     return s;
   }
 
-  const statIndex = s
-    .toLowerCase()
-    .indexOf(String(stat).toLowerCase());
+  const statIndex =
+    s
+      .toLowerCase()
+      .indexOf(
+        String(rawStat)
+          .toLowerCase()
+      );
 
   if (
     statIndex >= 0 &&
@@ -372,20 +535,28 @@ function contextualPopulationFromTitle(
   title = "",
   sentence = ""
 ) {
-  const h = `${title} ${sentence}`.toLowerCase();
+  const h =
+    `${title} ${sentence}`
+      .toLowerCase();
 
-  if (/\bcrowdfund(?:ing|ed)?\b/.test(h)) {
+  if (
+    /\bcrowdfund(?:ing|ed)?\b/.test(h)
+  ) {
     return "people who donated to a crowdfunding campaign";
   }
 
-  if (/\bcharit(?:y|ies|able)\b/.test(h)) {
+  if (
+    /\bcharit(?:y|ies|able)\b/.test(h)
+  ) {
     return "adults who made charitable donations";
   }
 
   return "";
 }
 
-function containsUndefinedReference(text = "") {
+function containsUndefinedReference(
+  text = ""
+) {
   return /\b(these|those|such)\s+(factors?|issues?|things?|reasons?|circumstances?|conditions?|changes?|effects?|events?|concerns?|problems?|pressures?|challenges?|results?|findings?)\b/i.test(
     text
   );
@@ -396,12 +567,14 @@ function isMalformedDonationQuestion(
   context = "",
   sourceUrl = ""
 ) {
-  const q = question
-    .replace(/\s+/g, " ")
-    .trim();
+  const q =
+    question
+      .replace(/\s+/g, " ")
+      .trim();
 
   const h =
-    `${context} ${sourceUrl}`.toLowerCase();
+    `${context} ${sourceUrl}`
+      .toLowerCase();
 
   if (
     /^how many people\s+(donated|gave|contributed)\b/i.test(q) &&
@@ -420,18 +593,25 @@ function isMalformedDonationQuestion(
   return false;
 }
 
-function isAmbiguousMultiYearQuestion(question = "") {
-  const q = question
-    .replace(/\s+/g, " ")
-    .trim();
+function isAmbiguousMultiYearQuestion(
+  question = ""
+) {
+  const q =
+    question
+      .replace(/\s+/g, " ")
+      .trim();
 
   const years =
-    q.match(/\b(?:19|20)\d{2}\b/g) || [];
+    q.match(
+      /\b(?:19|20)\d{2}\b/g
+    ) || [];
 
   const uniqueYears =
     [...new Set(years)];
 
-  if (uniqueYears.length < 2) {
+  if (
+    uniqueYears.length < 2
+  ) {
     return false;
   }
 
@@ -463,7 +643,8 @@ function isUnsupportedSportsSuperFanQuestion(
   context = ""
 ) {
   const h =
-    `${question} ${context}`.toLowerCase();
+    `${question} ${context}`
+      .toLowerCase();
 
   return (
     /\bsuper fans?\b/.test(h) &&
@@ -472,10 +653,13 @@ function isUnsupportedSportsSuperFanQuestion(
   );
 }
 
-function hasBadQuestionLanguage(question = "") {
-  const q = question
-    .replace(/\s+/g, " ")
-    .trim();
+function hasBadQuestionLanguage(
+  question = ""
+) {
+  const q =
+    question
+      .replace(/\s+/g, " ")
+      .trim();
 
   if (!q) {
     return true;
@@ -545,12 +729,17 @@ function hasBadQuestionLanguage(question = "") {
   return false;
 }
 
-function questionHasStandaloneContext(question = "") {
-  const q = question
-    .replace(/\s+/g, " ")
-    .trim();
+function questionHasStandaloneContext(
+  question = ""
+) {
+  const q =
+    question
+      .replace(/\s+/g, " ")
+      .trim();
 
-  if (hasBadQuestionLanguage(q)) {
+  if (
+    hasBadQuestionLanguage(q)
+  ) {
     return false;
   }
 
@@ -565,520 +754,10 @@ function questionHasStandaloneContext(question = "") {
   return true;
 }
 
-function isolateFindingClause(
-  sentence,
-  targetStat,
-  allStats = []
+function findStats(
+  sentence = ""
 ) {
-  let s = stripTrailingSemicolonClause(
-    sentence,
-    targetStat
-  );
-
-  if (containsUndefinedReference(s)) {
-    return "";
-  }
-
-  const sentenceYears =
-    s.match(/\b(?:19|20)\d{2}\b/g) || [];
-
-  if (
-    new Set(sentenceYears).size >= 2 &&
-    /\b(compared|compare|versus|vs\.?|than|this year)\b/i.test(
-      s
-    )
-  ) {
-    return "";
-  }
-
-  if (allStats.length <= 1) {
-    return s;
-  }
-
-  const targetIndex = s
-    .toLowerCase()
-    .indexOf(
-      targetStat.toLowerCase()
-    );
-
-  if (targetIndex < 0) {
-    return "";
-  }
-
-  const otherPatterns = [
-    /\b(?:about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\s*\d{1,3}%\b/gi,
-    /\b(?:about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\s*\d+\s+in\s+\d+\b/gi
-  ];
-
-  const boundaries = [];
-
-  for (const re of otherPatterns) {
-    for (const m of s.matchAll(re)) {
-      const raw = m[0].trim();
-
-      if (
-        raw.includes(targetStat) ||
-        targetStat.includes(raw)
-      ) {
-        continue;
-      }
-
-      if (m.index > targetIndex) {
-        const between = s.slice(
-          targetIndex + targetStat.length,
-          m.index
-        );
-
-        const conjunction =
-          between.match(
-            /\s+(?:and|while|but|whereas)\s+$/i
-          );
-
-        if (conjunction) {
-          boundaries.push(
-            m.index -
-            conjunction[0].length
-          );
-        } else {
-          const punct =
-            between.search(/[;—]/);
-
-          if (punct >= 0) {
-            boundaries.push(
-              targetIndex +
-              targetStat.length +
-              punct
-            );
-          }
-        }
-      }
-    }
-  }
-
-  if (boundaries.length) {
-    s = s
-      .slice(
-        0,
-        Math.min(...boundaries)
-      )
-      .trim();
-  }
-
-  if (findStats(s).length > 1) {
-    return "";
-  }
-
-  if (containsUndefinedReference(s)) {
-    return "";
-  }
-
-  return s;
-}
-
-function stripRatioLead(sentence, stat) {
-  const escaped = stat.replace(
-    /[.*+?^${}()|[\]\\]/g,
-    "\\$&"
-  );
-
-  return sentence
-    .replace(
-      new RegExp(
-        `^(about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\\s*${escaped}\\s+`,
-        "i"
-      ),
-      ""
-    )
-    .replace(/^of\s+/i, "")
-    .replace(/[.!?]+$/, "")
-    .trim();
-}
-
-function cleanRatioTail(tail = "") {
-  return fixBroadcastGrammar(tail)
-    .replace(/\badopting\b/gi, "have adopted")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function makeThoseWhoQuestion(tail = "") {
-  const clean = tail
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/[.!?]+$/, "");
-
-  const m = clean.match(
-    /^those who (.+?)\s+(believe|believed|think|thought|say|said|report|reported|feel|felt|agree|agreed|expect|expected|use|used|have|had|are|were|want|wanted|prefer|preferred)\s+(.+)$/i
-  );
-
-  if (!m) {
-    return "";
-  }
-
-  const population = m[1].trim();
-  const verb = m[2].trim();
-  const remainder = m[3].trim();
-
-  if (
-    !population ||
-    !verb ||
-    !remainder
-  ) {
-    return "";
-  }
-
-  return `Among those who ${population}, how many ${verb} ${remainder}?`;
-}
-
-function makeRatioQuestion(
-  sentence,
-  stat,
-  articleTitle = ""
-) {
-  const s = sentence
-    .replace(/\s+/g, " ")
-    .trim();
-
-  const escaped = stat.replace(
-    /[.*+?^${}()|[\]\\]/g,
-    "\\$&"
-  );
-
-  const beginsWithRatio =
-    new RegExp(
-      `^(about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\\s*${escaped}\\s+`,
-      "i"
-    ).test(s);
-
-  if (beginsWithRatio) {
-    let tail = cleanRatioTail(
-      stripRatioLead(
-        s,
-        stat
-      )
-    );
-
-    if (!tail) {
-      return "";
-    }
-
-    /*
-     * Never infer what the 1-in-5 sports-super-fan
-     * statistic measures. The source wording does
-     * not clearly establish that 1 in 5 adopted
-     * streaming services.
-     */
-    if (
-      /\bsuper fans?\b/i.test(tail) &&
-      /\bsports streaming services?\b/i.test(tail)
-    ) {
-      return "";
-    }
-
-    if (
-      /^those who\b/i.test(tail)
-    ) {
-      return makeThoseWhoQuestion(tail);
-    }
-
-    if (
-      /^Americans\s+have used crypto\b/i.test(tail)
-    ) {
-      return "How many Americans have used cryptocurrency?";
-    }
-
-    if (
-      /^(donated|gave|contributed)\b/i.test(
-        tail
-      )
-    ) {
-      const population =
-        contextualPopulationFromTitle(
-          articleTitle,
-          s
-        );
-
-      if (!population) {
-        return "";
-      }
-
-      return `Among ${population}, how many ${tail}?`;
-    }
-
-    if (
-      /^(Americans|Australians|adults|people|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|students|teens|teenagers|women|men|young women|young men)\b/i.test(
-        tail
-      )
-    ) {
-      return `How many ${tail}?`;
-    }
-
-    if (startsWithVerbPhrase(tail)) {
-      return `How many people ${tail}?`;
-    }
-
-    return `How many ${tail}?`;
-  }
-
-  const idx = s
-    .toLowerCase()
-    .indexOf(
-      stat.toLowerCase()
-    );
-
-  if (idx < 0) {
-    return "";
-  }
-
-  let before = s
-    .slice(0, idx)
-    .replace(/[,;:\s-]+$/, "")
-    .trim();
-
-  let after = s
-    .slice(
-      idx + stat.length
-    )
-    .replace(/^[,;:\s-]+/, "")
-    .replace(/[.!?]+$/, "")
-    .trim()
-    .replace(/^of\s+/i, "");
-
-  after = cleanRatioTail(after);
-
-  if (
-    !after ||
-    containsUndefinedReference(after)
-  ) {
-    return "";
-  }
-
-  /*
-   * Reject the ambiguous sports-super-fan
-   * relationship instead of rewriting it.
-   */
-  if (
-    /\bsuper fans?\b/i.test(`${s} ${after}`) &&
-    /\bsports streaming services?\b/i.test(`${s} ${after}`)
-  ) {
-    return "";
-  }
-
-  if (
-    /^those who\b/i.test(after)
-  ) {
-    return makeThoseWhoQuestion(after);
-  }
-
-  if (/^among\b/i.test(before)) {
-    const population = before
-      .replace(/^among\s+/i, "")
-      .trim();
-
-    if (!population) {
-      return "";
-    }
-
-    if (startsWithVerbPhrase(after)) {
-      return `Among ${population}, how many people ${after}?`;
-    }
-
-    return `Among ${population}, how many ${after}?`;
-  }
-
-  const populationMatch = before.match(
-    /\b(Americans|Australians|adults|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|teens|teenagers|children|students|people|women|men)\b[^,;:]*/i
-  );
-
-  if (populationMatch) {
-    const population =
-      fixBroadcastGrammar(
-        populationMatch[0]
-      );
-
-    if (/^who\b/i.test(after)) {
-      return `How many ${population} ${after}?`;
-    }
-
-    if (startsWithVerbPhrase(after)) {
-      return `How many ${population} ${after}?`;
-    }
-  }
-
-  if (
-    /^(donated|gave|contributed)\b/i.test(
-      after
-    )
-  ) {
-    const population =
-      contextualPopulationFromTitle(
-        articleTitle,
-        s
-      );
-
-    if (!population) {
-      return "";
-    }
-
-    return `Among ${population}, how many ${after}?`;
-  }
-
-  return "";
-}
-
-function makePercentageQuestion(
-  sentence,
-  stat
-) {
-  const s = sentence
-    .replace(/\s+/g, " ")
-    .trim();
-
-  const escaped =
-    stat.replace(
-      "%",
-      "\\%"
-    );
-
-  let m = s.match(
-    new RegExp(
-      `^${escaped}\\s+of\\s+(.+?)[.!]?$`,
-      "i"
-    )
-  );
-
-  if (m) {
-    return `What percentage of ${fixBroadcastGrammar(
-      m[1]
-        .replace(/[.!?]+$/, "")
-    )}?`;
-  }
-
-  m = s.match(
-    new RegExp(
-      `^(Among\\s+[^,]+,\\s*)${escaped}\\s+(.+?)[.!]?$`,
-      "i"
-    )
-  );
-
-  if (m) {
-    return `${m[1]}what percentage ${fixBroadcastGrammar(
-      m[2]
-        .replace(/[.!?]+$/, "")
-    )}?`;
-  }
-
-  const replaced =
-    fixBroadcastGrammar(
-      s.replace(
-        new RegExp(
-          escaped,
-          "i"
-        ),
-        "what percentage"
-      )
-    );
-
-  return (
-    replaced.replace(/[.!]+$/, "") +
-    (
-      replaced.endsWith("?")
-        ? ""
-        : "?"
-    )
-  );
-}
-
-function makeQuestion(
-  sentence,
-  stat,
-  articleTitle = "",
-  allStats = []
-) {
-  const isolated =
-    isolateFindingClause(
-      sentence,
-      stat,
-      allStats
-    );
-
-  if (!isolated) {
-    return "";
-  }
-
-  let q = "";
-
-  if (
-    /\bin\b/i.test(stat) &&
-    !stat.includes("%")
-  ) {
-    q = makeRatioQuestion(
-      isolated,
-      stat,
-      articleTitle
-    );
-  } else {
-    q = makePercentageQuestion(
-      isolated,
-      stat
-    );
-  }
-
-  q = fixBroadcastGrammar(q)
-    .replace(/\s+\?/g, "?")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  if (
-    !questionHasStandaloneContext(q)
-  ) {
-    return "";
-  }
-
-  return q;
-}
-
-function findStats(sentence) {
   const found = [];
-
-  for (
-    const m of sentence.matchAll(
-      /\b(?!1000)(\d{1,2}|100)%\b/g
-    )
-  ) {
-    const n = Number(m[1]);
-
-    if (
-      n >= 5 &&
-      n <= 95
-    ) {
-      found.push({
-        stat: m[0],
-        index: m.index,
-        type: "percent"
-      });
-    }
-  }
-
-  for (
-    const m of sentence.matchAll(
-      /\b([1-9]|10)\s+in\s+([2-9]|10)\b/gi
-    )
-  ) {
-    const a = Number(m[1]);
-    const b = Number(m[2]);
-
-    if (a < b) {
-      found.push({
-        stat: `${a} in ${b}`,
-        index: m.index,
-        type: "ratio"
-      });
-    }
-  }
-
-  const wordRe =
-    /\b(one|two|three|four|five|six|seven|eight|nine|ten)\s+in\s+(one|two|three|four|five|six|seven|eight|nine|ten)\b/gi;
 
   const nums = {
     one: 1,
@@ -1094,24 +773,129 @@ function findStats(sentence) {
   };
 
   for (
-    const m of sentence.matchAll(wordRe)
+    const m of sentence.matchAll(
+      /\b(?!1000)(\d{1,2}|100)%\b/g
+    )
+  ) {
+    const n =
+      Number(m[1]);
+
+    if (
+      n >= 5 &&
+      n <= 95
+    ) {
+      found.push({
+        stat: m[0],
+        raw: m[0],
+        index: m.index,
+        type: "percent"
+      });
+    }
+  }
+
+  for (
+    const m of sentence.matchAll(
+      /\b([1-9]|10)\s+in\s+([2-9]|10)\b/gi
+    )
   ) {
     const a =
-      nums[m[1].toLowerCase()];
+      Number(m[1]);
 
     const b =
-      nums[m[2].toLowerCase()];
+      Number(m[2]);
 
     if (a < b) {
       found.push({
         stat: `${a} in ${b}`,
+        raw: m[0],
         index: m.index,
         type: "ratio"
       });
     }
   }
 
-  const seen = new Set();
+  const wordWord =
+    /\b(one|two|three|four|five|six|seven|eight|nine|ten)\s+in\s+(one|two|three|four|five|six|seven|eight|nine|ten)\b/gi;
+
+  for (
+    const m of sentence.matchAll(
+      wordWord
+    )
+  ) {
+    const a =
+      nums[
+        m[1].toLowerCase()
+      ];
+
+    const b =
+      nums[
+        m[2].toLowerCase()
+      ];
+
+    if (a < b) {
+      found.push({
+        stat: `${a} in ${b}`,
+        raw: m[0],
+        index: m.index,
+        type: "ratio"
+      });
+    }
+  }
+
+  const wordNumber =
+    /\b(one|two|three|four|five|six|seven|eight|nine|ten)\s+in\s+([2-9]|10)\b/gi;
+
+  for (
+    const m of sentence.matchAll(
+      wordNumber
+    )
+  ) {
+    const a =
+      nums[
+        m[1].toLowerCase()
+      ];
+
+    const b =
+      Number(m[2]);
+
+    if (a < b) {
+      found.push({
+        stat: `${a} in ${b}`,
+        raw: m[0],
+        index: m.index,
+        type: "ratio"
+      });
+    }
+  }
+
+  const numberWord =
+    /\b([1-9]|10)\s+in\s+(two|three|four|five|six|seven|eight|nine|ten)\b/gi;
+
+  for (
+    const m of sentence.matchAll(
+      numberWord
+    )
+  ) {
+    const a =
+      Number(m[1]);
+
+    const b =
+      nums[
+        m[2].toLowerCase()
+      ];
+
+    if (a < b) {
+      found.push({
+        stat: `${a} in ${b}`,
+        raw: m[0],
+        index: m.index,
+        type: "ratio"
+      });
+    }
+  }
+
+  const seen =
+    new Set();
 
   return found
     .sort(
@@ -1120,9 +904,11 @@ function findStats(sentence) {
     )
     .filter(x => {
       const k =
-        `${x.stat}|${x.index}`;
+        `${x.raw.toLowerCase()}|${x.index}`;
 
-      if (seen.has(k)) {
+      if (
+        seen.has(k)
+      ) {
         return false;
       }
 
@@ -1130,19 +916,668 @@ function findStats(sentence) {
       return true;
     });
 }
+function isolateFindingClause(
+  sentence,
+  target,
+  allStats = []
+) {
+  const raw =
+    target.raw ||
+    target.stat;
+
+  let s =
+    stripTrailingSemicolonClause(
+      sentence,
+      raw
+    );
+
+  if (
+    containsUndefinedReference(s)
+  ) {
+    return "";
+  }
+
+  const sentenceYears =
+    s.match(
+      /\b(?:19|20)\d{2}\b/g
+    ) || [];
+
+  if (
+    new Set(
+      sentenceYears
+    ).size >= 2 &&
+    /\b(compared|compare|versus|vs\.?|than|this year)\b/i.test(
+      s
+    )
+  ) {
+    return "";
+  }
+
+  const targetIndex =
+    s
+      .toLowerCase()
+      .indexOf(
+        raw.toLowerCase()
+      );
+
+  if (
+    targetIndex < 0
+  ) {
+    return "";
+  }
+
+  if (
+    allStats.length > 1
+  ) {
+    const later =
+      allStats
+        .filter(x =>
+          (
+            (x.raw || x.stat)
+              .toLowerCase() !==
+            raw.toLowerCase()
+          ) ||
+          x.index !== target.index
+        )
+        .map(x => {
+          const xRaw =
+            x.raw ||
+            x.stat;
+
+          const idx =
+            s
+              .toLowerCase()
+              .indexOf(
+                xRaw.toLowerCase(),
+                targetIndex +
+                raw.length
+              );
+
+          return idx;
+        })
+        .filter(
+          idx =>
+            idx >
+            targetIndex
+        )
+        .sort(
+          (a, b) =>
+            a - b
+        );
+
+    if (
+      later.length
+    ) {
+      const nextStat =
+        later[0];
+
+      const between =
+        s.slice(
+          targetIndex +
+          raw.length,
+          nextStat
+        );
+
+      const cutMatch =
+        between.match(
+          /(?:,?\s+(?:and|while|but|whereas|compared with|compared to)\s+|[;—])/i
+        );
+
+      if (
+        !cutMatch
+      ) {
+        return "";
+      }
+
+      const cutAt =
+        targetIndex +
+        raw.length +
+        cutMatch.index;
+
+      s =
+        s
+          .slice(
+            0,
+            cutAt
+          )
+          .trim()
+          .replace(
+            /[,;:—-]+$/,
+            ""
+          )
+          .trim();
+    }
+  }
+
+  const remaining =
+    findStats(s);
+
+  if (
+    remaining.length > 1
+  ) {
+    return "";
+  }
+
+  if (
+    containsUndefinedReference(s)
+  ) {
+    return "";
+  }
+
+  return s;
+}
+
+function stripRatioLead(
+  sentence,
+  rawStat
+) {
+  const escaped =
+    regexEscape(rawStat);
+
+  return sentence
+    .replace(
+      new RegExp(
+        `^(about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\\s*${escaped}\\s+`,
+        "i"
+      ),
+      ""
+    )
+    .replace(
+      /^of\s+/i,
+      ""
+    )
+    .replace(
+      /[.!?]+$/,
+      ""
+    )
+    .trim();
+}
+
+function cleanRatioTail(
+  tail = ""
+) {
+  return fixBroadcastGrammar(
+    tail
+  )
+    .replace(
+      /\badopting\b/gi,
+      "have adopted"
+    )
+    .replace(
+      /\s+/g,
+      " "
+    )
+    .trim();
+}
+
+function makeThoseWhoQuestion(
+  tail = ""
+) {
+  const clean =
+    tail
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(
+        /[.!?]+$/,
+        ""
+      );
+
+  const m =
+    clean.match(
+      /^those who (.+?)\s+(believe|believed|think|thought|say|said|report|reported|feel|felt|agree|agreed|expect|expected|use|used|have|had|are|were|want|wanted|prefer|preferred)\s+(.+)$/i
+    );
+
+  if (!m) {
+    return "";
+  }
+
+  const population =
+    m[1].trim();
+
+  const verb =
+    m[2].trim();
+
+  const remainder =
+    m[3].trim();
+
+  if (
+    !population ||
+    !verb ||
+    !remainder
+  ) {
+    return "";
+  }
+
+  return `Among those who ${population}, how many ${verb} ${remainder}?`;
+}
+
+function makeRatioQuestion(
+  sentence,
+  target,
+  articleTitle = ""
+) {
+  const s =
+    sentence
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const raw =
+    target.raw ||
+    target.stat;
+
+  const escaped =
+    regexEscape(raw);
+
+  const beginsWithRatio =
+    new RegExp(
+      `^(about|around|roughly|nearly|almost|approximately|only|just|more than|less than|another)?\\s*${escaped}\\s+`,
+      "i"
+    ).test(s);
+
+  if (
+    beginsWithRatio
+  ) {
+    let tail =
+      cleanRatioTail(
+        stripRatioLead(
+          s,
+          raw
+        )
+      );
+
+    if (!tail) {
+      return "";
+    }
+
+    if (
+      /\bsuper fans?\b/i.test(
+        tail
+      ) &&
+      /\bsports streaming services?\b/i.test(
+        tail
+      )
+    ) {
+      return "";
+    }
+
+    if (
+      /^those who\b/i.test(
+        tail
+      )
+    ) {
+      return makeThoseWhoQuestion(
+        tail
+      );
+    }
+
+    if (
+      /^Americans\s+have used crypto\b/i.test(
+        tail
+      )
+    ) {
+      return "How many Americans have used cryptocurrency?";
+    }
+
+    if (
+      /^(donated|gave|contributed)\b/i.test(
+        tail
+      )
+    ) {
+      const population =
+        contextualPopulationFromTitle(
+          articleTitle,
+          s
+        );
+
+      if (
+        !population
+      ) {
+        return "";
+      }
+
+      return `Among ${population}, how many ${tail}?`;
+    }
+
+    if (
+      /^(Americans|U\.S\. adults|US adults|Australians|adults|people|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|students|teens|teenagers|women|men|young women|young men)\b/i.test(
+        tail
+      )
+    ) {
+      return `How many ${tail}?`;
+    }
+
+    if (
+      startsWithVerbPhrase(
+        tail
+      )
+    ) {
+      return `How many people ${tail}?`;
+    }
+
+    return `How many ${tail}?`;
+  }
+
+  const idx =
+    s
+      .toLowerCase()
+      .indexOf(
+        raw.toLowerCase()
+      );
+
+  if (
+    idx < 0
+  ) {
+    return "";
+  }
+
+  let before =
+    s
+      .slice(0, idx)
+      .replace(
+        /[,;:\s-]+$/,
+        ""
+      )
+      .trim();
+
+  let after =
+    s
+      .slice(
+        idx +
+        raw.length
+      )
+      .replace(
+        /^[,;:\s-]+/,
+        ""
+      )
+      .replace(
+        /[.!?]+$/,
+        ""
+      )
+      .trim()
+      .replace(
+        /^of\s+/i,
+        ""
+      );
+
+  after =
+    cleanRatioTail(
+      after
+    );
+
+  if (
+    !after ||
+    containsUndefinedReference(
+      after
+    )
+  ) {
+    return "";
+  }
+
+  if (
+    /\bsuper fans?\b/i.test(
+      `${s} ${after}`
+    ) &&
+    /\bsports streaming services?\b/i.test(
+      `${s} ${after}`
+    )
+  ) {
+    return "";
+  }
+
+  if (
+    /^those who\b/i.test(
+      after
+    )
+  ) {
+    return makeThoseWhoQuestion(
+      after
+    );
+  }
+
+  if (
+    /^among\b/i.test(
+      before
+    )
+  ) {
+    const population =
+      before
+        .replace(
+          /^among\s+/i,
+          ""
+        )
+        .trim();
+
+    if (
+      !population
+    ) {
+      return "";
+    }
+
+    if (
+      startsWithVerbPhrase(
+        after
+      )
+    ) {
+      return `Among ${population}, how many people ${after}?`;
+    }
+
+    return `Among ${population}, how many ${after}?`;
+  }
+
+  const populationMatch =
+    before.match(
+      /\b(Americans|U\.S\. adults|US adults|Australians|adults|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|teens|teenagers|children|students|people|women|men)\b[^,;:]*/i
+    );
+
+  if (
+    populationMatch
+  ) {
+    const population =
+      fixBroadcastGrammar(
+        populationMatch[0]
+      );
+
+    if (
+      /^who\b/i.test(
+        after
+      )
+    ) {
+      return `How many ${population} ${after}?`;
+    }
+
+    if (
+      startsWithVerbPhrase(
+        after
+      )
+    ) {
+      return `How many ${population} ${after}?`;
+    }
+  }
+
+  if (
+    /^(donated|gave|contributed)\b/i.test(
+      after
+    )
+  ) {
+    const population =
+      contextualPopulationFromTitle(
+        articleTitle,
+        s
+      );
+
+    if (
+      !population
+    ) {
+      return "";
+    }
+
+    return `Among ${population}, how many ${after}?`;
+  }
+
+  return "";
+}
+
+function makePercentageQuestion(
+  sentence,
+  target
+) {
+  const s =
+    sentence
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const raw =
+    target.raw ||
+    target.stat;
+
+  const escaped =
+    regexEscape(raw);
+
+  let m =
+    s.match(
+      new RegExp(
+        `^${escaped}\\s+of\\s+(.+?)[.!]?$`,
+        "i"
+      )
+    );
+
+  if (m) {
+    return `What percentage of ${fixBroadcastGrammar(
+      m[1]
+        .replace(
+          /[.!?]+$/,
+          ""
+        )
+    )}?`;
+  }
+
+  m =
+    s.match(
+      new RegExp(
+        `^(Among\\s+[^,]+,\\s*)${escaped}\\s+(.+?)[.!]?$`,
+        "i"
+      )
+    );
+
+  if (m) {
+    return `${m[1]}what percentage ${fixBroadcastGrammar(
+      m[2]
+        .replace(
+          /[.!?]+$/,
+          ""
+        )
+    )}?`;
+  }
+
+  const replaced =
+    fixBroadcastGrammar(
+      s.replace(
+        new RegExp(
+          escaped,
+          "i"
+        ),
+        "what percentage"
+      )
+    );
+
+  return (
+    replaced
+      .replace(
+        /[.!]+$/,
+        ""
+      ) +
+    (
+      replaced.endsWith("?")
+        ? ""
+        : "?"
+    )
+  );
+}
+
+function makeQuestion(
+  sentence,
+  target,
+  articleTitle = "",
+  allStats = []
+) {
+  const isolated =
+    isolateFindingClause(
+      sentence,
+      target,
+      allStats
+    );
+
+  if (
+    !isolated
+  ) {
+    return "";
+  }
+
+  let q =
+    target.type === "ratio"
+      ? makeRatioQuestion(
+          isolated,
+          target,
+          articleTitle
+        )
+      : makePercentageQuestion(
+          isolated,
+          target
+        );
+
+  q =
+    fixBroadcastGrammar(q)
+      .replace(
+        /\s+\?/g,
+        "?"
+      )
+      .replace(
+        /\s+/g,
+        " "
+      )
+      .trim();
+
+  if (
+    !questionHasStandaloneContext(
+      q
+    )
+  ) {
+    return "";
+  }
+
+  if (
+    findStats(q).length > 0
+  ) {
+    return "";
+  }
+
+  if (
+    /\b\d{1,3}%\b/.test(q) ||
+    /\b\d+\s+in\s+\d+\b/i.test(q)
+  ) {
+    return "";
+  }
+
+  return q;
+}
 
 function hashId(parts) {
   return crypto
     .createHash("sha1")
-    .update(parts.join("|"))
+    .update(
+      parts.join("|")
+    )
     .digest("hex")
     .slice(0, 16);
 }
 
 function isoDate(raw) {
-  const d = new Date(raw);
+  const d =
+    new Date(raw);
 
-  return Number.isNaN(d.getTime())
+  return Number.isNaN(
+    d.getTime()
+  )
     ? new Date()
         .toISOString()
         .slice(0, 10)
@@ -1185,6 +1620,30 @@ function ageDays(date) {
   ) / 86400000;
 }
 
+function cleanFindingContext(
+  sentence = ""
+) {
+  return stripHtml(
+    sentence
+  )
+    .replace(
+      /\s+/g,
+      " "
+    )
+    .trim()
+    .replace(
+      /^[-–—\s]+/,
+      ""
+    )
+    .replace(
+      /["“”]+/g,
+      "”"
+    )
+    .slice(
+      0,
+      260
+    );
+}
 function extractCandidates(
   article,
   sourceName
@@ -1197,12 +1656,17 @@ function extractCandidates(
 
   const candidateSentences = [];
 
-  for (const chunk of chunks) {
-    const clean = stripHtml(chunk)
-      .replace(/\s+/g, " ")
-      .trim();
+  for (
+    const chunk of chunks
+  ) {
+    const clean =
+      stripHtml(chunk)
+        .replace(/\s+/g, " ")
+        .trim();
 
-    if (!clean) {
+    if (
+      !clean
+    ) {
       continue;
     }
 
@@ -1210,7 +1674,9 @@ function extractCandidates(
       chunk === article.title ||
       clean.length < 35
     ) {
-      candidateSentences.push(clean);
+      candidateSentences.push(
+        clean
+      );
     }
 
     candidateSentences.push(
@@ -1218,7 +1684,9 @@ function extractCandidates(
     );
   }
 
-  const seen = new Set();
+  const seen =
+    new Set();
+
   const out = [];
 
   for (
@@ -1233,7 +1701,9 @@ function extractCandidates(
     }
 
     if (
-      containsUndefinedReference(sentence)
+      containsUndefinedReference(
+        sentence
+      )
     ) {
       continue;
     }
@@ -1244,7 +1714,9 @@ function extractCandidates(
       ) || [];
 
     if (
-      new Set(sentenceYears).size >= 2 &&
+      new Set(
+        sentenceYears
+      ).size >= 2 &&
       /\b(compared|compare|versus|vs\.?|than|this year)\b/i.test(
         sentence
       )
@@ -1252,14 +1724,13 @@ function extractCandidates(
       continue;
     }
 
-    /*
-     * Reject the ambiguous AP-NORC sports
-     * super-fan headline before question
-     * generation.
-     */
     if (
-      /\bsuper fans?\b/i.test(sentence) &&
-      /\bsports streaming services?\b/i.test(sentence)
+      /\bsuper fans?\b/i.test(
+        sentence
+      ) &&
+      /\bsports streaming services?\b/i.test(
+        sentence
+      )
     ) {
       continue;
     }
@@ -1267,15 +1738,22 @@ function extractCandidates(
     if (
       /\b(discount|off sale|battery|humidity|chance of rain)\b/i.test(
         sentence
+      ) &&
+      !/\bshopping|stores?|online|consumer\b/i.test(
+        sentence
       )
     ) {
       continue;
     }
 
     const stats =
-      findStats(sentence);
+      findStats(
+        sentence
+      );
 
-    if (!stats.length) {
+    if (
+      !stats.length
+    ) {
       continue;
     }
 
@@ -1283,12 +1761,12 @@ function extractCandidates(
       const found of
       stats.slice(0, 2)
     ) {
-      const stat = found.stat;
-
       const key =
-        `${article.link}|${sentence}|${stat}`;
+        `${article.link}|${sentence}|${found.stat}|${found.raw}`;
 
-      if (seen.has(key)) {
+      if (
+        seen.has(key)
+      ) {
         continue;
       }
 
@@ -1297,13 +1775,21 @@ function extractCandidates(
       const question =
         makeQuestion(
           sentence,
-          stat,
+          found,
           article.title,
+          stats
+        );
+
+      const isolated =
+        isolateFindingClause(
+          sentence,
+          found,
           stats
         );
 
       const topic =
         inferTopicFromFinding(
+          isolated ||
           sentence,
           article.title
         );
@@ -1313,31 +1799,40 @@ function extractCandidates(
           article.date
         );
 
+      const findingContext =
+        cleanFindingContext(
+          isolated ||
+          sentence
+        );
+
       out.push({
         id:
           hashId([
             sourceName,
             article.link,
             sentence,
-            stat
+            found.stat
           ]),
 
         topic,
 
         question,
 
-        answer: stat,
+        answer:
+          found.stat,
 
-        stat,
+        stat:
+          found.stat,
 
         context:
-          article.title
-            ? `From “${article.title}.”`
+          findingContext
+            ? `Finding: ${findingContext}`
             : "From a recent survey finding.",
 
         talk:
           talkForFinding(
             topic,
+            isolated ||
             sentence,
             article.title
           ),
@@ -1363,7 +1858,9 @@ function extractCandidates(
   return out;
 }
 
-function explainUsability(item) {
+function explainUsability(
+  item
+) {
   if (
     !item ||
     !item.question ||
@@ -1406,15 +1903,19 @@ function explainUsability(item) {
     return "standalone";
   }
 
-  /*
-   * Purges the older cached sports-super-fan
-   * question from surveys.json too.
-   */
   if (
     isUnsupportedSportsSuperFanQuestion(
       item.question,
       item.context || ""
     )
+  ) {
+    return "standalone";
+  }
+
+  if (
+    findStats(
+      item.question
+    ).length > 0
   ) {
     return "standalone";
   }
@@ -1450,7 +1951,10 @@ function explainUsability(item) {
 
   return "ok";
 }
-function pickWidgetItems(items) {
+
+function pickWidgetItems(
+  items
+) {
   const picked = [];
   const topicCount =
     new Map();
@@ -1463,11 +1967,15 @@ function pickWidgetItems(items) {
         item.topic
       ) || 0;
 
-    if (n >= 2) {
+    if (
+      n >= 2
+    ) {
       continue;
     }
 
-    picked.push(item);
+    picked.push(
+      item
+    );
 
     topicCount.set(
       item.topic,
@@ -1496,7 +2004,9 @@ function pickWidgetItems(items) {
             item.id
         )
       ) {
-        picked.push(item);
+        picked.push(
+          item
+        );
       }
 
       if (
@@ -1516,16 +2026,24 @@ function buildWidgetHtml(
   limit = 3
 ) {
   const picked =
-    pickWidgetItems(items)
-      .slice(0, limit);
-
-  const topics = [
-    ...new Set(
-      picked.map(
-        x => x.topic
-      )
+    pickWidgetItems(
+      items
     )
-  ].sort();
+      .slice(
+        0,
+        limit
+      );
+
+  const topics =
+    [
+      ...new Set(
+        picked.map(
+          x =>
+            x.topic
+        )
+      )
+    ]
+      .sort();
 
   const options =
     topics
@@ -1606,7 +2124,6 @@ function buildWidgetHtml(
 <head>
 
 <meta charset="utf-8">
-
 <meta
   name="viewport"
   content="width=device-width,initial-scale=1"
@@ -1925,7 +2442,6 @@ body {
 
 </html>`;
 }
-
 function readRotationState() {
   try {
     const parsed =
@@ -1940,7 +2456,9 @@ function readRotationState() {
       parsed.history
     )
       ? parsed
-      : { history: [] };
+      : {
+          history: []
+        };
 
   } catch {
     return {
@@ -1949,7 +2467,9 @@ function readRotationState() {
   }
 }
 
-function writeRotationState(state) {
+function writeRotationState(
+  state
+) {
   fs.writeFileSync(
     ROTATION_STATE,
     JSON.stringify(
@@ -1960,7 +2480,9 @@ function writeRotationState(state) {
   );
 }
 
-function dateKey(d = new Date()) {
+function dateKey(
+  d = new Date()
+) {
   return d
     .toISOString()
     .slice(0, 10);
@@ -1968,13 +2490,15 @@ function dateKey(d = new Date()) {
 
 function recentShownIds(
   state,
-  days = RECENT_SHOWN_DAYS
+  days =
+    RECENT_SHOWN_DAYS
 ) {
   const cutoff =
     Date.now() -
     days * 86400000;
 
-  const ids = new Set();
+  const ids =
+    new Set();
 
   for (
     const row of
@@ -1996,7 +2520,9 @@ function recentShownIds(
       const id of
       row.ids || []
     ) {
-      ids.add(id);
+      ids.add(
+        id
+      );
     }
   }
 
@@ -2007,10 +2533,13 @@ function sourceCount(
   chosen,
   source
 ) {
-  return chosen.filter(
-    x =>
-      x.source === source
-  ).length;
+  return chosen
+    .filter(
+      x =>
+        x.source ===
+        source
+    )
+    .length;
 }
 
 function pickDailyRotation(
@@ -2019,36 +2548,45 @@ function pickDailyRotation(
   state
 ) {
   const recent =
-    recentShownIds(state);
+    recentShownIds(
+      state
+    );
 
   const newestFirst =
     arr =>
-      [...arr].sort(
-        (a, b) =>
-          String(
-            b.published_at ||
-            b.source_date ||
-            ""
-          ).localeCompare(
+      [...arr]
+        .sort(
+          (a, b) =>
             String(
-              a.published_at ||
-              a.source_date ||
+              b.published_at ||
+              b.source_date ||
               ""
             )
-          )
-      );
+              .localeCompare(
+                String(
+                  a.published_at ||
+                  a.source_date ||
+                  ""
+                )
+              )
+        );
 
   const ordered = [
     ...newestFirst(
       pool.filter(
         x =>
-          !recent.has(x.id)
+          !recent.has(
+            x.id
+          )
       )
     ),
+
     ...newestFirst(
       pool.filter(
         x =>
-          recent.has(x.id)
+          recent.has(
+            x.id
+          )
       )
     )
   ];
@@ -2066,7 +2604,9 @@ function pickDailyRotation(
     talker &&
     count > 0
   ) {
-    chosen.push(talker);
+    chosen.push(
+      talker
+    );
   }
 
   const usedTopics =
@@ -2082,7 +2622,8 @@ function pickDailyRotation(
     ordered
   ) {
     if (
-      chosen.length >= count
+      chosen.length >=
+      count
     ) {
       break;
     }
@@ -2101,7 +2642,8 @@ function pickDailyRotation(
       sourceCount(
         chosen,
         item.source
-      ) >= MAX_PER_SOURCE
+      ) >=
+      MAX_PER_SOURCE
     ) {
       continue;
     }
@@ -2114,8 +2656,13 @@ function pickDailyRotation(
       continue;
     }
 
-    chosen.push(item);
-    usedTopics.add(item.topic);
+    chosen.push(
+      item
+    );
+
+    usedTopics.add(
+      item.topic
+    );
   }
 
   for (
@@ -2123,7 +2670,8 @@ function pickDailyRotation(
     ordered
   ) {
     if (
-      chosen.length >= count
+      chosen.length >=
+      count
     ) {
       break;
     }
@@ -2142,12 +2690,15 @@ function pickDailyRotation(
       sourceCount(
         chosen,
         item.source
-      ) >= MAX_PER_SOURCE
+      ) >=
+      MAX_PER_SOURCE
     ) {
       continue;
     }
 
-    chosen.push(item);
+    chosen.push(
+      item
+    );
   }
 
   for (
@@ -2155,7 +2706,8 @@ function pickDailyRotation(
     ordered
   ) {
     if (
-      chosen.length >= count
+      chosen.length >=
+      count
     ) {
       break;
     }
@@ -2170,23 +2722,31 @@ function pickDailyRotation(
       continue;
     }
 
-    chosen.push(item);
+    chosen.push(
+      item
+    );
   }
 
-  return chosen.slice(
-    0,
-    count
-  );
+  return chosen
+    .slice(
+      0,
+      count
+    );
 }
 
-async function fetchText(url) {
+async function fetchText(
+  url
+) {
   const r =
     await fetch(
       url,
       {
         headers: {
           "user-agent":
-            "MediaJobsReport-SurveySays/2.5 (+https://www.mediajobsreport.com/)"
+            "MediaJobsReport-SurveySays/2.6 (+https://www.mediajobsreport.com/)",
+
+          accept:
+            "application/rss+xml, application/atom+xml, application/xml, text/xml, text/html;q=0.8, */*;q=0.5"
         },
 
         redirect:
@@ -2194,7 +2754,9 @@ async function fetchText(url) {
       }
     );
 
-  if (!r.ok) {
+  if (
+    !r.ok
+  ) {
     throw new Error(
       `${r.status} ${r.statusText}`
     );
@@ -2214,7 +2776,9 @@ async function fetchText(url) {
   const ensureDiag =
     source => {
 
-      if (!diag[source]) {
+      if (
+        !diag[source]
+      ) {
         diag[source] = {
           discovered: 0,
           rejectedMissing: 0,
@@ -2231,7 +2795,9 @@ async function fetchText(url) {
     };
 
   const seed =
-    fs.existsSync(SEED)
+    fs.existsSync(
+      SEED
+    )
       ? JSON.parse(
           fs.readFileSync(
             SEED,
@@ -2283,7 +2849,9 @@ async function fetchText(url) {
         );
 
       let articles =
-        parseRss(xml);
+        parseFeed(
+          xml
+        );
 
       console.log(
         `  RSS items: ${articles.length}`
@@ -2324,13 +2892,16 @@ async function fetchText(url) {
 
       ensureDiag(
         source.name
-      ).discovered += added;
+      ).discovered +=
+        added;
 
       console.log(
         `  Findings discovered from ${source.name}: ${added}`
       );
 
-    } catch (err) {
+    } catch (
+      err
+    ) {
       console.warn(
         `  Source failed: ${err.message}`
       );
@@ -2344,9 +2915,12 @@ async function fetchText(url) {
   ];
 
   const discoveredObjects =
-    new Set(discovered);
+    new Set(
+      discovered
+    );
 
-  const dedup = new Map();
+  const dedup =
+    new Map();
 
   for (
     const item of
@@ -2361,10 +2935,14 @@ async function fetchText(url) {
       ]);
 
     const reason =
-      explainUsability(item);
+      explainUsability(
+        item
+      );
 
     if (
-      discoveredObjects.has(item)
+      discoveredObjects.has(
+        item
+      )
     ) {
       const d =
         ensureDiag(
@@ -2373,7 +2951,8 @@ async function fetchText(url) {
         );
 
       if (
-        reason === "missing"
+        reason ===
+        "missing"
       ) {
         d.rejectedMissing++;
 
@@ -2396,7 +2975,8 @@ async function fetchText(url) {
         d.rejectedPolitical++;
 
       } else if (
-        reason === "age"
+        reason ===
+        "age"
       ) {
         d.rejectedAge++;
       }
@@ -2409,15 +2989,20 @@ async function fetchText(url) {
     }
 
     if (
-      dedup.has(key)
+      dedup.has(
+        key
+      )
     ) {
       if (
-        discoveredObjects.has(item)
+        discoveredObjects.has(
+          item
+        )
       ) {
         ensureDiag(
           item.source ||
           "Unknown"
-        ).rejectedDuplicate++;
+        )
+          .rejectedDuplicate++;
       }
 
       continue;
@@ -2432,33 +3017,36 @@ async function fetchText(url) {
     );
   }
 
-  const allUsable = [
-    ...dedup.values()
-  ].sort(
-    (a, b) =>
-      String(
-        b.published_at ||
-        b.source_date ||
-        ""
-      ).localeCompare(
-        String(
-          a.published_at ||
-          a.source_date ||
-          ""
-        )
-      )
-  );
+  const allUsable =
+    [...dedup.values()]
+      .sort(
+        (a, b) =>
+          String(
+            b.published_at ||
+            b.source_date ||
+            ""
+          )
+            .localeCompare(
+              String(
+                a.published_at ||
+                a.source_date ||
+                ""
+              )
+            )
+      );
 
   const items =
-    allUsable.slice(
-      0,
-      MAX_POOL
-    );
+    allUsable
+      .slice(
+        0,
+        MAX_POOL
+      );
 
   const finalIds =
     new Set(
       items.map(
-        x => x.id
+        x =>
+          x.id
       )
     );
 
@@ -2467,7 +3055,9 @@ async function fetchText(url) {
     discovered
   ) {
     const reason =
-      explainUsability(item);
+      explainUsability(
+        item
+      );
 
     const key =
       item.id ||
@@ -2479,12 +3069,15 @@ async function fetchText(url) {
 
     if (
       reason === "ok" &&
-      finalIds.has(key)
+      finalIds.has(
+        key
+      )
     ) {
       ensureDiag(
         item.source ||
         "Unknown"
-      ).accepted++;
+      )
+        .accepted++;
     }
   }
 
@@ -2493,7 +3086,9 @@ async function fetchText(url) {
       source,
       d
     ] of
-    Object.entries(diag)
+    Object.entries(
+      diag
+    )
   ) {
     console.log(
       `Diagnostics ${source}: ` +
@@ -2606,11 +3201,12 @@ async function fetchText(url) {
     ...(
       rotationState.history ||
       []
-    ).filter(
-      x =>
-        x.date !==
-        dateKey()
     )
+      .filter(
+        x =>
+          x.date !==
+          dateKey()
+      )
 
   ].slice(
     0,
@@ -2628,6 +3224,7 @@ async function fetchText(url) {
   const mix3 =
     daily3.reduce(
       (m, x) => {
+
         m[x.source] =
           (
             m[x.source] ||
@@ -2642,6 +3239,7 @@ async function fetchText(url) {
   const mix7 =
     daily7.reduce(
       (m, x) => {
+
         m[x.source] =
           (
             m[x.source] ||
@@ -2675,7 +3273,12 @@ async function fetchText(url) {
 
 })().catch(
   err => {
-    console.error(err);
-    process.exit(1);
+    console.error(
+      err
+    );
+
+    process.exit(
+      1
+    );
   }
 );
