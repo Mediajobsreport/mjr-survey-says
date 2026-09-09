@@ -20,10 +20,40 @@ const SOURCES = [
     name: "Pew Research Center",
     url: "https://www.pewresearch.org/publications/feed/",
     mode: "rss"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/culture-and-society/feed/",
+    mode: "rss"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/science-and-technology/feed/",
+    mode: "rss"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/younger-generations/feed/",
+    mode: "rss"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/education/feed/",
+    mode: "rss"
+  },
+  {
+    name: "AP-NORC Center",
+    url: "https://apnorc.org/topics/media-insight-project/feed/",
+    mode: "rss"
+  },
+  {
+    name: "Edison Research",
+    url: "https://www.edisonresearch.com/feed/",
+    mode: "rss"
   }
 ];
 
-const MAX_POOL = 90;
+const MAX_POOL = 140;
 const MAX_AGE_DAYS = 180;
 const ROTATION_STATE = path.join(process.cwd(), "mjr-survey-rotation.json");
 const RECENT_SHOWN_DAYS = 7;
