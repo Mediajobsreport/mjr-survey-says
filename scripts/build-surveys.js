@@ -159,11 +159,6 @@ function sentences(text = "") {
 function inferTopic(text = "") {
   const t = text.toLowerCase();
 
-  /*
-   * Work goes before Technology so
-   * AI-at-work findings stay under Work.
-   */
-
   const rules = [
     [
       "Work",
@@ -340,35 +335,12 @@ function fixBroadcastGrammar(text = "") {
       /\bpeople\s+(\d{1,2})-(\d{1,2})\b/gi,
       "people ages $1–$2"
     )
-    .replace(
-      /\blistening\s+to\b/gi,
-      "listen to"
-    )
-    .replace(
-      /\busing\s+/gi,
-      "use "
-    )
-    .replace(
-      /\bwatching\s+/gi,
-      "watch "
-    )
-    .replace(
-      /\bgetting\s+/gi,
-      "get "
-    );
+    .replace(/\blistening\s+to\b/gi, "listen to")
+    .replace(/\busing\s+/gi, "use ")
+    .replace(/\bwatching\s+/gi, "watch ")
+    .replace(/\bgetting\s+/gi, "get ");
 }
 
-/*
- * If a statistic appears before a semicolon,
- * discard the unrelated trailing headline clause.
- *
- * Example:
- * About 1 in 5 Americans have used crypto;
- * Republicans' use has ticked up.
- *
- * becomes:
- * About 1 in 5 Americans have used crypto
- */
 function stripTrailingSemicolonClause(sentence = "", stat = "") {
   const s = sentence
     .replace(/\s+/g, " ")
@@ -383,8 +355,7 @@ function stripTrailingSemicolonClause(sentence = "", stat = "") {
   const statIndex = s
     .toLowerCase()
     .indexOf(
-      String(stat)
-        .toLowerCase()
+      String(stat).toLowerCase()
     );
 
   if (
@@ -422,6 +393,89 @@ function containsUndefinedReference(text = "") {
   );
 }
 
+function isMalformedDonationQuestion(
+  question = "",
+  context = "",
+  sourceUrl = ""
+) {
+  const q = question
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const h =
+    `${context} ${sourceUrl}`.toLowerCase();
+
+  /*
+   * Cached failure:
+   * "How many people donated between $51 and $100?"
+   *
+   * If the material is specifically crowdfunding,
+   * the donor population must be stated.
+   */
+  if (
+    /^how many people\s+(donated|gave|contributed)\b/i.test(q) &&
+    /\bcrowdfund(?:ing|ed)?\b/.test(h)
+  ) {
+    return true;
+  }
+
+  /*
+   * Any "How many people donated..." question
+   * with a dollar range is too ambiguous without
+   * explicitly naming who those people were.
+   */
+  if (
+    /^how many people\s+(donated|gave|contributed)\b/i.test(q) &&
+    /\$\s*\d/.test(q)
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function isAmbiguousMultiYearQuestion(question = "") {
+  const q = question
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const years =
+    q.match(/\b(?:19|20)\d{2}\b/g) || [];
+
+  const uniqueYears =
+    [...new Set(years)];
+
+  if (uniqueYears.length < 2) {
+    return false;
+  }
+
+  /*
+   * Reject questions asking one statistic to
+   * represent a comparison across several years.
+   */
+  if (
+    /\b(compared|compare|versus|vs\.?|than)\b/i.test(q)
+  ) {
+    return true;
+  }
+
+  if (
+    /\bthis year\b/i.test(q)
+  ) {
+    return true;
+  }
+
+  if (
+    /\bin\s+(?:19|20)\d{2}\b[\s\S]{0,100}\band\b[\s\S]{0,100}\bin\s+(?:19|20)\d{2}\b/i.test(
+      q
+    )
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
 function hasBadQuestionLanguage(question = "") {
   const q = question
     .replace(/\s+/g, " ")
@@ -452,6 +506,12 @@ function hasBadQuestionLanguage(question = "") {
   }
 
   if (
+    isAmbiguousMultiYearQuestion(q)
+  ) {
+    return true;
+  }
+
+  if (
     /\bhow many\s+(donated|said|used|use|listening|watching|getting|prefer|agreed|believe|think)\b/i.test(
       q
     )
@@ -474,9 +534,8 @@ function hasBadQuestionLanguage(question = "") {
   }
 
   /*
-   * The finished question should not
-   * accidentally contain a second
-   * raw percentage or ratio.
+   * No second raw statistic should survive
+   * inside the finished question.
    */
   if (
     /\b\d{1,3}%\b/.test(q) ||
@@ -519,6 +578,24 @@ function isolateFindingClause(
   );
 
   if (containsUndefinedReference(s)) {
+    return "";
+  }
+
+  /*
+   * Comparative sentences spanning two or
+   * more explicit years are risky because
+   * one extracted stat may not clearly belong
+   * to one specific year.
+   */
+  const sentenceYears =
+    s.match(/\b(?:19|20)\d{2}\b/g) || [];
+
+  if (
+    new Set(sentenceYears).size >= 2 &&
+    /\b(compared|compare|versus|vs\.?|than|this year)\b/i.test(
+      s
+    )
+  ) {
     return "";
   }
 
@@ -664,10 +741,6 @@ function makeRatioQuestion(
       return "";
     }
 
-    /*
-     * About 1 in 5 Americans have used crypto
-     * -> How many Americans have used cryptocurrency?
-     */
     if (
       /^Americans\s+have used crypto\b/i.test(tail)
     ) {
@@ -692,11 +765,6 @@ function makeRatioQuestion(
       return `Among ${population}, how many ${tail}?`;
     }
 
-    /*
-     * "Americans have..."
-     * "young women get..."
-     * "adults say..."
-     */
     if (
       /^(Americans|Australians|adults|people|parents|workers|employees|consumers|respondents|listeners|viewers|shoppers|students|teens|teenagers|women|men|young women|young men)\b/i.test(
         tail
@@ -745,13 +813,6 @@ function makeRatioQuestion(
     return "";
   }
 
-  /*
-   * Special sports pattern:
-   *
-   * "Half the public are fans of sports,
-   * but it's the 1 in 5 who are super fans
-   * adopting sports streaming services."
-   */
   if (
     /\bsports\b/i.test(s) &&
     /^who are super fans\b/i.test(after)
@@ -802,15 +863,11 @@ function makeRatioQuestion(
         populationMatch[0]
       );
 
-    if (
-      /^who\b/i.test(after)
-    ) {
+    if (/^who\b/i.test(after)) {
       return `How many ${population} ${after}?`;
     }
 
-    if (
-      startsWithVerbPhrase(after)
-    ) {
+    if (startsWithVerbPhrase(after)) {
       return `How many ${population} ${after}?`;
     }
   }
@@ -1148,6 +1205,20 @@ function extractCandidates(
       continue;
     }
 
+    const sentenceYears =
+      sentence.match(
+        /\b(?:19|20)\d{2}\b/g
+      ) || [];
+
+    if (
+      new Set(sentenceYears).size >= 2 &&
+      /\b(compared|compare|versus|vs\.?|than|this year)\b/i.test(
+        sentence
+      )
+    ) {
+      continue;
+    }
+
     if (
       /\b(discount|off sale|battery|humidity|chance of rain)\b/i.test(
         sentence
@@ -1272,10 +1343,24 @@ function explainUsability(item) {
     return "standalone";
   }
 
-  /*
-   * This catches older cached items such as:
-   * "...Republicans' use has ticked up."
-   */
+  if (
+    isMalformedDonationQuestion(
+      item.question,
+      item.context || "",
+      item.source_url || ""
+    )
+  ) {
+    return "standalone";
+  }
+
+  if (
+    isAmbiguousMultiYearQuestion(
+      item.question
+    )
+  ) {
+    return "standalone";
+  }
+
   if (
     isPolitical(
       `${item.question} ${item.context || ""}`
@@ -1934,11 +2019,6 @@ function pickDailyRotation(
       )
     );
 
-  /*
-   * Pass 1:
-   * favor topic diversity and
-   * limit each source to two.
-   */
   for (
     const item of
     ordered
@@ -1980,11 +2060,6 @@ function pickDailyRotation(
     usedTopics.add(item.topic);
   }
 
-  /*
-   * Pass 2:
-   * allow repeat topics,
-   * retain source limit.
-   */
   for (
     const item of
     ordered
@@ -2017,11 +2092,6 @@ function pickDailyRotation(
     chosen.push(item);
   }
 
-  /*
-   * Pass 3:
-   * relax source limit only
-   * if necessary to fill widget.
-   */
   for (
     const item of
     ordered
@@ -2058,7 +2128,7 @@ async function fetchText(url) {
       {
         headers: {
           "user-agent":
-            "MediaJobsReport-SurveySays/2.3 (+https://www.mediajobsreport.com/)"
+            "MediaJobsReport-SurveySays/2.4 (+https://www.mediajobsreport.com/)"
         },
 
         redirect:
