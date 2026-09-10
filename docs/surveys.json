@@ -1,7 +1,49 @@
 {
-  "updated_at": "2026-09-09T16:49:59.200Z",
-  "count": 30,
+  "updated_at": "2026-09-10T08:32:16.992Z",
+  "count": 33,
   "items": [
+    {
+      "id": "f0f7a0b55993e408",
+      "topic": "Work",
+      "question": "What percentage of Americans see an upside locally agree that data centers would significantly contribute to economic growth and job creation in their community?",
+      "answer": "27%",
+      "stat": "27%",
+      "context": "Finding: Likewise, fewer Americans see an upside locally, as just 27% agree that data centers would significantly contribute to economic growth and job creation in their community.",
+      "talk": "Does this sound like your workplace, or is your experience completely different?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/latest-us-opinion-polls",
+      "source_date": "2026-09-09",
+      "published_at": "2026-09-09",
+      "auto_generated": true
+    },
+    {
+      "id": "3b459350ae2c53a7",
+      "topic": "Life & Culture",
+      "question": "What percentage of Americans are neutral on the visit's significance?",
+      "answer": "43%",
+      "stat": "43%",
+      "context": "Finding: A plurality of Americans, 43%, are neutral on the visit's significance.",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/latest-us-opinion-polls",
+      "source_date": "2026-09-09",
+      "published_at": "2026-09-09",
+      "auto_generated": true
+    },
+    {
+      "id": "de7ef3ee6fbb2291",
+      "topic": "Work",
+      "question": "How many employees at companies offering such training are more likely to feel supported and less worried about stigma have received it?",
+      "answer": "1 in 3",
+      "stat": "1 in 3",
+      "context": "Finding: Workplace mental health training may help; employees at companies offering such training are more likely to feel supported and less worried about stigma, yet only about one in three have received it.",
+      "talk": "Does this sound like your workplace, or is your experience completely different?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/latest-us-opinion-polls",
+      "source_date": "2026-09-09",
+      "published_at": "2026-09-09",
+      "auto_generated": true
+    },
     {
       "id": "a5a0027251a14974",
       "topic": "Family & Life",
