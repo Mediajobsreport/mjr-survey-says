@@ -1,7 +1,35 @@
 {
-  "updated_at": "2026-09-15T08:33:30.094Z",
-  "count": 33,
+  "updated_at": "2026-09-16T08:31:38.558Z",
+  "count": 34,
   "items": [
+    {
+      "id": "cfbf8638799e4672",
+      "topic": "Life & Culture",
+      "question": "How many Americans feel they don’t do enough each day?",
+      "answer": "7 in 10",
+      "stat": "7 in 10",
+      "context": "Finding: 7 in 10 Americans feel they don’t do enough each day",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/09/15/7-in-10-americans-feel-they-dont-do-enough-each-day/",
+      "source_date": "2026-09-15",
+      "published_at": "2026-09-15",
+      "auto_generated": true
+    },
+    {
+      "id": "435ea867e0fc94e7",
+      "topic": "Technology",
+      "question": "How many Americans express concern about the growth of AI data center construction?",
+      "answer": "7 in 10",
+      "stat": "7 in 10",
+      "context": "Finding: Nearly seven in ten Americans express concern about the growth of AI data center construction",
+      "talk": "What everyday task are you most willing to hand over to AI?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/news-polls/consumer-behavior-time-covid-19",
+      "source_date": "2026-09-15",
+      "published_at": "2026-09-15",
+      "auto_generated": true
+    },
     {
       "id": "f0f7a0b55993e408",
       "topic": "Work",
@@ -442,20 +470,6 @@
       "source_url": "https://apnorc.org/projects/more-people-are-enjoying-movies-from-the-comfort-of-home/?utm_source=rss&utm_medium=rss&utm_campaign=more-people-are-enjoying-movies-from-the-comfort-of-home",
       "source_date": "2025-09-25",
       "published_at": "2025-09-25",
-      "auto_generated": true
-    },
-    {
-      "id": "c59e7c089e9aa4c1",
-      "topic": "Entertainment",
-      "question": "How many sports fans watch a game at least a few times a week?",
-      "answer": "3 in 10",
-      "stat": "3 in 10",
-      "context": "Finding: Three in 10 sports fans watch a game at least a few times a week",
-      "talk": "Have streaming services made it easier or harder for you to watch the sports you want?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services/?utm_source=rss&utm_medium=rss&utm_campaign=half-the-public-are-sports-fans-but-its-the-1-in-5-who-are-super-fans-adopting-sports-streaming-services",
-      "source_date": "2025-09-16",
-      "published_at": "2025-09-16",
       "auto_generated": true
     }
   ]
