@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-09-17T08:31:41.352Z",
-  "count": 37,
+  "updated_at": "2026-09-18T08:30:29.163Z",
+  "count": 38,
   "items": [
+    {
+      "id": "87ae4f4404e6728c",
+      "topic": "Entertainment",
+      "question": "What percentage of Gen Z adult streamers are particularly responsive to these types of ads say they hold ‘a lot’ of influence for them?",
+      "answer": "32%",
+      "stat": "32%",
+      "context": "Finding: Gen Z adult streamers are particularly responsive to these types of ads, as 32% say they hold ‘a lot’ of influence for them.",
+      "talk": "Does this match your own viewing, listening or entertainment habits?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/more-streaming-more-discovery-how-americans-are-listening-to-music-in-2026/",
+      "source_date": "2026-09-17",
+      "published_at": "2026-09-17",
+      "auto_generated": true
+    },
     {
       "id": "204206521c23c851",
       "topic": "Shopping",
