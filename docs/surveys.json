@@ -1,7 +1,35 @@
 {
-  "updated_at": "2026-09-24T08:32:01.144Z",
-  "count": 39,
+  "updated_at": "2026-09-25T08:32:03.078Z",
+  "count": 40,
   "items": [
+    {
+      "id": "298bb53a45719b14",
+      "topic": "Shopping",
+      "question": "How many Americans Are ‘Very’ Loyal to Their Favorite Footwear Brands?",
+      "answer": "3 in 10",
+      "stat": "3 in 10",
+      "context": "Finding: Nearly 3 in 10 Americans Are ‘Very’ Loyal to Their Favorite Footwear Brands.",
+      "talk": "What purchase or shopping habit have you changed the most lately?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/nearly-3-in-10-americans-are-very-loyal-to-their-favorite-footwear-brands-heres-what-shapes-their-path-to-purchase/",
+      "source_date": "2026-09-24",
+      "published_at": "2026-09-24",
+      "auto_generated": true
+    },
+    {
+      "id": "c4214f37a758e851",
+      "topic": "Shopping",
+      "question": "How many Americans Are ‘Very’ Loyal to Their Favorite Footwear Brands. Here’s What Shapes Their Path to Purchase?",
+      "answer": "3 in 10",
+      "stat": "3 in 10",
+      "context": "Finding: Nearly 3 in 10 Americans Are ‘Very’ Loyal to Their Favorite Footwear Brands. Here’s What Shapes Their Path to Purchase",
+      "talk": "What purchase or shopping habit have you changed the most lately?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/nearly-3-in-10-americans-are-very-loyal-to-their-favorite-footwear-brands-heres-what-shapes-their-path-to-purchase/",
+      "source_date": "2026-09-24",
+      "published_at": "2026-09-24",
+      "auto_generated": true
+    },
     {
       "id": "d47639e12313ef93",
       "topic": "Food & Dining",
@@ -526,20 +554,6 @@
       "source_url": "https://apnorc.org/projects/epic-climate-change-2025/?utm_source=rss&utm_medium=rss&utm_campaign=epic-climate-change-2025",
       "source_date": "2025-10-23",
       "published_at": "2025-10-23",
-      "auto_generated": true
-    },
-    {
-      "id": "4f3f2f912ae41090",
-      "topic": "Entertainment",
-      "question": "What percentage of Americans have gone to see a movie at the theater at least once?",
-      "answer": "65%",
-      "stat": "65%",
-      "context": "Finding: Still, a majority of Americans, 65%, have gone to see a movie at the theater at least once.",
-      "talk": "Does this match your own viewing, listening or entertainment habits?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/more-people-are-enjoying-movies-from-the-comfort-of-home/?utm_source=rss&utm_medium=rss&utm_campaign=more-people-are-enjoying-movies-from-the-comfort-of-home",
-      "source_date": "2025-09-25",
-      "published_at": "2025-09-25",
       "auto_generated": true
     }
   ]
