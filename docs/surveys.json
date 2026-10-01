@@ -1,7 +1,35 @@
 {
-  "updated_at": "2026-09-30T14:57:44.175Z",
-  "count": 53,
+  "updated_at": "2026-10-01T15:29:21.445Z",
+  "count": 55,
   "items": [
+    {
+      "id": "ce5e1c1f67c8de3a",
+      "topic": "Life & Culture",
+      "question": "How many Americans judge others based on their coffee preferences, according to a new study?",
+      "answer": "1 in 3",
+      "stat": "1 in 3",
+      "context": "Finding: One in three Americans judge others based on their coffee preferences, according to a new study.",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/01/brew-haha-americans-secretly-judge-others-coffee-orders/",
+      "source_date": "2026-10-01",
+      "published_at": "2026-10-01",
+      "auto_generated": true
+    },
+    {
+      "id": "94566598fb10dd92",
+      "topic": "Work",
+      "question": "How many small businesses report offering benefits to their full-time employees, unchanged from last year, and nearly all recognize the importance of benefits to the employee experience?",
+      "answer": "7 in 10",
+      "stat": "7 in 10",
+      "context": "Finding: Seven in ten small businesses report offering benefits to their full-time employees, unchanged from last year, and nearly all recognize the importance of benefits to the employee experience.",
+      "talk": "Does this sound like your workplace, or is your experience completely different?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/small-business-sentiment-shows-uptick-economic-concerns-persist",
+      "source_date": "2026-09-30",
+      "published_at": "2026-09-30",
+      "auto_generated": true
+    },
     {
       "id": "5cd4723f518b61aa",
       "topic": "Shopping",
