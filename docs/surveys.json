@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-10-01T15:29:21.445Z",
-  "count": 55,
+  "updated_at": "2026-10-02T14:46:27.101Z",
+  "count": 56,
   "items": [
+    {
+      "id": "4511be648c3678e9",
+      "topic": "Technology",
+      "question": "How many online grocery shoppers also shop in-store, making the digital experience an important part of building loyalty across channels?",
+      "answer": "6 in 10",
+      "stat": "6 in 10",
+      "context": "Finding: Nearly six in ten online grocery shoppers also shop in-store, making the digital experience an important part of building loyalty across channels.",
+      "talk": "Would this number be higher or lower among your friends and coworkers?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/new-ipsos-study-finds-target-leads-grocery-delivery-while-safeway-ranks-first-curbside-pickup",
+      "source_date": "2026-10-01",
+      "published_at": "2026-10-01",
+      "auto_generated": true
+    },
     {
       "id": "ce5e1c1f67c8de3a",
       "topic": "Life & Culture",
@@ -87,20 +101,6 @@
       "auto_generated": true
     },
     {
-      "id": "60f51f6c721f8a14",
-      "topic": "Shopping",
-      "question": "How many people reject the idea that expensive clothes are necessarily better than less expensive ones, and as many say that brands are becoming less important as a deciding factor?",
-      "answer": "8 in 10",
-      "stat": "8 in 10",
-      "context": "Finding: More than eight in ten people reject the idea that expensive clothes are necessarily better than less expensive ones, and as many say that brands are becoming less important as a deciding factor.",
-      "talk": "What purchase or shopping habit have you changed the most lately?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/most-younger-americans-consider-cost-wear-metric-apparel-purchases",
-      "source_date": "2026-09-29",
-      "published_at": "2026-09-29",
-      "auto_generated": true
-    },
-    {
       "id": "cc92631ab149a035",
       "topic": "Technology",
       "question": "How many Americans have talked to a chatbot instead of their doctor?",
@@ -110,6 +110,20 @@
       "talk": "What everyday task are you most willing to hand over to AI?",
       "source": "Ipsos",
       "source_url": "https://www.ipsos.com/en-us/one-three-americans-have-talked-chatbot-instead-their-doctor",
+      "source_date": "2026-09-29",
+      "published_at": "2026-09-29",
+      "auto_generated": true
+    },
+    {
+      "id": "60f51f6c721f8a14",
+      "topic": "Shopping",
+      "question": "How many people reject the idea that expensive clothes are necessarily better than less expensive ones, and as many say that brands are becoming less important as a deciding factor?",
+      "answer": "8 in 10",
+      "stat": "8 in 10",
+      "context": "Finding: More than eight in ten people reject the idea that expensive clothes are necessarily better than less expensive ones, and as many say that brands are becoming less important as a deciding factor.",
+      "talk": "What purchase or shopping habit have you changed the most lately?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/most-younger-americans-consider-cost-wear-metric-apparel-purchases",
       "source_date": "2026-09-29",
       "published_at": "2026-09-29",
       "auto_generated": true
