@@ -1,7 +1,35 @@
 {
-  "updated_at": "2026-10-04T14:06:21.864Z",
-  "count": 56,
+  "updated_at": "2026-10-05T17:11:08.756Z",
+  "count": 58,
   "items": [
+    {
+      "id": "f75410a1581433cb",
+      "topic": "Entertainment",
+      "question": "What percentage of respondents said they have started their own game-day tradition have long-running traditions spanning three generations?",
+      "answer": "14%",
+      "stat": "14%",
+      "context": "Finding: Our team won from a far deficit on a day we were sitting in those chairs and we have sat in them ever since.” Thirty-seven percent of respondents said they have started their own game-day tradition, 14% have long-running traditions spanning three generations.",
+      "talk": "Does this match your own viewing, listening or entertainment habits?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/05/over-a-third-of-fans-actually-believe-their-rituals-affect-the-game/",
+      "source_date": "2026-10-05",
+      "published_at": "2026-10-05",
+      "auto_generated": true
+    },
+    {
+      "id": "51854c3b22428357",
+      "topic": "Money",
+      "question": "what percentage), the split among household income levels shifted?",
+      "answer": "70%",
+      "stat": "70%",
+      "context": "Finding: 70%), the split among household income levels shifted.",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/3-things-to-know-following-individual-journalists-when-americans-see-a-doctor-and-private-label-grocery-buying/",
+      "source_date": "2026-10-05",
+      "published_at": "2026-10-05",
+      "auto_generated": true
+    },
     {
       "id": "4511be648c3678e9",
       "topic": "Technology",
