@@ -1,7 +1,35 @@
 {
-  "updated_at": "2026-10-07T15:35:24.910Z",
-  "count": 59,
+  "updated_at": "2026-10-08T15:41:04.449Z",
+  "count": 61,
   "items": [
+    {
+      "id": "28622b2765136b1b",
+      "topic": "Money",
+      "question": "What percentage of Americans say, \"After paying my bills, I don't have any money left to spend on the things I want.\" While it's especially true of low-income Americans, it's also true in higher income households?",
+      "answer": "37%",
+      "stat": "37%",
+      "context": "Finding: 37% of Americans say, \"After paying my bills, I don't have any money left to spend on the things I want.\" While it's especially true of low-income Americans, it's also true in higher income households.",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/webinar-how-winning-brands-are-making-themselves-essential-tight-economy",
+      "source_date": "2026-10-07",
+      "published_at": "2026-10-07",
+      "auto_generated": true
+    },
+    {
+      "id": "7d9fd6cc58711273",
+      "topic": "Money",
+      "question": "How many Americans say they have favorite products that they aren't willing to switch?",
+      "answer": "2 in 3",
+      "stat": "2 in 3",
+      "context": "Finding: Two in three Americans say they have favorite products that they aren't willing to switch.",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/webinar-how-winning-brands-are-making-themselves-essential-tight-economy",
+      "source_date": "2026-10-07",
+      "published_at": "2026-10-07",
+      "auto_generated": true
+    },
     {
       "id": "0a8f631e908d7159",
       "topic": "Technology",
