@@ -1,7 +1,35 @@
 {
-  "updated_at": "2026-10-08T15:41:04.449Z",
-  "count": 61,
+  "updated_at": "2026-10-10T14:30:07.170Z",
+  "count": 62,
   "items": [
+    {
+      "id": "155850021043809c",
+      "topic": "Shopping",
+      "question": "What percentage of customers choose a brand because they expect the experience to be good, and when evaluating brands, personal experience consistently outweighs marketing or brand image?",
+      "answer": "70%",
+      "stat": "70%",
+      "context": "Finding: 70% of customers choose a brand because they expect the experience to be good, and when evaluating brands, personal experience consistently outweighs marketing or brand image.",
+      "talk": "What purchase or shopping habit have you changed the most lately?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/why-ai-efficiency-alone-isnt-enough-great-customer-experience",
+      "source_date": "2026-10-08",
+      "published_at": "2026-10-08",
+      "auto_generated": true
+    },
+    {
+      "id": "9d92a6d81a6c9684",
+      "topic": "Money",
+      "question": "How many higher-income households say this too?",
+      "answer": "3 in 10",
+      "stat": "3 in 10",
+      "context": "Finding: About three in ten higher-income households say this too.",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/updated-9-charts-explain-zero-sum-human-economy",
+      "source_date": "2026-10-08",
+      "published_at": "2026-10-08",
+      "auto_generated": true
+    },
     {
       "id": "28622b2765136b1b",
       "topic": "Money",
@@ -87,20 +115,6 @@
       "auto_generated": true
     },
     {
-      "id": "4511be648c3678e9",
-      "topic": "Technology",
-      "question": "How many online grocery shoppers also shop in-store, making the digital experience an important part of building loyalty across channels?",
-      "answer": "6 in 10",
-      "stat": "6 in 10",
-      "context": "Finding: Nearly six in ten online grocery shoppers also shop in-store, making the digital experience an important part of building loyalty across channels.",
-      "talk": "Would this number be higher or lower among your friends and coworkers?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/new-ipsos-study-finds-target-leads-grocery-delivery-while-safeway-ranks-first-curbside-pickup",
-      "source_date": "2026-10-05",
-      "published_at": "2026-10-05",
-      "auto_generated": true
-    },
-    {
       "id": "51854c3b22428357",
       "topic": "Money",
       "question": "what percentage), the split among household income levels shifted?",
@@ -110,6 +124,20 @@
       "talk": "Does this finding match the way you are spending, saving or giving right now?",
       "source": "CivicScience",
       "source_url": "https://civicscience.com/3-things-to-know-following-individual-journalists-when-americans-see-a-doctor-and-private-label-grocery-buying/",
+      "source_date": "2026-10-05",
+      "published_at": "2026-10-05",
+      "auto_generated": true
+    },
+    {
+      "id": "4511be648c3678e9",
+      "topic": "Technology",
+      "question": "How many online grocery shoppers also shop in-store, making the digital experience an important part of building loyalty across channels?",
+      "answer": "6 in 10",
+      "stat": "6 in 10",
+      "context": "Finding: Nearly six in ten online grocery shoppers also shop in-store, making the digital experience an important part of building loyalty across channels.",
+      "talk": "Would this number be higher or lower among your friends and coworkers?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/new-ipsos-study-finds-target-leads-grocery-delivery-while-safeway-ranks-first-curbside-pickup",
       "source_date": "2026-10-05",
       "published_at": "2026-10-05",
       "auto_generated": true
@@ -236,20 +264,6 @@
       "talk": "What purchase or shopping habit have you changed the most lately?",
       "source": "Ipsos",
       "source_url": "https://www.ipsos.com/en-us/most-younger-americans-consider-cost-wear-metric-apparel-purchases",
-      "source_date": "2026-09-29",
-      "published_at": "2026-09-29",
-      "auto_generated": true
-    },
-    {
-      "id": "155850021043809c",
-      "topic": "Shopping",
-      "question": "What percentage of customers choose a brand because they expect the experience to be good, and when evaluating brands, personal experience consistently outweighs marketing or brand image?",
-      "answer": "70%",
-      "stat": "70%",
-      "context": "Finding: 70% of customers choose a brand because they expect the experience to be good, and when evaluating brands, personal experience consistently outweighs marketing or brand image.",
-      "talk": "What purchase or shopping habit have you changed the most lately?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/why-ai-efficiency-alone-isnt-enough-great-customer-experience",
       "source_date": "2026-09-29",
       "published_at": "2026-09-29",
       "auto_generated": true
