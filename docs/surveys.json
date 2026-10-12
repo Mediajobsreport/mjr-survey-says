@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-10-11T14:56:42.004Z",
-  "count": 62,
+  "updated_at": "2026-10-12T17:59:35.680Z",
+  "count": 63,
   "items": [
+    {
+      "id": "401a14703af84f94",
+      "topic": "Money",
+      "question": "How many Americans found the average person estimates saving about $482.10 from following a friend’s advice have even saved upwards of $800?",
+      "answer": "1 in 7",
+      "stat": "1 in 7",
+      "context": "Finding: A poll of 2,000 Americans found the average person estimates saving about $482.10 from following a friend’s advice, and one in seven have even saved upwards of $800.",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/12/how-financially-savvy-friends-can-save-you-tons-of-cash/",
+      "source_date": "2026-10-12",
+      "published_at": "2026-10-12",
+      "auto_generated": true
+    },
     {
       "id": "155850021043809c",
       "topic": "Shopping",
