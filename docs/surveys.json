@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-10-12T17:59:35.680Z",
-  "count": 63,
+  "updated_at": "2026-10-13T16:03:55.239Z",
+  "count": 64,
   "items": [
+    {
+      "id": "2d2f80087cb18788",
+      "topic": "Life & Culture",
+      "question": "what percentage), but women represent the bigger opportunity?",
+      "answer": "19%",
+      "stat": "19%",
+      "context": "Finding: 19%), but women represent the bigger opportunity.",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/3-things-to-know-print-media-readership-strava-usage-and-americans-preferred-payment-methods/",
+      "source_date": "2026-10-12",
+      "published_at": "2026-10-12",
+      "auto_generated": true
+    },
     {
       "id": "401a14703af84f94",
       "topic": "Money",
