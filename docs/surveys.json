@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-10-14T13:46:27.294Z",
-  "count": 72,
+  "updated_at": "2026-10-15T13:28:49.485Z",
+  "count": 73,
   "items": [
+    {
+      "id": "0d112c1a59d5317d",
+      "topic": "Money",
+      "question": "What percentage of Americans had trouble paying for a basic necessity in the past year, with lower-income adults hit hardest?",
+      "answer": "44%",
+      "stat": "44%",
+      "context": "Finding: 44% of Americans had trouble paying for a basic necessity in the past year, with lower-income adults hit hardest.",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "Pew Research Center",
+      "source_url": "https://www.pewresearch.org/short-reads/2026/10/14/many-americans-are-struggling-to-afford-basic-necessities/",
+      "source_date": "2026-10-14",
+      "published_at": "2026-10-14",
+      "auto_generated": true
+    },
     {
       "id": "1538582b56b60255",
       "topic": "Work",
