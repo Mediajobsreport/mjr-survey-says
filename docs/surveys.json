@@ -1,7 +1,35 @@
 {
-  "updated_at": "2026-10-18T12:38:28.203Z",
-  "count": 73,
+  "updated_at": "2026-10-19T15:41:00.479Z",
+  "count": 75,
   "items": [
+    {
+      "id": "ed72a0a5900fc135",
+      "topic": "Food & Dining",
+      "question": "How many Americans are eating ultra-processed foods without realizing it, according to new research?",
+      "answer": "9 in 10",
+      "stat": "9 in 10",
+      "context": "Finding: Nine in 10 Americans are eating ultra-processed foods without realizing it, according to new research",
+      "talk": "Does this match the way you eat, order or dine out?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/19/survey-finds-americans-eat-more-ultra-processed-food-than-they-realize/",
+      "source_date": "2026-10-19",
+      "published_at": "2026-10-19",
+      "auto_generated": true
+    },
+    {
+      "id": "73a402c3a99feb7b",
+      "topic": "Work",
+      "question": "How many Americans may experience \"retirement drift\" — when retirement savings get fragmented, complicated, and harder to manage with each job change?",
+      "answer": "1 in 3",
+      "stat": "1 in 3",
+      "context": "Finding: One in three Americans may experience \"retirement drift\" — when retirement savings get fragmented, complicated, and harder to manage with each job change.",
+      "talk": "Does this sound like your workplace, or is your experience completely different?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/19/job-changes-lead-to-retirement-drift-for-americans-savings/",
+      "source_date": "2026-10-19",
+      "published_at": "2026-10-19",
+      "auto_generated": true
+    },
     {
       "id": "0d112c1a59d5317d",
       "topic": "Money",
