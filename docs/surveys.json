@@ -1,21 +1,7 @@
 {
-  "updated_at": "2026-10-19T15:41:00.479Z",
-  "count": 75,
+  "updated_at": "2026-10-20T13:35:38.847Z",
+  "count": 77,
   "items": [
-    {
-      "id": "ed72a0a5900fc135",
-      "topic": "Food & Dining",
-      "question": "How many Americans are eating ultra-processed foods without realizing it, according to new research?",
-      "answer": "9 in 10",
-      "stat": "9 in 10",
-      "context": "Finding: Nine in 10 Americans are eating ultra-processed foods without realizing it, according to new research",
-      "talk": "Does this match the way you eat, order or dine out?",
-      "source": "Talker Research",
-      "source_url": "https://talker.news/2026/10/19/survey-finds-americans-eat-more-ultra-processed-food-than-they-realize/",
-      "source_date": "2026-10-19",
-      "published_at": "2026-10-19",
-      "auto_generated": true
-    },
     {
       "id": "73a402c3a99feb7b",
       "topic": "Work",
@@ -26,6 +12,48 @@
       "talk": "Does this sound like your workplace, or is your experience completely different?",
       "source": "Talker Research",
       "source_url": "https://talker.news/2026/10/19/job-changes-lead-to-retirement-drift-for-americans-savings/",
+      "source_date": "2026-10-19",
+      "published_at": "2026-10-19",
+      "auto_generated": true
+    },
+    {
+      "id": "3793716150d9698a",
+      "topic": "Life & Culture",
+      "question": "How many Americans Regularly Get News on TikTok?",
+      "answer": "1 in 5",
+      "stat": "1 in 5",
+      "context": "Finding: 1 in 5 Americans Regularly Get News on TikTok",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "Pew Research Center",
+      "source_url": "https://www.pewresearch.org/short-reads/2026/10/19/1-in-5-americans-regularly-get-news-on-tiktok/",
+      "source_date": "2026-10-19",
+      "published_at": "2026-10-19",
+      "auto_generated": true
+    },
+    {
+      "id": "cf590b09e07ffcc4",
+      "topic": "Money",
+      "question": "How many U.S. adults now prepare frozen entrees at least once per week, led by Gen Z?",
+      "answer": "7 in 10",
+      "stat": "7 in 10",
+      "context": "Finding: Nearly 7 in 10 U.S. adults now prepare frozen entrees at least once per week, led by Gen Z.",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/3-things-to-know-utility-cost-concerns-frozen-entree-consumption-and-sports-betting-partnership-unease/",
+      "source_date": "2026-10-19",
+      "published_at": "2026-10-19",
+      "auto_generated": true
+    },
+    {
+      "id": "ed72a0a5900fc135",
+      "topic": "Food & Dining",
+      "question": "How many Americans are eating ultra-processed foods without realizing it, according to new research?",
+      "answer": "9 in 10",
+      "stat": "9 in 10",
+      "context": "Finding: Nine in 10 Americans are eating ultra-processed foods without realizing it, according to new research",
+      "talk": "Does this match the way you eat, order or dine out?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/19/survey-finds-americans-eat-more-ultra-processed-food-than-they-realize/",
       "source_date": "2026-10-19",
       "published_at": "2026-10-19",
       "auto_generated": true
