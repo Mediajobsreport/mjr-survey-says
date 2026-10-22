@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-10-21T13:51:25.271Z",
-  "count": 79,
+  "updated_at": "2026-10-22T13:50:00.215Z",
+  "count": 80,
   "items": [
+    {
+      "id": "71429af644fb3e72",
+      "topic": "Technology",
+      "question": "Among respondents open to use AI in purchase decisions, what percentage rated AI recommendations as very or somewhat influential?",
+      "answer": "73%",
+      "stat": "73%",
+      "context": "Finding: Among respondents open to using AI in purchase decisions, 73% rated AI recommendations as very or somewhat influential.",
+      "talk": "What everyday task are you most willing to hand over to AI?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/22/survey-finds-ai-tools-drive-64-to-buy-new-brands/",
+      "source_date": "2026-10-22",
+      "published_at": "2026-10-22",
+      "auto_generated": true
+    },
     {
       "id": "31544c690b451cee",
       "topic": "Life & Culture",
