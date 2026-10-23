@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-10-22T13:50:00.215Z",
-  "count": 80,
+  "updated_at": "2026-10-23T13:29:53.855Z",
+  "count": 79,
   "items": [
     {
       "id": "71429af644fb3e72",
@@ -1100,20 +1100,6 @@
       "source_url": "https://apnorc.org/projects/most-are-getting-into-the-halloween-spirit-but-the-holiday-has-not-fully-rebounded-post-pandemic/?utm_source=rss&utm_medium=rss&utm_campaign=most-are-getting-into-the-halloween-spirit-but-the-holiday-has-not-fully-rebounded-post-pandemic",
       "source_date": "2025-10-28",
       "published_at": "2025-10-28",
-      "auto_generated": true
-    },
-    {
-      "id": "39c30b3918038468",
-      "topic": "Money",
-      "question": "How many Americans across income levels cite the upfront price as a reason they would not purchase an EV?",
-      "answer": "8 in 10",
-      "stat": "8 in 10",
-      "context": "Finding: About 8 in 10 Americans across income levels cite the upfront price as a reason they would not purchase an EV.",
-      "talk": "Does this finding match the way you are spending, saving or giving right now?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/epic-climate-change-2025/?utm_source=rss&utm_medium=rss&utm_campaign=epic-climate-change-2025",
-      "source_date": "2025-10-23",
-      "published_at": "2025-10-23",
       "auto_generated": true
     }
   ]
