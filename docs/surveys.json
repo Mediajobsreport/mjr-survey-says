@@ -1,7 +1,35 @@
 {
-  "updated_at": "2026-10-25T13:13:05.569Z",
-  "count": 80,
+  "updated_at": "2026-10-26T15:14:44.478Z",
+  "count": 82,
   "items": [
+    {
+      "id": "c17449d924fe4d3b",
+      "topic": "Family & Life",
+      "question": "How many homeowners say they can’t fully relax on vacation because they’re too worried about their home, according to new research?",
+      "answer": "1 in 5",
+      "stat": "1 in 5",
+      "context": "Finding: One in five homeowners say they can’t fully relax on vacation because they’re too worried about their home, according to new research",
+      "talk": "Would your family or friends agree with this finding?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/26/no-1-worry-homeowners-have-after-theyve-already-left-home/",
+      "source_date": "2026-10-26",
+      "published_at": "2026-10-26",
+      "auto_generated": true
+    },
+    {
+      "id": "7b134ce16797beb6",
+      "topic": "Family & Life",
+      "question": "What percentage of respondents who admit to worrying about unlocked doors or appliances left on said the unknown has caused them to turn around to go back home and check?",
+      "answer": "59%",
+      "stat": "59%",
+      "context": "Finding: Of respondents who admit to worrying about unlocked doors or appliances left on, 59% said the unknown has caused them to turn around to go back home and check.",
+      "talk": "Would your family or friends agree with this finding?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/26/no-1-worry-homeowners-have-after-theyve-already-left-home/",
+      "source_date": "2026-10-26",
+      "published_at": "2026-10-26",
+      "auto_generated": true
+    },
     {
       "id": "f0f7a0b55993e408",
       "topic": "Work",
