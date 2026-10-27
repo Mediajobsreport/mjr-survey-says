@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-10-26T15:14:44.478Z",
-  "count": 82,
+  "updated_at": "2026-10-27T14:34:46.070Z",
+  "count": 85,
   "items": [
+    {
+      "id": "325f9f21b55f4a9d",
+      "topic": "Family & Life",
+      "question": "What percentage of adults ages 18 to 29 prefer a home-based activity?",
+      "answer": "62%",
+      "stat": "62%",
+      "context": "Finding: Even among adults ages 18 to 29, the group most likely to favor a night out, 62% prefer a home-based activity.",
+      "talk": "Would your family or friends agree with this finding?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/homebodies-how-americans-spend-their-free-time/",
+      "source_date": "2026-10-27",
+      "published_at": "2026-10-27",
+      "auto_generated": true
+    },
     {
       "id": "c17449d924fe4d3b",
       "topic": "Family & Life",
@@ -40,8 +54,8 @@
       "talk": "Does this sound like your workplace, or is your experience completely different?",
       "source": "Ipsos",
       "source_url": "https://www.ipsos.com/en-us/latest-us-opinion-polls",
-      "source_date": "2026-10-23",
-      "published_at": "2026-10-23",
+      "source_date": "2026-10-26",
+      "published_at": "2026-10-26",
       "auto_generated": true
     },
     {
@@ -54,8 +68,8 @@
       "talk": "Does this number surprise you, or does it sound about right?",
       "source": "Ipsos",
       "source_url": "https://www.ipsos.com/en-us/latest-us-opinion-polls",
-      "source_date": "2026-10-23",
-      "published_at": "2026-10-23",
+      "source_date": "2026-10-26",
+      "published_at": "2026-10-26",
       "auto_generated": true
     },
     {
@@ -68,8 +82,36 @@
       "talk": "Does this sound like your workplace, or is your experience completely different?",
       "source": "Ipsos",
       "source_url": "https://www.ipsos.com/en-us/latest-us-opinion-polls",
-      "source_date": "2026-10-23",
-      "published_at": "2026-10-23",
+      "source_date": "2026-10-26",
+      "published_at": "2026-10-26",
+      "auto_generated": true
+    },
+    {
+      "id": "98b6e652ce08f78e",
+      "topic": "Money",
+      "question": "How many Americans want to know more about non-traditional forms of finance?",
+      "answer": "1 in 5",
+      "stat": "1 in 5",
+      "context": "Finding: One in five Americans want to know more about non-traditional forms of finance",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/one-five-americans-want-know-more-about-non-traditional-forms-finance",
+      "source_date": "2026-10-26",
+      "published_at": "2026-10-26",
+      "auto_generated": true
+    },
+    {
+      "id": "cc26d2fc0490466d",
+      "topic": "Shopping",
+      "question": "What percentage of Americans still have funds left to use report they have no remaining FSA balance to spend?",
+      "answer": "14%",
+      "stat": "14%",
+      "context": "Finding: Consumer-reported data from CivicScience show that many Americans still have funds left to use, as just 14% report they have no remaining FSA balance to spend.",
+      "talk": "What purchase or shopping habit have you changed the most lately?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/3-things-to-know-fsa-spending-plans-popularity-of-anime-and-k-pop-belief-in-the-paranormal/",
+      "source_date": "2026-10-26",
+      "published_at": "2026-10-26",
       "auto_generated": true
     },
     {
