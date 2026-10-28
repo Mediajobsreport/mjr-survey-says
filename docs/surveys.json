@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-10-27T14:34:46.070Z",
-  "count": 85,
+  "updated_at": "2026-10-28T15:09:41.005Z",
+  "count": 87,
   "items": [
+    {
+      "id": "7f313e485fe1fcd9",
+      "topic": "Money",
+      "question": "How many Americans say the U.S. financial system is secure?",
+      "answer": "1 in 5",
+      "stat": "1 in 5",
+      "context": "Finding: Only one in five Americans say the U.S. financial system is secure",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/only-one-five-americans-say-us-financial-system-secure",
+      "source_date": "2026-10-27",
+      "published_at": "2026-10-27",
+      "auto_generated": true
+    },
     {
       "id": "325f9f21b55f4a9d",
       "topic": "Family & Life",
@@ -14,34 +28,6 @@
       "source_url": "https://civicscience.com/homebodies-how-americans-spend-their-free-time/",
       "source_date": "2026-10-27",
       "published_at": "2026-10-27",
-      "auto_generated": true
-    },
-    {
-      "id": "c17449d924fe4d3b",
-      "topic": "Family & Life",
-      "question": "How many homeowners say they can’t fully relax on vacation because they’re too worried about their home, according to new research?",
-      "answer": "1 in 5",
-      "stat": "1 in 5",
-      "context": "Finding: One in five homeowners say they can’t fully relax on vacation because they’re too worried about their home, according to new research",
-      "talk": "Would your family or friends agree with this finding?",
-      "source": "Talker Research",
-      "source_url": "https://talker.news/2026/10/26/no-1-worry-homeowners-have-after-theyve-already-left-home/",
-      "source_date": "2026-10-26",
-      "published_at": "2026-10-26",
-      "auto_generated": true
-    },
-    {
-      "id": "7b134ce16797beb6",
-      "topic": "Family & Life",
-      "question": "What percentage of respondents who admit to worrying about unlocked doors or appliances left on said the unknown has caused them to turn around to go back home and check?",
-      "answer": "59%",
-      "stat": "59%",
-      "context": "Finding: Of respondents who admit to worrying about unlocked doors or appliances left on, 59% said the unknown has caused them to turn around to go back home and check.",
-      "talk": "Would your family or friends agree with this finding?",
-      "source": "Talker Research",
-      "source_url": "https://talker.news/2026/10/26/no-1-worry-homeowners-have-after-theyve-already-left-home/",
-      "source_date": "2026-10-26",
-      "published_at": "2026-10-26",
       "auto_generated": true
     },
     {
@@ -110,6 +96,34 @@
       "talk": "What purchase or shopping habit have you changed the most lately?",
       "source": "CivicScience",
       "source_url": "https://civicscience.com/3-things-to-know-fsa-spending-plans-popularity-of-anime-and-k-pop-belief-in-the-paranormal/",
+      "source_date": "2026-10-26",
+      "published_at": "2026-10-26",
+      "auto_generated": true
+    },
+    {
+      "id": "c17449d924fe4d3b",
+      "topic": "Family & Life",
+      "question": "How many homeowners say they can’t fully relax on vacation because they’re too worried about their home, according to new research?",
+      "answer": "1 in 5",
+      "stat": "1 in 5",
+      "context": "Finding: One in five homeowners say they can’t fully relax on vacation because they’re too worried about their home, according to new research",
+      "talk": "Would your family or friends agree with this finding?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/26/no-1-worry-homeowners-have-after-theyve-already-left-home/",
+      "source_date": "2026-10-26",
+      "published_at": "2026-10-26",
+      "auto_generated": true
+    },
+    {
+      "id": "7b134ce16797beb6",
+      "topic": "Family & Life",
+      "question": "What percentage of respondents who admit to worrying about unlocked doors or appliances left on said the unknown has caused them to turn around to go back home and check?",
+      "answer": "59%",
+      "stat": "59%",
+      "context": "Finding: Of respondents who admit to worrying about unlocked doors or appliances left on, 59% said the unknown has caused them to turn around to go back home and check.",
+      "talk": "Would your family or friends agree with this finding?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/10/26/no-1-worry-homeowners-have-after-theyve-already-left-home/",
       "source_date": "2026-10-26",
       "published_at": "2026-10-26",
       "auto_generated": true
@@ -224,6 +238,34 @@
       "source_url": "https://talker.news/2026/10/19/survey-finds-americans-eat-more-ultra-processed-food-than-they-realize/",
       "source_date": "2026-10-19",
       "published_at": "2026-10-19",
+      "auto_generated": true
+    },
+    {
+      "id": "6a76eff007e30aad",
+      "topic": "Technology",
+      "question": "How many Americans say brands that feel human and imperfect stick with them more than polished AI-generated marketing?",
+      "answer": "4 in 5",
+      "stat": "4 in 5",
+      "context": "Finding: Four in five Americans say brands that feel human and imperfect stick with them more than polished AI-generated marketing.",
+      "talk": "What everyday task are you most willing to hand over to AI?",
+      "source": "The Harris Poll",
+      "source_url": "https://theharrispoll.com/articles/america-this-week-october-15-2026/",
+      "source_date": "2026-10-15",
+      "published_at": "2026-10-15",
+      "auto_generated": true
+    },
+    {
+      "id": "ee87f7bd1b7e8b15",
+      "topic": "Work",
+      "question": "How many Gen Z / Millennials say the future they were promised growing up – a steady job, an affordable home, a family – hasn’t turned out to be real?",
+      "answer": "7 in 10",
+      "stat": "7 in 10",
+      "context": "Finding: Seven in ten Gen Z / Millennials say the future they were promised growing up – a steady job, an affordable home, a family – hasn’t turned out to be real.",
+      "talk": "Does this sound like your workplace, or is your experience completely different?",
+      "source": "The Harris Poll",
+      "source_url": "https://theharrispoll.com/articles/america-this-week-october-15-2026/",
+      "source_date": "2026-10-15",
+      "published_at": "2026-10-15",
       "auto_generated": true
     },
     {
@@ -1170,20 +1212,6 @@
       "source_url": "https://apnorc.org/projects/gift-cards-and-cash-are-viewed-as-more-appropriate-holiday-gifts-than-second-hand-items-or-regifting/?utm_source=rss&utm_medium=rss&utm_campaign=gift-cards-and-cash-are-viewed-as-more-appropriate-holiday-gifts-than-second-hand-items-or-regifting",
       "source_date": "2025-12-17",
       "published_at": "2025-12-17",
-      "auto_generated": true
-    },
-    {
-      "id": "e99090b23bf55cee",
-      "topic": "Family & Life",
-      "question": "what percentage), especially when it comes to wearing or dressing up children in costumes, decorating homes, taking children trick or treating, and carving pumpkins?",
-      "answer": "62%",
-      "stat": "62%",
-      "context": "Finding: 62%), especially when it comes to wearing or dressing up children in costumes, decorating homes, taking children trick or treating, and carving pumpkins.",
-      "talk": "Would your family or friends agree with this finding?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/most-are-getting-into-the-halloween-spirit-but-the-holiday-has-not-fully-rebounded-post-pandemic/?utm_source=rss&utm_medium=rss&utm_campaign=most-are-getting-into-the-halloween-spirit-but-the-holiday-has-not-fully-rebounded-post-pandemic",
-      "source_date": "2025-10-28",
-      "published_at": "2025-10-28",
       "auto_generated": true
     }
   ]
