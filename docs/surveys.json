@@ -1,7 +1,35 @@
 {
-  "updated_at": "2026-10-30T15:04:58.400Z",
+  "updated_at": "2026-10-31T14:34:05.803Z",
   "count": 89,
   "items": [
+    {
+      "id": "28622b2765136b1b",
+      "topic": "Money",
+      "question": "What percentage of Americans say, \"After paying my bills, I don't have any money left to spend on the things I want.\" While it's especially true of low-income Americans, it's also true in higher income households?",
+      "answer": "37%",
+      "stat": "37%",
+      "context": "Finding: 37% of Americans say, \"After paying my bills, I don't have any money left to spend on the things I want.\" While it's especially true of low-income Americans, it's also true in higher income households.",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/webinar-how-winning-brands-are-making-themselves-essential-tight-economy",
+      "source_date": "2026-10-29",
+      "published_at": "2026-10-29",
+      "auto_generated": true
+    },
+    {
+      "id": "7d9fd6cc58711273",
+      "topic": "Money",
+      "question": "How many Americans say they have favorite products that they aren't willing to switch?",
+      "answer": "2 in 3",
+      "stat": "2 in 3",
+      "context": "Finding: Two in three Americans say they have favorite products that they aren't willing to switch.",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/webinar-how-winning-brands-are-making-themselves-essential-tight-economy",
+      "source_date": "2026-10-29",
+      "published_at": "2026-10-29",
+      "auto_generated": true
+    },
     {
       "id": "feabe01998461467",
       "topic": "Technology",
@@ -14,6 +42,20 @@
       "source_url": "https://talker.news/2026/10/29/trust-robots-over-doctors-many-ai-users-already-do/",
       "source_date": "2026-10-29",
       "published_at": "2026-10-29",
+      "auto_generated": true
+    },
+    {
+      "id": "303476449717f4f2",
+      "topic": "Life & Culture",
+      "question": "How many Americans plan holiday cutbacks amid economic concerns?",
+      "answer": "2 in 3",
+      "stat": "2 in 3",
+      "context": "Finding: Two in three Americans plan holiday cutbacks amid economic concerns",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/two-three-americans-plan-holiday-cutbacks-amid-economic-concerns",
+      "source_date": "2026-10-28",
+      "published_at": "2026-10-28",
       "auto_generated": true
     },
     {
@@ -59,17 +101,17 @@
       "auto_generated": true
     },
     {
-      "id": "303476449717f4f2",
-      "topic": "Life & Culture",
-      "question": "How many Americans plan holiday cutbacks amid economic concerns?",
-      "answer": "2 in 3",
-      "stat": "2 in 3",
-      "context": "Finding: Two in three Americans plan holiday cutbacks amid economic concerns",
-      "talk": "Does this number surprise you, or does it sound about right?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/two-three-americans-plan-holiday-cutbacks-amid-economic-concerns",
-      "source_date": "2026-10-28",
-      "published_at": "2026-10-28",
+      "id": "325f9f21b55f4a9d",
+      "topic": "Family & Life",
+      "question": "What percentage of adults ages 18 to 29 prefer a home-based activity?",
+      "answer": "62%",
+      "stat": "62%",
+      "context": "Finding: Even among adults ages 18 to 29, the group most likely to favor a night out, 62% prefer a home-based activity.",
+      "talk": "Would your family or friends agree with this finding?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/homebodies-how-americans-spend-their-free-time/",
+      "source_date": "2026-10-27",
+      "published_at": "2026-10-27",
       "auto_generated": true
     },
     {
@@ -82,20 +124,6 @@
       "talk": "Does this finding match the way you are spending, saving or giving right now?",
       "source": "Ipsos",
       "source_url": "https://www.ipsos.com/en-us/only-one-five-americans-say-us-financial-system-secure",
-      "source_date": "2026-10-27",
-      "published_at": "2026-10-27",
-      "auto_generated": true
-    },
-    {
-      "id": "325f9f21b55f4a9d",
-      "topic": "Family & Life",
-      "question": "What percentage of adults ages 18 to 29 prefer a home-based activity?",
-      "answer": "62%",
-      "stat": "62%",
-      "context": "Finding: Even among adults ages 18 to 29, the group most likely to favor a night out, 62% prefer a home-based activity.",
-      "talk": "Would your family or friends agree with this finding?",
-      "source": "CivicScience",
-      "source_url": "https://civicscience.com/homebodies-how-americans-spend-their-free-time/",
       "source_date": "2026-10-27",
       "published_at": "2026-10-27",
       "auto_generated": true
@@ -504,34 +532,6 @@
       "source_url": "https://www.ipsos.com/en-us/updated-9-charts-explain-zero-sum-human-economy",
       "source_date": "2026-10-08",
       "published_at": "2026-10-08",
-      "auto_generated": true
-    },
-    {
-      "id": "28622b2765136b1b",
-      "topic": "Money",
-      "question": "What percentage of Americans say, \"After paying my bills, I don't have any money left to spend on the things I want.\" While it's especially true of low-income Americans, it's also true in higher income households?",
-      "answer": "37%",
-      "stat": "37%",
-      "context": "Finding: 37% of Americans say, \"After paying my bills, I don't have any money left to spend on the things I want.\" While it's especially true of low-income Americans, it's also true in higher income households.",
-      "talk": "Does this finding match the way you are spending, saving or giving right now?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/webinar-how-winning-brands-are-making-themselves-essential-tight-economy",
-      "source_date": "2026-10-07",
-      "published_at": "2026-10-07",
-      "auto_generated": true
-    },
-    {
-      "id": "7d9fd6cc58711273",
-      "topic": "Money",
-      "question": "How many Americans say they have favorite products that they aren't willing to switch?",
-      "answer": "2 in 3",
-      "stat": "2 in 3",
-      "context": "Finding: Two in three Americans say they have favorite products that they aren't willing to switch.",
-      "talk": "Does this finding match the way you are spending, saving or giving right now?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/webinar-how-winning-brands-are-making-themselves-essential-tight-economy",
-      "source_date": "2026-10-07",
-      "published_at": "2026-10-07",
       "auto_generated": true
     },
     {
