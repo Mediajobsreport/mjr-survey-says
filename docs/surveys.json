@@ -1,7 +1,49 @@
 {
-  "updated_at": "2026-11-01T15:14:43.614Z",
-  "count": 89,
+  "updated_at": "2026-11-02T18:26:49.460Z",
+  "count": 92,
   "items": [
+    {
+      "id": "a1dd2677c6e9484e",
+      "topic": "Life & Culture",
+      "question": "What percentage of respondents are refreshing how they approach the holidays agree that the typical way they […] The post How are Americans giving holiday traditions makeovers? appeared first on Talker?",
+      "answer": "44%",
+      "stat": "44%",
+      "context": "Finding: The survey of 2,000 American homeowners with backyards looked at how many respondents are refreshing how they approach the holidays, finding that 44% agree that the typical way they […] The post How are Americans giving holiday traditions makeovers? appeared f",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/11/02/how-are-americans-giving-holiday-traditions-makeovers/",
+      "source_date": "2026-11-02",
+      "published_at": "2026-11-02",
+      "auto_generated": true
+    },
+    {
+      "id": "2dc187833479bc91",
+      "topic": "Life & Culture",
+      "question": "What percentage of respondents are refreshing how they approach the holidays agree that the typical way they celebrate feels tired?",
+      "answer": "44%",
+      "stat": "44%",
+      "context": "Finding: The survey of 2,000 American homeowners with backyards looked at how many respondents are refreshing how they approach the holidays, finding that 44% agree that the typical way they celebrate feels tired.",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/11/02/how-are-americans-giving-holiday-traditions-makeovers/",
+      "source_date": "2026-11-02",
+      "published_at": "2026-11-02",
+      "auto_generated": true
+    },
+    {
+      "id": "d0cb5df0758a6604",
+      "topic": "Money",
+      "question": "What percentage of respondents are spending time outdoors even beyond the holidays want their home to be guest-ready all year round?",
+      "answer": "58%",
+      "stat": "58%",
+      "context": "Finding: The survey also looked at how respondents are spending time outdoors even beyond the holidays, finding that 58% want their home to be guest-ready all year round.",
+      "talk": "Does this finding match the way you are spending, saving or giving right now?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/11/02/how-are-americans-giving-holiday-traditions-makeovers/",
+      "source_date": "2026-11-02",
+      "published_at": "2026-11-02",
+      "auto_generated": true
+    },
     {
       "id": "28622b2765136b1b",
       "topic": "Money",
