@@ -1,7 +1,49 @@
 {
-  "updated_at": "2026-11-04T16:22:32.794Z",
-  "count": 95,
+  "updated_at": "2026-11-05T16:30:22.219Z",
+  "count": 97,
   "items": [
+    {
+      "id": "7e7c3b29f4d26ca5",
+      "topic": "Health",
+      "question": "What percentage of Americans have no concerns if their doctor were to recommend that they get screened for lung cancer?",
+      "answer": "40%",
+      "stat": "40%",
+      "context": "Finding: A plurality of Americans, 40%, have no concerns if their doctor were to recommend that they get screened for lung cancer.",
+      "talk": "Has this changed the way you think about your own health choices?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/americans-are-open-lung-cancer-screening",
+      "source_date": "2026-11-05",
+      "published_at": "2026-11-05",
+      "auto_generated": true
+    },
+    {
+      "id": "dfc16bc84bdd661c",
+      "topic": "Life & Culture",
+      "question": "What percentage of Americans believe that if someone smokes, they still deserve compassion when dealing with a lung cancer diagnosis?",
+      "answer": "61%",
+      "stat": "61%",
+      "context": "Finding: 61% of Americans believe that if someone smokes, they still deserve compassion when dealing with a lung cancer diagnosis.",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/americans-are-open-lung-cancer-screening",
+      "source_date": "2026-11-05",
+      "published_at": "2026-11-05",
+      "auto_generated": true
+    },
+    {
+      "id": "04f8f9e7e7f546ac",
+      "topic": "Technology",
+      "question": "What percentage of Online Shoppers Abandon Their Online Shopping Carts Often, But It’s Not a Lost Cause for Retailers?",
+      "answer": "65%",
+      "stat": "65%",
+      "context": "Finding: 65% of Online Shoppers Abandon Their Online Shopping Carts Often, But It’s Not a Lost Cause for Retailers",
+      "talk": "Would this number be higher or lower among your friends and coworkers?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/65-of-online-shoppers-abandon-their-online-shopping-carts-often-but-its-not-a-lost-cause-for-retailers/",
+      "source_date": "2026-11-04",
+      "published_at": "2026-11-04",
+      "auto_generated": true
+    },
     {
       "id": "c66d4f20a6e6f8a7",
       "topic": "Money",
@@ -26,20 +68,6 @@
       "talk": "Does this finding match the way you are spending, saving or giving right now?",
       "source": "Talker Research",
       "source_url": "https://talker.news/2026/11/04/six-in-10-americans-keep-secret-money-from-their-partners/",
-      "source_date": "2026-11-04",
-      "published_at": "2026-11-04",
-      "auto_generated": true
-    },
-    {
-      "id": "04f8f9e7e7f546ac",
-      "topic": "Technology",
-      "question": "What percentage of Online Shoppers Abandon Their Online Shopping Carts Often, But It’s Not a Lost Cause for Retailers?",
-      "answer": "65%",
-      "stat": "65%",
-      "context": "Finding: 65% of Online Shoppers Abandon Their Online Shopping Carts Often, But It’s Not a Lost Cause for Retailers",
-      "talk": "Would this number be higher or lower among your friends and coworkers?",
-      "source": "CivicScience",
-      "source_url": "https://civicscience.com/65-of-online-shoppers-abandon-their-online-shopping-carts-often-but-its-not-a-lost-cause-for-retailers/",
       "source_date": "2026-11-04",
       "published_at": "2026-11-04",
       "auto_generated": true
