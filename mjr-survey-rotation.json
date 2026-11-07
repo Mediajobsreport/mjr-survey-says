@@ -1,6 +1,18 @@
 {
   "history": [
     {
+      "date": "2026-11-07",
+      "ids": [
+        "31544c690b451cee",
+        "98b6e652ce08f78e",
+        "73a402c3a99feb7b",
+        "6a76eff007e30aad",
+        "8acafbcf2792490f",
+        "ipsos-fastfood-human-20260828",
+        "5082294ac5389b54"
+      ]
+    },
+    {
       "date": "2026-11-06",
       "ids": [
         "7b134ce16797beb6",
@@ -346,18 +358,6 @@
         "9ef20ba8a084536b",
         "ipsos-streaming-cancel-20260424",
         "a71d3137e8948dc3"
-      ]
-    },
-    {
-      "date": "2026-10-07",
-      "ids": [
-        "0a8f631e908d7159",
-        "5cd4723f518b61aa",
-        "f64dddda503b1d19",
-        "14f6c23b2aac62ff",
-        "5c1679aff625f459",
-        "ipsos-fastfood-human-20260828",
-        "5b8219cf60d8502f"
       ]
     }
   ]
