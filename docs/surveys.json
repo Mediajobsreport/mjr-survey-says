@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-11-10T16:27:42.684Z",
-  "count": 98,
+  "updated_at": "2026-11-11T16:14:18.710Z",
+  "count": 99,
   "items": [
+    {
+      "id": "99729520d363d782",
+      "topic": "Family & Life",
+      "question": "What percentage of parents of teenagers ages 13 to 17 revealed that agree that their kid has a better grasp on finances than they do?",
+      "answer": "46%",
+      "stat": "46%",
+      "context": "Finding: A survey of 2,000 parents of teenagers ages 13 to 17 revealed that 46% agree that their kid has a better grasp on finances than they do.",
+      "talk": "Would your family or friends agree with this finding?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/11/11/do-teens-know-money-better-than-their-parents/",
+      "source_date": "2026-11-11",
+      "published_at": "2026-11-11",
+      "auto_generated": true
+    },
     {
       "id": "06797e0eea223aaa",
       "topic": "Work",
