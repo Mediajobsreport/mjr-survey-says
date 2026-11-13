@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-11-12T16:50:53.212Z",
-  "count": 99,
+  "updated_at": "2026-11-13T16:29:33.593Z",
+  "count": 100,
   "items": [
+    {
+      "id": "b0ed0fa601ff64fd",
+      "topic": "Life & Culture",
+      "question": "what percentage). ‘Happy’ Americans also stand apart beyond those trends?",
+      "answer": "25%",
+      "stat": "25%",
+      "context": "Finding: 25%). ‘Happy’ Americans also stand apart beyond those trends.",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/from-a-record-low-to-a-5-year-high-whats-behind-americans-happiness-rebound/",
+      "source_date": "2026-11-12",
+      "published_at": "2026-11-12",
+      "auto_generated": true
+    },
     {
       "id": "99729520d363d782",
       "topic": "Family & Life",
