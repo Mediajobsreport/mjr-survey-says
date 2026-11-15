@@ -1,21 +1,7 @@
 {
-  "updated_at": "2026-11-14T15:08:24.563Z",
-  "count": 100,
+  "updated_at": "2026-11-15T15:41:10.548Z",
+  "count": 96,
   "items": [
-    {
-      "id": "b0ed0fa601ff64fd",
-      "topic": "Life & Culture",
-      "question": "what percentage). ‘Happy’ Americans also stand apart beyond those trends?",
-      "answer": "25%",
-      "stat": "25%",
-      "context": "Finding: 25%). ‘Happy’ Americans also stand apart beyond those trends.",
-      "talk": "Does this number surprise you, or does it sound about right?",
-      "source": "CivicScience",
-      "source_url": "https://civicscience.com/from-a-record-low-to-a-5-year-high-whats-behind-americans-happiness-rebound/",
-      "source_date": "2026-11-12",
-      "published_at": "2026-11-12",
-      "auto_generated": true
-    },
     {
       "id": "99729520d363d782",
       "topic": "Family & Life",
@@ -633,20 +619,6 @@
       "auto_generated": true
     },
     {
-      "id": "2d2f80087cb18788",
-      "topic": "Life & Culture",
-      "question": "what percentage), but women represent the bigger opportunity?",
-      "answer": "19%",
-      "stat": "19%",
-      "context": "Finding: 19%), but women represent the bigger opportunity.",
-      "talk": "Does this number surprise you, or does it sound about right?",
-      "source": "CivicScience",
-      "source_url": "https://civicscience.com/3-things-to-know-print-media-readership-strava-usage-and-americans-preferred-payment-methods/",
-      "source_date": "2026-10-12",
-      "published_at": "2026-10-12",
-      "auto_generated": true
-    },
-    {
       "id": "401a14703af84f94",
       "topic": "Money",
       "question": "How many Americans found the average person estimates saving about $482.10 from following a friend’s advice have even saved upwards of $800?",
@@ -700,20 +672,6 @@
       "source_url": "https://talker.news/2026/10/07/why-nearly-3-in-5-agree-brands-must-disclose-ai-use/",
       "source_date": "2026-10-07",
       "published_at": "2026-10-07",
-      "auto_generated": true
-    },
-    {
-      "id": "51854c3b22428357",
-      "topic": "Money",
-      "question": "what percentage), the split among household income levels shifted?",
-      "answer": "70%",
-      "stat": "70%",
-      "context": "Finding: 70%), the split among household income levels shifted.",
-      "talk": "Does this finding match the way you are spending, saving or giving right now?",
-      "source": "CivicScience",
-      "source_url": "https://civicscience.com/3-things-to-know-following-individual-journalists-when-americans-see-a-doctor-and-private-label-grocery-buying/",
-      "source_date": "2026-10-05",
-      "published_at": "2026-10-05",
       "auto_generated": true
     },
     {
@@ -1319,20 +1277,6 @@
       "answer": "58%",
       "stat": "58%",
       "context": "Finding: Among donors, 58% contributed $50 or less for their most recent donation.",
-      "talk": "Have you ever donated to a crowdfunding campaign? What made you decide to give?",
-      "source": "AP-NORC Center",
-      "source_url": "https://apnorc.org/projects/crowdfunding-contributions-tend-to-be-small-donations-to-help-others-in-need/?utm_source=rss&utm_medium=rss&utm_campaign=crowdfunding-contributions-tend-to-be-small-donations-to-help-others-in-need",
-      "source_date": "2026-01-08",
-      "published_at": "2026-01-08",
-      "auto_generated": true
-    },
-    {
-      "id": "fc384fa01ba4449e",
-      "topic": "Money",
-      "question": "what percentage), those in higher income households do not make larger donations on average?",
-      "answer": "14%",
-      "stat": "14%",
-      "context": "Finding: 14%), those in higher income households do not make larger donations on average.",
       "talk": "Have you ever donated to a crowdfunding campaign? What made you decide to give?",
       "source": "AP-NORC Center",
       "source_url": "https://apnorc.org/projects/crowdfunding-contributions-tend-to-be-small-donations-to-help-others-in-need/?utm_source=rss&utm_medium=rss&utm_campaign=crowdfunding-contributions-tend-to-be-small-donations-to-help-others-in-need",
