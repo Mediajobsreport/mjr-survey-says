@@ -1,0 +1,20 @@
+<!-- MJR SURVEY SAYS - STABLE 3/5/7 SWITCHER -->
+<div id="mjrSurveyWrap" style="width:100%;margin:0;padding:0;">
+  <iframe id="mjrSurveyFrame" src="https://mediajobsreport.github.io/mjr-survey-says/survey-says-3.html?fit=2" title="MJR Survey Says" loading="eager" scrolling="auto" style="display:block;width:100%;height:500px;border:0;margin:0;padding:0;overflow:hidden;"></iframe>
+  <div style="display:flex;justify-content:center;gap:6px;padding:8px 10px;background:#fff;border:1px solid #dfe5ee;border-top:0;border-radius:0 0 10px 10px;">
+    <button type="button" data-count="3" style="border:1px solid #192A56;border-radius:6px;background:#192A56;color:#fff;padding:6px 10px;font:700 11px/1 Roboto,Arial,sans-serif;cursor:pointer;">Show Less</button>
+    <button type="button" data-count="5" style="border:1px solid #cfd7e5;border-radius:6px;background:#fff;color:#192A56;padding:6px 10px;font:700 11px/1 Roboto,Arial,sans-serif;cursor:pointer;">Show 5</button>
+    <button type="button" data-count="7" style="border:1px solid #cfd7e5;border-radius:6px;background:#fff;color:#192A56;padding:6px 10px;font:700 11px/1 Roboto,Arial,sans-serif;cursor:pointer;">Show 7</button>
+  </div>
+</div>
+
+<script>
+(function(){
+var frame=document.getElementById('mjrSurveyFrame'),wrap=document.getElementById('mjrSurveyWrap');if(!frame||!wrap)return;
+var origin='https://mediajobsreport.github.io',buttons=wrap.querySelectorAll('button[data-count]');
+function measure(){if(frame.contentWindow)frame.contentWindow.postMessage({type:'mjr-survey-measure'},origin);}
+window.addEventListener('message',function(event){if(event.origin!==origin||event.source!==frame.contentWindow)return;var data=event.data;if(!data||data.type!=='mjr-survey-height'||data.path!==new URL(frame.src).pathname)return;var height=Number(data.height);if(!Number.isFinite(height)||height<100||height>20000)return;frame.style.height=Math.ceil(height)+'px';frame.setAttribute('scrolling','no');frame.dataset.measuredHeight=String(Math.ceil(height));});
+frame.addEventListener('load',measure);window.addEventListener('resize',measure);window.addEventListener('pageshow',measure);
+buttons.forEach(function(button){button.setAttribute('aria-pressed',button.getAttribute('data-count')==='3'?'true':'false');button.addEventListener('click',function(){var n=Number(button.getAttribute('data-count'));if([3,5,7].indexOf(n)<0)return;frame.setAttribute('scrolling','auto');frame.src=origin+'/mjr-survey-says/survey-says-'+n+'.html?fit=2&v='+Date.now();buttons.forEach(function(b){var active=b===button;b.style.background=active?'#192A56':'#fff';b.style.color=active?'#fff':'#192A56';b.style.borderColor=active?'#192A56':'#cfd7e5';b.setAttribute('aria-pressed',String(active));});});});measure();
+})();
+</script>
