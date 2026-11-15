@@ -792,10 +792,20 @@ function questionLeaksPreStatClause(item) {
   return leaked.length > 0;
 }
 
+function hasUnbalancedParentheses(text = '') {
+  let depth = 0;
+  for (const char of String(text)) {
+    if (char === '(') depth++;
+    if (char === ')' && --depth < 0) return true;
+  }
+  return depth !== 0;
+}
+
 function finalBroadcastQualityGate(item) {
   if (!item || !item.question) return false;
   const q = String(item.question).replace(/\s+/g, ' ').trim();
 
+  if (hasUnbalancedParentheses(q) || hasUnbalancedParentheses(item.context || '')) return false;
   if (q.length < 25 || q.length > 240) return false;
   if (!/\?$/.test(q)) return false;
   if (containsVisibleStat(q)) return false;
@@ -904,6 +914,12 @@ html,body{margin:0;padding:0;background:transparent;font-family:Roboto,Arial,san
 #mjrSurveySays .mjrss-answerlabel{display:block;margin-top:4px;color:var(--mjrss-muted);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
 @media(max-width:680px){#mjrSurveySays .mjrss-card{grid-template-columns:minmax(0,1fr) 84px;gap:8px;padding:9px 10px}#mjrSurveySays .mjrss-question{font-size:14px}#mjrSurveySays .mjrss-context,#mjrSurveySays .mjrss-talk{font-size:11.5px}#mjrSurveySays .mjrss-stat{font-size:20px}}
 @media(max-width:480px){#mjrSurveySays .mjrss-card{grid-template-columns:1fr}#mjrSurveySays .mjrss-statbox{justify-self:start;min-width:84px}}
+
+/* Match MJR Prep section headers. */
+#mjrSurveySays{border:0;border-radius:0}
+#mjrSurveySays .mjrss-head{width:100%;border:1px solid #192a56;border-left:6px solid #50a7d0;padding:16px 20px}
+#mjrSurveySays .mjrss-head h2{font-size:21px;line-height:1.3;letter-spacing:.04em}
+@media(max-width:600px){#mjrSurveySays .mjrss-head{border-left-width:4px;padding:13px 14px}#mjrSurveySays .mjrss-head h2{font-size:16px;line-height:1.35;letter-spacing:.02em}}
 </style>
 </head>
 <body>
