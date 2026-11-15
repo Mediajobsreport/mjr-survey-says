@@ -141,5 +141,20 @@ html,body{margin:0;padding:0;background:transparent;font-family:Roboto,Arial,san
 <script>
 (function(){var root=document.getElementById('mjrSurveySays');if(!root)return;var filter=root.querySelector('.mjrss-topicfilter');var cards=root.querySelectorAll('.mjrss-card');function update(){var topic=filter.value;cards.forEach(function(card){card.style.display=(topic==='all'||card.getAttribute('data-topic')===topic)?'grid':'none';});}filter.addEventListener('change',update);update();})();
 </script>
+<script>
+(function(){
+var root=document.getElementById('mjrSurveySays');if(!root||window.parent===window)return;
+var queued=false,last=0;
+function report(){queued=false;var height=Math.ceil(root.getBoundingClientRect().height)+2;if(height===last)return;last=height;window.parent.postMessage({type:'mjr-survey-height',height:height,path:location.pathname},'*');}
+function schedule(){if(!queued){queued=true;requestAnimationFrame(report);}}
+if(window.ResizeObserver)new ResizeObserver(schedule).observe(root);
+window.addEventListener('resize',schedule);
+window.addEventListener('pageshow',function(){last=0;schedule();});
+window.addEventListener('load',schedule);
+window.addEventListener('message',function(e){if(e.source===window.parent&&e.data&&e.data.type==='mjr-survey-measure'){last=0;schedule();}});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(schedule);
+schedule();
+})();
+</script>
 </body>
 </html>
