@@ -1,7 +1,35 @@
 {
-  "updated_at": "2026-11-15T15:41:10.548Z",
-  "count": 96,
+  "updated_at": "2026-11-16T18:37:15.947Z",
+  "count": 97,
   "items": [
+    {
+      "id": "06797e0eea223aaa",
+      "topic": "Work",
+      "question": "How many American workers already believe AI will make their working life worse rather than better , while AI usage remains concentrated among higher-income, college-educated, white-collar employees?",
+      "answer": "2 in 3",
+      "stat": "2 in 3",
+      "context": "Finding: Two in three American workers already believe AI will make their working life worse rather than better , while AI usage remains concentrated among higher-income, college-educated, white-collar employees .",
+      "talk": "What everyday task are you most willing to hand over to AI?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/beyond-adoption-measuring-ais-real-world-impact-people-work-and-communities",
+      "source_date": "2026-11-16",
+      "published_at": "2026-11-16",
+      "auto_generated": true
+    },
+    {
+      "id": "01ff250d5e3fb032",
+      "topic": "Technology",
+      "question": "How many U.S. adults say they have bought sold-out items either from an online marketplace or a dedicated reseller?",
+      "answer": "2 in 5",
+      "stat": "2 in 5",
+      "context": "Finding: Nearly 2 in 5 U.S. adults say they have bought sold-out items either from an online marketplace or a dedicated reseller.",
+      "talk": "Would this number be higher or lower among your friends and coworkers?",
+      "source": "CivicScience",
+      "source_url": "https://civicscience.com/3-things-to-know-bnpl-shifts-purchasing-sold-out-items-and-telemedicine-usage/",
+      "source_date": "2026-11-16",
+      "published_at": "2026-11-16",
+      "auto_generated": true
+    },
     {
       "id": "99729520d363d782",
       "topic": "Family & Life",
@@ -14,20 +42,6 @@
       "source_url": "https://talker.news/2026/11/11/do-teens-know-money-better-than-their-parents/",
       "source_date": "2026-11-11",
       "published_at": "2026-11-11",
-      "auto_generated": true
-    },
-    {
-      "id": "06797e0eea223aaa",
-      "topic": "Work",
-      "question": "How many American workers already believe AI will make their working life worse rather than better , while AI usage remains concentrated among higher-income, college-educated, white-collar employees?",
-      "answer": "2 in 3",
-      "stat": "2 in 3",
-      "context": "Finding: Two in three American workers already believe AI will make their working life worse rather than better , while AI usage remains concentrated among higher-income, college-educated, white-collar employees .",
-      "talk": "What everyday task are you most willing to hand over to AI?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/beyond-adoption-measuring-ais-real-world-impact-people-work-and-communities",
-      "source_date": "2026-11-10",
-      "published_at": "2026-11-10",
       "auto_generated": true
     },
     {
