@@ -1,21 +1,7 @@
 {
-  "updated_at": "2026-11-17T17:39:42.634Z",
+  "updated_at": "2026-11-18T17:18:12.299Z",
   "count": 98,
   "items": [
-    {
-      "id": "6a9bdc01c08b7bc3",
-      "topic": "Shopping",
-      "question": "What percentage of customers say recommendations influenced their decision to start use a brand?",
-      "answer": "56%",
-      "stat": "56%",
-      "context": "Finding: 56% of customers say recommendations influenced their decision to start using a brand.",
-      "talk": "What purchase or shopping habit have you changed the most lately?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/the-advocacy-ripple-effect",
-      "source_date": "2026-11-17",
-      "published_at": "2026-11-17",
-      "auto_generated": true
-    },
     {
       "id": "f0f7a0b55993e408",
       "topic": "Work",
@@ -54,6 +40,20 @@
       "talk": "Does this sound like your workplace, or is your experience completely different?",
       "source": "Ipsos",
       "source_url": "https://www.ipsos.com/en-us/latest-us-opinion-polls",
+      "source_date": "2026-11-17",
+      "published_at": "2026-11-17",
+      "auto_generated": true
+    },
+    {
+      "id": "6a9bdc01c08b7bc3",
+      "topic": "Shopping",
+      "question": "What percentage of customers say recommendations influenced their decision to start use a brand?",
+      "answer": "56%",
+      "stat": "56%",
+      "context": "Finding: 56% of customers say recommendations influenced their decision to start using a brand.",
+      "talk": "What purchase or shopping habit have you changed the most lately?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/the-advocacy-ripple-effect",
       "source_date": "2026-11-17",
       "published_at": "2026-11-17",
       "auto_generated": true
