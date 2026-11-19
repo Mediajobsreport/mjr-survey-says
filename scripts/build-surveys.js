@@ -399,6 +399,7 @@ function hasBadQuestionLanguage(question = '') {
   const q = question.replace(/\s+/g, ' ').trim();
   if (!q) return true;
   if (/^in a survey about\b/i.test(q)) return true;
+  if (hasBrokenQuestionSyntax(q)) return true;
   if (/\b(matched this survey finding|matched the survey finding|this survey finding|this finding|the finding above|the survey finding above|the research topic)\b/i.test(q)) return true;
   if (containsUndefinedReference(q)) return true;
   if (hasIncompleteMoreLessObject(q)) return true;
@@ -856,7 +857,8 @@ function finalBroadcastQualityGate(item) {
 }
 
 function explainUsability(item) {
-  if (!item || !item.question || !item.source_url || !item.stat) return 'missing';\n  if (hasGenericSourceUrl(item)) return 'standalone';
+  if (!item || !item.question || !item.source_url || !item.stat) return 'missing';
+  if (hasGenericSourceUrl(item)) return 'standalone';
   if (!finalBroadcastQualityGate(item)) return 'standalone';
   if (item.question.length < 25 || item.question.length > 240) return 'question_length';
   if (!questionHasStandaloneContext(item.question)) return 'standalone';
