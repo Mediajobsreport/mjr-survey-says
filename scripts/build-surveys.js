@@ -374,11 +374,11 @@ function hasBrokenQuestionSyntax(question = '') {
   // into the question without rebuilding the sentence around the actual statistic.
   if (/\b(?:revealed|found|reported|showed)\s+that\s+(?:agree|agrees|report|reports|say|says|want|wants|think|thinks|believe|believes|have received|are)\b/i.test(q)) return true;
   if (/\b(?:more likely to feel supported|less worried about stigma)\b[^?]{0,100}\b(?:have|has|had) received\b/i.test(q)) return true;
-  if (/\\bproducts and services use AI has\\b/i.test(q)) return true;
-  if (/\\bstarted (?:their|its) own [a-z-]+ tradition have long-running traditions\\b/i.test(q)) return true;
+  if (/\bproducts and services use AI has\b/i.test(q)) return true;
+  if (/\bstarted (?:their|its) own [a-z-]+ tradition have long-running traditions\b/i.test(q)) return true;
 
   // Headline title case after a population is a sign the RSS title was copied as prose.
-  if (/\\b(?:Americans|U\\.S\\. adults|US adults|adults|respondents|parents|people|workers|employees|consumers|women|men)\\s+(?:Regularly|Often|Frequently|Get|Gets|Are|Is|Have|Has|Say|Says|Want|Wants|Prefer|More|Less|No|Very)\\s+[A-Z][a-z]+/i.test(q)) return true;
+  if (/\b(?:Americans|U\.S\. adults|US adults|adults|respondents|parents|people|workers|employees|consumers|women|men)\s+(?:Regularly|Often|Frequently|Get|Gets|Are|Is|Have|Has|Say|Says|Want|Wants|Prefer|More|Less|No|Very)\s+[A-Z][a-z]+/i.test(q)) return true;
 
   // Catch two predicates that were joined without a grammatical connector,
   // such as “still have funds left to use report they have no balance.”
