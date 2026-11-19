@@ -688,7 +688,7 @@ const BROADCAST_POPULATION_RE = /\b(?:Americans?|U\.S\. adults?|US adults?|adult
 
 function hasHeadlineDebris(question = '') {
   const q = String(question).replace(/\s+/g, ' ').trim();
-  return /\bHere[’']s What to Know\b|\bIn a new poll(?: we conducted)?\b|\bRead More\b|\bWhat You Need to Know\b|\bEverything You Need to Know\b|\baccording to a new poll from\b[^?]{80,}/i.test(q);
+  return /\bHere[’']s What (?:to Know|Shapes)\b|\bIn a new poll(?: we conducted)?\b|\bRead More\b|\bWhat You Need to Know\b|\bEverything You Need to Know\b|\baccording to a new poll from\b[^?]{80,}/i.test(q) || /\b(?:Are|Is|Have|Has)\s+[‘'\"]?Very[’'\"]?\s+Loyal\b/.test(q);
 }
 
 function hasUndefinedQuestionPopulation(question = '') {
