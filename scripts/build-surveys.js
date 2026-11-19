@@ -378,7 +378,8 @@ function hasBrokenQuestionSyntax(question = '') {
   if (/\bstarted (?:their|its) own [a-z-]+ tradition have long-running traditions\b/i.test(q)) return true;
 
   // Headline title case after a population is a sign the RSS title was copied as prose.
-  if (/\b(?:Americans|U\.S\. adults|US adults|adults|respondents|parents|people|workers|employees|consumers|women|men)\s+(?:Regularly|Often|Frequently|Get|Gets|Are|Is|Have|Has|Say|Says|Want|Wants|Prefer|More|Less|No|Very)\s+[A-Z][a-z]+/i.test(q)) return true;
+  if (/\b(?:Americans|U\.S\. adults|US adults|adults|respondents|parents|people|workers|employees|consumers|women|men)\s+(?:Regularly|Often|Frequently|Get|Gets|Are|Is|Have|Has|Say|Says|Want|Wants|Prefer|More|Less|No|Very)\s+[A-Z][a-z]+/.test(q)) return true;
+  if (/\bVery[’'”]?\s+Likely\b/.test(q)) return true;
 
   // Catch two predicates that were joined without a grammatical connector,
   // such as “still have funds left to use report they have no balance.”
