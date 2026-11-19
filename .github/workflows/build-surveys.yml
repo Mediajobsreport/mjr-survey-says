@@ -3,6 +3,13 @@ name: Build Survey Says
 on:
   workflow_dispatch:
 
+  push:
+    branches: [main]
+    paths:
+      - scripts/**
+      - data-seed.json
+      - .github/workflows/build-surveys.yml
+
   schedule:
     - cron: "15 8 * * *"
 
