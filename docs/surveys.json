@@ -1,21 +1,7 @@
 {
-  "updated_at": "2026-11-19T15:54:16.835Z",
-  "count": 87,
+  "updated_at": "2026-11-19T15:57:46.759Z",
+  "count": 83,
   "items": [
-    {
-      "id": "8b34d2046142424f",
-      "topic": "Technology",
-      "question": "What percentage of adults across 32 global countries say products and services use AI has profoundly changed their daily lives in the past 3-5 years?",
-      "answer": "54%",
-      "stat": "54%",
-      "context": "Finding: 54% of adults across 32 global countries say products and services using AI has profoundly changed their daily lives in the past 3-5 years.",
-      "talk": "What everyday task are you most willing to hand over to AI?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/artificial-intelligence-key-insights-data-and-tables",
-      "source_date": "2026-11-18",
-      "published_at": "2026-11-18",
-      "auto_generated": true
-    },
     {
       "id": "6a9bdc01c08b7bc3",
       "topic": "Shopping",
@@ -297,20 +283,6 @@
       "auto_generated": true
     },
     {
-      "id": "3793716150d9698a",
-      "topic": "Life & Culture",
-      "question": "How many Americans Regularly Get News on TikTok?",
-      "answer": "1 in 5",
-      "stat": "1 in 5",
-      "context": "Finding: 1 in 5 Americans Regularly Get News on TikTok",
-      "talk": "Does this number surprise you, or does it sound about right?",
-      "source": "Pew Research Center",
-      "source_url": "https://www.pewresearch.org/short-reads/2026/10/19/1-in-5-americans-regularly-get-news-on-tiktok/",
-      "source_date": "2026-10-19",
-      "published_at": "2026-10-19",
-      "auto_generated": true
-    },
-    {
       "id": "cf590b09e07ffcc4",
       "topic": "Money",
       "question": "How many U.S. adults now prepare frozen entrees at least once per week, led by Gen Z?",
@@ -586,20 +558,6 @@
       "talk": "Would this number be higher or lower among your friends and coworkers?",
       "source": "Ipsos",
       "source_url": "https://www.ipsos.com/en-us/new-ipsos-study-finds-target-leads-grocery-delivery-while-safeway-ranks-first-curbside-pickup",
-      "source_date": "2026-10-05",
-      "published_at": "2026-10-05",
-      "auto_generated": true
-    },
-    {
-      "id": "f75410a1581433cb",
-      "topic": "Entertainment",
-      "question": "What percentage of respondents said they have started their own game-day tradition have long-running traditions spanning three generations?",
-      "answer": "14%",
-      "stat": "14%",
-      "context": "Finding: Our team won from a far deficit on a day we were sitting in those chairs and we have sat in them ever since.” Thirty-seven percent of respondents said they have started their own game-day tradition, 14% have long-running traditions spanning three generations.",
-      "talk": "Does this match your own viewing, listening or entertainment habits?",
-      "source": "Talker Research",
-      "source_url": "https://talker.news/2026/10/05/over-a-third-of-fans-actually-believe-their-rituals-affect-the-game/",
       "source_date": "2026-10-05",
       "published_at": "2026-10-05",
       "auto_generated": true
@@ -924,20 +882,6 @@
       "source_url": "https://talker.news/2026/09/09/lengths-parents-will-go-to-find-best-care-for-their-kids/",
       "source_date": "2026-09-09",
       "published_at": "2026-09-09",
-      "auto_generated": true
-    },
-    {
-      "id": "9502aefe02070071",
-      "topic": "Health",
-      "question": "What percentage of U.S. adults are ‘Very’ Likely to Switch Health Insurance Soon?",
-      "answer": "16%",
-      "stat": "16%",
-      "context": "Finding: 16% of U.S. Adults Are ‘Very’ Likely to Switch Health Insurance Soon",
-      "talk": "Has this changed the way you think about your own health choices?",
-      "source": "CivicScience",
-      "source_url": "https://civicscience.com/16-of-u-s-adults-are-very-likely-to-switch-health-insurance-soon-heres-what-to-know/",
-      "source_date": "2026-09-01",
-      "published_at": "2026-09-01",
       "auto_generated": true
     },
     {
