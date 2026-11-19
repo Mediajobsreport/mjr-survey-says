@@ -367,6 +367,34 @@ function isUnsupportedSportsSuperFanQuestion(question = '', context = '') {
   return /\bsuper fans?\b/.test(h) && /\bsports streaming services?\b/.test(h) && /\b1 in 5\b/.test(h);
 }
 
+function hasBrokenQuestionSyntax(question = '') {
+  const q = String(question).replace(/\\s+/g, ' ').trim();
+
+  // These phrases usually mean the source headline or a preceding clause was copied
+  // into the question without rebuilding the sentence around the actual statistic.
+  if (/\\b(?:revealed|found|reported|showed)\\s+that\\s+(?:agree|agrees|report|reports|say|says|want|wants|think|thinks|believe|believes|have received|are)\\b/i.test(q)) return true;
+  if (/\\b(?:more likely to feel supported|less worried about stigma)\\b[^?]{0,100}\\b(?:have|has|had) received\\b/i.test(q)) return true;
+
+  // Catch two predicates that were joined without a grammatical connector,
+  // such as “still have funds left to use report they have no balance.”
+  const pair = q.match(/\\b(?:are|is|were|was|have|has|had|see|sees|saw|keep|keeps|kept|feel|feels|felt)\\b([^?]{0,100}?)\\b(?:agree|agrees|report|reports|say|says|want|wants|have received)\\b/i);
+  if (pair && !/\\b(?:and|that|who|which|while|but|yet|as|because|although)\\b/i.test(pair[1])) return true;
+
+  // A question must name what an otherwise deictic reference points to.
+  if (/\\b(?:the|this|that|such)\\s+(?:visit|visit’s|visit's|training|event|significance)\\b/i.test(q)) return true;
+  if (/\\b(?:it|they|them)\\b/i.test(q) && /\\bsuch training\\b/i.test(q)) return true;
+
+  // Reject article-headline conclusions that do not describe the measured behavior.
+  if (/\\bnot a lost cause for retailers\\b/i.test(q)) return true;
+  return false;
+}
+
+function hasGenericSourceUrl(item = {}) {
+  if (!item.auto_generated) return false;
+  const url = String(item.source_url || '').toLowerCase().replace(/\\/$/, '');
+  return /ipsos\\.com\\/en-us\\/latest-us-opinion-polls$/.test(url);
+}
+
 function hasBadQuestionLanguage(question = '') {
   const q = question.replace(/\s+/g, ' ').trim();
   if (!q) return true;
@@ -828,7 +856,7 @@ function finalBroadcastQualityGate(item) {
 }
 
 function explainUsability(item) {
-  if (!item || !item.question || !item.source_url || !item.stat) return 'missing';
+  if (!item || !item.question || !item.source_url || !item.stat) return 'missing';\n  if (hasGenericSourceUrl(item)) return 'standalone';
   if (!finalBroadcastQualityGate(item)) return 'standalone';
   if (item.question.length < 25 || item.question.length > 240) return 'question_length';
   if (!questionHasStandaloneContext(item.question)) return 'standalone';
