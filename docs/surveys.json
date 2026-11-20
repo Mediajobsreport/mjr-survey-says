@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-11-19T17:24:57.304Z",
-  "count": 81,
+  "updated_at": "2026-11-20T16:59:31.994Z",
+  "count": 83,
   "items": [
+    {
+      "id": "7dd16e29e800df83",
+      "topic": "Shopping",
+      "question": "How many Americans buy gifts for people they don’t like?",
+      "answer": "1 in 5",
+      "stat": "1 in 5",
+      "context": "Finding: One in 5 Americans buy gifts for people they don’t like",
+      "talk": "What purchase or shopping habit have you changed the most lately?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/11/20/one-in-5-americans-buy-gifts-for-people-they-dont-like/",
+      "source_date": "2026-11-20",
+      "published_at": "2026-11-20",
+      "auto_generated": true
+    },
     {
       "id": "6a9bdc01c08b7bc3",
       "topic": "Shopping",
@@ -56,6 +70,20 @@
       "source_url": "https://www.ipsos.com/en-us/beyond-adoption-measuring-ais-real-world-impact-people-work-and-communities",
       "source_date": "2026-11-16",
       "published_at": "2026-11-16",
+      "auto_generated": true
+    },
+    {
+      "id": "a3b83c80e9c9d3fd",
+      "topic": "Family & Life",
+      "question": "How many Gen Zers have had or considered it to save up for a home?",
+      "answer": "3 in 4",
+      "stat": "3 in 4",
+      "context": "Finding: Over three in four Gen Zers have had or considered it to save up for a home.",
+      "talk": "Would your family or friends agree with this finding?",
+      "source": "The Harris Poll",
+      "source_url": "https://theharrispoll.com/articles/america-this-week-november-12-2026/",
+      "source_date": "2026-11-12",
+      "published_at": "2026-11-12",
       "auto_generated": true
     },
     {
