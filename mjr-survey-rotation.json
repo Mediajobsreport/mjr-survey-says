@@ -1,6 +1,18 @@
 {
   "history": [
     {
+      "date": "2026-11-21",
+      "ids": [
+        "7b134ce16797beb6",
+        "358ec744a419c501",
+        "7d9fd6cc58711273",
+        "71429af644fb3e72",
+        "14f6c23b2aac62ff",
+        "ipsos-streaming-cancel-20260424",
+        "ee87f7bd1b7e8b15"
+      ]
+    },
+    {
       "date": "2026-11-20",
       "ids": [
         "7dd16e29e800df83",
@@ -346,18 +358,6 @@
         "14f6c23b2aac62ff",
         "9502aefe02070071",
         "ipsos-streaming-cancel-20260424"
-      ]
-    },
-    {
-      "date": "2026-10-22",
-      "ids": [
-        "71429af644fb3e72",
-        "0d112c1a59d5317d",
-        "801ddef48c1eaf96",
-        "f64dddda503b1d19",
-        "2d2f80087cb18788",
-        "5cd4723f518b61aa",
-        "a5a0027251a14974"
       ]
     }
   ]
