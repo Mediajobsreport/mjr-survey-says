@@ -1,7 +1,21 @@
 {
-  "updated_at": "2026-11-22T16:20:13.410Z",
+  "updated_at": "2026-11-23T20:17:03.972Z",
   "count": 82,
   "items": [
+    {
+      "id": "358ec744a419c501",
+      "topic": "Shopping",
+      "question": "How many Americans say they are more likely to keep extra essentials like food, water and batteries on hand, according to new data from the Ipsos Consumer Tracker?",
+      "answer": "4 in 10",
+      "stat": "4 in 10",
+      "context": "Finding: Four in ten Americans say they are more likely to keep extra essentials like food, water and batteries on hand, according to new data from the Ipsos Consumer Tracker.",
+      "talk": "What purchase or shopping habit have you changed the most lately?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/four-ten-say-they-are-hoarding-more-case-emergencies",
+      "source_date": "2026-11-23",
+      "published_at": "2026-11-23",
+      "auto_generated": true
+    },
     {
       "id": "6a9bdc01c08b7bc3",
       "topic": "Shopping",
@@ -28,20 +42,6 @@
       "source_url": "https://talker.news/2026/11/20/one-in-5-americans-buy-gifts-for-people-they-dont-like/",
       "source_date": "2026-11-20",
       "published_at": "2026-11-20",
-      "auto_generated": true
-    },
-    {
-      "id": "358ec744a419c501",
-      "topic": "Shopping",
-      "question": "How many Americans say they are more likely to keep extra essentials like food, water and batteries on hand, according to new data from the Ipsos Consumer Tracker?",
-      "answer": "4 in 10",
-      "stat": "4 in 10",
-      "context": "Finding: Four in ten Americans say they are more likely to keep extra essentials like food, water and batteries on hand, according to new data from the Ipsos Consumer Tracker.",
-      "talk": "What purchase or shopping habit have you changed the most lately?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/four-ten-say-they-are-hoarding-more-case-emergencies",
-      "source_date": "2026-11-18",
-      "published_at": "2026-11-18",
       "auto_generated": true
     },
     {
