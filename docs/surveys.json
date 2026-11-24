@@ -1,7 +1,49 @@
 {
-  "updated_at": "2026-11-23T20:17:03.972Z",
-  "count": 82,
+  "updated_at": "2026-11-24T19:31:23.815Z",
+  "count": 84,
   "items": [
+    {
+      "id": "cb4f08b618dccc5c",
+      "topic": "Life & Culture",
+      "question": "How many respondents say they plan to change the subject immediately once politics is brought up at the table?",
+      "answer": "2 in 5",
+      "stat": "2 in 5",
+      "context": "Finding: Two in five respondents say they plan to change the subject immediately once politics is brought up at the table.",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/11/24/no-politics-at-the-thanksgiving-dinner-table/",
+      "source_date": "2026-11-24",
+      "published_at": "2026-11-24",
+      "auto_generated": true
+    },
+    {
+      "id": "7f9bae0545b59620",
+      "topic": "Life & Culture",
+      "question": "How many respondents say they plan to change the subject immediately once politics is brought up at the table. The post No politics at the Thanksgiving dinner table? appeared first on Talker?",
+      "answer": "2 in 5",
+      "stat": "2 in 5",
+      "context": "Finding: Two in five respondents say they plan to change the subject immediately once politics is brought up at the table. The post No politics at the Thanksgiving dinner table? appeared first on Talker .",
+      "talk": "Does this number surprise you, or does it sound about right?",
+      "source": "Talker Research",
+      "source_url": "https://talker.news/2026/11/24/no-politics-at-the-thanksgiving-dinner-table/",
+      "source_date": "2026-11-24",
+      "published_at": "2026-11-24",
+      "auto_generated": true
+    },
+    {
+      "id": "06797e0eea223aaa",
+      "topic": "Work",
+      "question": "How many American workers already believe AI will make their working life worse rather than better , while AI usage remains concentrated among higher-income, college-educated, white-collar employees?",
+      "answer": "2 in 3",
+      "stat": "2 in 3",
+      "context": "Finding: Two in three American workers already believe AI will make their working life worse rather than better , while AI usage remains concentrated among higher-income, college-educated, white-collar employees .",
+      "talk": "What everyday task are you most willing to hand over to AI?",
+      "source": "Ipsos",
+      "source_url": "https://www.ipsos.com/en-us/beyond-adoption-measuring-ais-real-world-impact-people-work-and-communities",
+      "source_date": "2026-11-23",
+      "published_at": "2026-11-23",
+      "auto_generated": true
+    },
     {
       "id": "358ec744a419c501",
       "topic": "Shopping",
@@ -54,20 +96,6 @@
       "talk": "Would this number be higher or lower among your friends and coworkers?",
       "source": "CivicScience",
       "source_url": "https://civicscience.com/3-things-to-know-bnpl-shifts-purchasing-sold-out-items-and-telemedicine-usage/",
-      "source_date": "2026-11-16",
-      "published_at": "2026-11-16",
-      "auto_generated": true
-    },
-    {
-      "id": "06797e0eea223aaa",
-      "topic": "Work",
-      "question": "How many American workers already believe AI will make their working life worse rather than better , while AI usage remains concentrated among higher-income, college-educated, white-collar employees?",
-      "answer": "2 in 3",
-      "stat": "2 in 3",
-      "context": "Finding: Two in three American workers already believe AI will make their working life worse rather than better , while AI usage remains concentrated among higher-income, college-educated, white-collar employees .",
-      "talk": "What everyday task are you most willing to hand over to AI?",
-      "source": "Ipsos",
-      "source_url": "https://www.ipsos.com/en-us/beyond-adoption-measuring-ais-real-world-impact-people-work-and-communities",
       "source_date": "2026-11-16",
       "published_at": "2026-11-16",
       "auto_generated": true
