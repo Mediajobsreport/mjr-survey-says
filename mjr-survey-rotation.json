@@ -1,6 +1,18 @@
 {
   "history": [
     {
+      "date": "2026-11-27",
+      "ids": [
+        "7dd16e29e800df83",
+        "a3b83c80e9c9d3fd",
+        "e72afa382c8f1623",
+        "f64dddda503b1d19",
+        "f9d61a1a91e65df3",
+        "9c6fe0d57e491b42",
+        "ipsos-human-food-20260828"
+      ]
+    },
+    {
       "date": "2026-11-26",
       "ids": [
         "feabe01998461467",
@@ -346,18 +358,6 @@
         "ee87f7bd1b7e8b15",
         "8acafbcf2792490f",
         "ipsos-fastfood-human-20260828"
-      ]
-    },
-    {
-      "date": "2026-10-28",
-      "ids": [
-        "31544c690b451cee",
-        "7f313e485fe1fcd9",
-        "325f9f21b55f4a9d",
-        "de7ef3ee6fbb2291",
-        "6a76eff007e30aad",
-        "f75410a1581433cb",
-        "ipsos-human-food-20260828"
       ]
     }
   ]
